@@ -1,0 +1,9 @@
+For installation see 'INSTALL'
+Under development files are given in 'under_dev_files'[Useful for developers]
+
+To remove a feature from calculator permanently change 'calc_features.h' file.
+
+For example if you want to get rid of colors/fonts from the calculator
+permanently then remove or comment out '#define CALC_COLORS' from
+'calc_features.h' header file and compile the program[See INSTALL for
+compilation].

@@ -1,0 +1,10 @@
+Use of long double gives wrong precision in longer precisions and wrong
+integers in longer integers.
+
+Solution:
+Use 'show e' command to view values in exponentials by setting maximum
+precision to 5[using command 'precision 5']. This will throw out the wrong
+values and thus you will get a precise answer which is always better than a
+wrong answer.
+
+Report Bugs to 'compro.prasad@gmail.com'

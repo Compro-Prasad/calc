@@ -1,0 +1,86 @@
+INNOVATION - Abhishek(Compro) Prasad
+
+
+
+PROGRAMMING - Abhishek(Compro) Prasad
+
+
+
+LAST UPGRADE: 10-OCTOBER-2015, 11:56AM
+
+
+
+FEATURES REMOVED:
+	 OUTPUT FILE IN INPUT
+	 FILE REDIRECTION
+
+
+
+RECORD OF FEATURES ADDED
+        --------------------- ----------- ------------------------------------
+       |  Date               |  Time     |  Feature                           |
+        --------------------- ----------- ------------------------------------
+       |  14 October   2015  |  01:15pm  |  CORRECTED FACTORIAL NOTATION IN   |
+       |                     |           |  INPUT                             |
+       |  10 October   2015  |  11:56am  |  CURSOR MOVEMENT IN INPUT          |
+       |  25 September 2015  |  10:55pm  |  COLOR CHANGE                      |
+       |  11 November  2015  |  04:45pm  |  COMMAND HISTORY SUPPORT           |
+       |  17 December  2015  |  12:00pm  |  MODIFIED insert() FUNCTION IN     |
+       |                     |           |  cal.cpp WHICH INTRODUCES A NEW    |
+       |                     |           |  POINTER 'top_optr' TO REDUCE      |
+       |                     |           |  CALLS TO link_oprators::get()     |
+        --------------------- ----------- ------------------------------------
+
+
+
+TESTERS:
+	Abhishek(Compro) Prasad
+	Kishalay Ghosh
+
+
+
+BUG REPORTERS
+	Kishalay Ghosh - extending operator support functionality
+
+
+
+ALGORITHM
+	Ankur Jhunjhunwala - conversion of integer to string which is used in
+	                     '=' operator of class "strings" located in
+			     strings.h which was later removed because it
+			     didn't have any use within the program.
+
+
+
+USERS USING LATEST UPGRADES
+	Abhishek(Compro) Prasad
+
+
+
+VERSIONS RELEASED - NA
+
+
+
+REPOSITORIES - NA
+
+
+
+ABOUT
+	Initially this calculator was just made by me when I studied in class
+	XI and it had support for only binary operations. Till then I had no
+	idea of Open Source softwares. And I also didn't know much of
+	programming techniques. So I stopped working on it and started shifting
+	onto other smaller projects.
+	But then I visualised what all problems were faced while longer
+	calulations. I figured out that when normal users faced bigger
+	calculations they had to remember the previous answers before
+	proceeding forwards and they also had to sacrifice the amount of
+	precision recieved in their previous answer. So I started writing code
+	for storing answers in the memory so they could be retreived afterward
+	thus relieving stress off the user's head. But till then I had learned
+	about stacks, postfix and infix notations thus the user could also
+	enjoy writing larger expressions upto 5000 characters. Then the
+	operator support also widened to a great extent supporting bitwise
+	operations also.
+	Now it has abilties for normal file operations, color changing, and
+	history support.

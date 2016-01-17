@@ -1,0 +1,8 @@
+1)Using strings to store numbers in place of long doubles using n number of
+  precision after decimal and get more accurate values. This will be just like
+  the 'scale' variable in 'bc'.
+2)Using the ncurses API in a stripped version to integrate it with the
+  calculator which will allow to run in absence of ncurses library.
+3)Making the 'configure' file.
+4)Making it more portable.
+5)Implementing calculator's native variables and functions.
