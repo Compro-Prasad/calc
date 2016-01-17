@@ -1,6 +1,6 @@
 cd to the src/ directory.
 Type in 'make'.
-WWait for till the compilation ends.
+Wait till the compilation ends.
 For installation, copy 'calc'[created after successfull compilation] to
 '/usr/local/bin' or any of the directories available through the PATH variable.
 Start by typing help at the prompt.
