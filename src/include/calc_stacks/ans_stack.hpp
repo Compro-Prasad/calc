@@ -1,10 +1,11 @@
-#include "calc_colors.h"
+#include <calc_features.hpp>
 
 #ifdef ANS_CMD
-#ifndef ANS_H
-#define ANS_H
+#ifndef ANS_STACK_H
+#define ANS_STACK_H
 
-#include "calc_strings.h"
+#include <calc_strings.hpp>
+#include <calc_colors.hpp>
 
 /* constant strings used repeatedly in the program */
 #define Not_Calc "!!Ans%ld not yet calculated and is 0!!"
@@ -34,7 +35,7 @@ struct ans:public answer
 
 class link_ans
 {
-  ans *top;                              // stores the starting address of answers list
+  ans *top, *free_list;                              // stores the starting address of answers list
   unsigned long n;                       // stores the number of answers in the list
  public:
   link_ans();

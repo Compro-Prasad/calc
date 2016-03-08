@@ -1,10 +1,10 @@
-#include "calc_features.h"
-#include "calc_error.h"
+#include <calc_features.hpp>
+#include <calc_error.hpp>
 #include <strings.h>
 #include <ctype.h>
 #ifdef CALC_VARIABLES
-#ifndef CALC_VARIABLES_H
-#define CALC_VARIABLES_H
+#ifndef CALC_VARIABLES_STACK_H
+#define CALC_VARIABLES_STACK_H
 struct variable
 {
   long double value;
@@ -126,5 +126,5 @@ void variable_list::deallocate()
     delete temp;
   }
 }
-#endif // CALC_VARIABLES_H
+#endif // CALC_VARIABLES_STACK_H
 #endif // CALC_VARIABLES

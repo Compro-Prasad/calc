@@ -1,4 +1,4 @@
-#include "calc_colors.h"
+#include <calc_colors.hpp>
 #ifndef string_H
 #define string_H
 #define strMAX 5000

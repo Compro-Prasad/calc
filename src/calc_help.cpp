@@ -1,10 +1,10 @@
-#include "calc_help.h"
+#include <calc_help.hpp>
 #ifdef HELP_CMD
 void help(strings c)
 {
-  if (c == "file manager")
+    if (c == "file manager")
     {
-      fprintf(PRINTFAST, "\n\
+        fprintf(PRINTFAST, "\n\
 -> rm <file>                  - removes <file>\n\
 -> ls <dir>                   - lists files and directories\n\
 -> cd <dir>                   - changes directory\n\
@@ -12,25 +12,25 @@ void help(strings c)
 -> edit <file>                - for editing <file>\n\
 -> pwd                        - shows present working directory");
     }
-  else if (c == "constants")
+    else if (c == "constants")
     {
-      fprintf(PRINTFAST, "\n\
+        fprintf(PRINTFAST, "\n\
 -> constant <name>=<value>    - for creating a custom constant\n\
 -> show constants             - shows all constants\n\
 -> remove constant <name>     - removes constant\n\
 -> remove constants           - removes all constants\n\
 -> load constant pi           - loads pi as a constant");
     }
-  else if (c == "answers")
+    else if (c == "answers")
     {
-      fprintf(PRINTFAST, "\n\
+        fprintf(PRINTFAST, "\n\
 -> start/stop storing answers - starts/stops the storing of answers\n\
 -> show/delete answers        - shows/deletes all answers\n\
 -> show/delete A31            - shows/deletes answer number 31");
     }
-  else if (c == "font")
+    else if (c == "font")
     {
-      fprintf(PRINTFAST, "\n\
+        fprintf(PRINTFAST, "\n\
 The following commands are self explanatory:\n\
 -> input font color <color>\n\
 -> input font background <color>\n\
@@ -55,9 +55,9 @@ and <style> represents one of the folowing:\n\
 3. Underline  7. Blink\n\
 4. Negative   8. Strikeoff");
     }
-  else if (c == "command history")
+    else if (c == "command history")
     {
-      fprintf(PRINTFAST, "\n\
+        fprintf(PRINTFAST, "\n\
 -> allow/restrict undefined commands       - Allow/Restrict recording of undefined commands\n\
 -> allow/restrict normal commands          - Allow/Restrict recording of normal commands\n\
 -> allow/restrict expression commands      - Allow/Restrict recording of expression commands\n\
@@ -65,9 +65,9 @@ and <style> represents one of the folowing:\n\
 -> <up arrow key>                          - previous command\n\
 -> <down arrow key>                        - next command");
     }
-  else if (c == "miscellaneous")
+    else if (c == "miscellaneous")
     {
-      fprintf(PRINTFAST, "\n\
+        fprintf(PRINTFAST, "\n\
 -> show settings              - shows all settings\n\
 -> clear                      - clears the screen\n\
 -> exit                       - quits the calculator\n\
@@ -85,9 +85,9 @@ and <style> represents one of the folowing:\n\
 -> show/hide number details   - shows/hides number stack details\n\
 -> show/hide steps            - shows/hides steps of each calculation");
     }
-  else
+    else
     {
-      fprintf(PRINTFAST, "\n\
+        fprintf(PRINTFAST, "\n\
 help file manager    - Help on file managing commands\n\
 help constants       - Help on constant manipulating commands\n\
 help answers         - Help on answer manipulating commands\n\

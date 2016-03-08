@@ -1,9 +1,11 @@
-#include "calc_features.h"
-#include "calc_constants.h"
-#include "cal.h"
-#include "calc_history.h"
-#include "calc_file.h"
-#include "calc_help.h"
+#include <calc_features.hpp>
+#include <cal.hpp>
+#include <calc_stacks/constant_stack.hpp>
+#include <calc_stacks/history_stack.hpp>
+#include <calc_stacks/num_stack.hpp>
+#include <calc_stacks/optr_stack.hpp>
+#include <calc_file.hpp>
+#include <calc_help.hpp>
 #include <time.h>
 
 extern history h;                      /* Object for inserting commands in stack for further retrieval */

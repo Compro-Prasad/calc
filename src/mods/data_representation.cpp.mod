@@ -1,4 +1,4 @@
-#include "str.cpp"
+#include <str.cpp"
 #include <stdlib.h>
 #define NON 0
 #define BIN 1

@@ -4,8 +4,8 @@
 #include <ctype.h>
 #include <math.h>
 #include <string.h>
-#include "chatr.h"
-#include "calc_constants.h"
+#include <chatr.hpp>
+#include <calc_stacks/constant_stack.hpp>
 
 extern const_list cons;
 
@@ -14,12 +14,12 @@ extern const_list cons;
 #define LOW  10
 
 enum data_type
-  {
+{
     REAL,
     INT,
     UNSIGNED_INT,
     UNSIGNED_REAL,
-  };
+};
 
 bool ismathchar(const char ch);
 
@@ -32,7 +32,7 @@ bool ismath(const char *s);
 signed char atof(const char *a, unsigned long &i, long double &x, data_type d = REAL);
 
 #ifdef ANS_CMD
-signed char separate_ans(const char *a, unsigned long &i, long &x);
+signed char separate_ans(const char *a, unsigned long &i, unsigned long &x);
 #endif
 
 void reduce_space(char *a);

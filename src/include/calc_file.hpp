@@ -1,7 +1,7 @@
-#include "calc_features.h"
+#include <calc_features.hpp>
 
 #ifdef FILE_MANAGER
-#include "chatr.h"
+#include <chatr.hpp>
 #include <fstream>
 #include <iostream>
 #include <string.h>

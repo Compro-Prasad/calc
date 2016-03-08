@@ -1,5 +1,5 @@
-#include "calc_constants.h"
-#ifdef CONSTANTS_H
+#include <calc_stacks/constant_stack.hpp>
+#ifdef CONSTANT_STACK_H
 constant::constant()
 {
 	name[0] = 0, value = 0.0;
@@ -144,4 +144,4 @@ const_list::~const_list()
 {
 	delete_all_const();
 }
-#endif // CONSTANTS_H
+#endif // CONSTANT_STACK_H

@@ -1,8 +1,8 @@
-#include "calc_features.h"
+#include <calc_features.hpp>
 #ifdef CALC_HISTORY
-#ifndef CALC_HISTORY_H
-#define CALC_HISTORY_H
-#include "calc_strings.h"
+#ifndef CALC_HISTORY_STACK_H
+#define CALC_HISTORY_STACK_H
+#include <calc_strings.hpp>
 #define UNDEFINED_COMMANDS       1
 #define EXPRESSION_COMMANDS      2
 #define EXPRESSIONS_HAVING_ERROR 4
@@ -30,5 +30,5 @@ public:
   void display();
 };
 extern history h;
-#endif // CALC_HISTORY_H
+#endif // CALC_HISTORY_STACK_H
 #endif // CALC_HISTORY

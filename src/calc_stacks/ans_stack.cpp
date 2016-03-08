@@ -1,54 +1,75 @@
-#include "calc_ans.h"
-#ifdef ANS_H
+#include <calc_stacks/ans_stack.hpp>
+#ifdef ANS_STACK_H
 void answer::display()
 {
-	fprintf(PRINTFAST, " = ");
-	fprintf(PRINTFAST, precision, n);
+  fprintf(PRINTFAST, " = ");
+  fprintf(PRINTFAST, precision, n);
 }
 
 ans::ans()
 {
-	n = 0.0, next = 0;
+  n = 0.0, next = 0;
 }
 
 link_ans::link_ans()
 {
-	top = 0, n = 0;
+  free_list = top = 0, n = 0;
 }
 
 link_ans::~link_ans()
 {
-	deallocate();
+  deallocate();
 }
 
 // single answers list is to be used throughout the program
 
 void link_ans::add_ans(const double a)
 {
-  ans *temp = new ans;
-  if (temp)					// memory allocated successfully
+  if (free_list)
     {
-      temp->n = a;			// initialising the newly allocated memory
-      temp->next = 0;
+      free_list->n = a;
       n++;
-      // incrementing the size of answers list as a new answer is added
-      
-      if (top == 0)			// checking if answer list is empty
-	top = temp;			// copying the address of the first answer
-      else					// if the answers list has some answers
+      if (top == 0)		// checking if answer list is empty
+	top = free_list;	// copying the address of the first answer
+      else			// if the answers list has some answers
 	{
 	  ans *z = top;		// another temporary pointer
 	  for (; z->next != 0; z = z->next)
 	    // travelling to the end of the answers list
 	    ;
-	  z->next = temp;
+	  z->next = free_list;
 	  // adding the newly made answer to the end of the answers list
 	}
       fprintf(PRINTFAST, "[ A%ld ]", n);
       // printing the position of the newly made answer in the answers list
+      free_list = free_list->next;
     }
-  else						// if the memory is full
-    fprintf(PRINTFAST, "<Answer not saved. Please delete some answers to free memory>");
+  else
+    {
+      ans *temp = new ans;
+      if (temp)					// memory allocated successfully
+	{
+	  temp->n = a;			// initialising the newly allocated memory
+	  temp->next = 0;
+	  n++;
+	  // incrementing the size of answers list as a new answer is added
+	  if (top == 0)			// checking if answer list is empty
+	    top = temp;			// copying the address of the first answer
+	  else					// if the answers list has some answers
+	    {
+	      ans *z = top;		// another temporary pointer
+	      for (; z->next != 0; z = z->next)
+		// travelling to the end of the answers list
+		;
+	      z->next = temp;
+	      // adding the newly made answer to the end of the answers list
+	    }
+	  fprintf(PRINTFAST, "[ A%ld ]", n);
+	  // printing the position of the newly made answer in the answers list
+	}
+      else						// if the memory is full
+	fprintf(PRINTFAST, "<Answer not saved. Please delete some answers to free memory>");
+    }
 }
 
 ans link_ans::get_ans_x(unsigned long x)

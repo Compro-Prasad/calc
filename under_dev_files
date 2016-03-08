@@ -1,7 +1,1 @@
-calc_variables.h
-calc_variables.cpp
-stringsmod.h
-data representation.cpp
-function.cpp
-function_user.cpp
-calc_error.h
+Under development files are in the 'src/mods/' directory

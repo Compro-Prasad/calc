@@ -1,8 +1,8 @@
-#include "calc_features.h"
+#include <calc_features.hpp>
 
 #ifdef CONST_CMDS
-#ifndef CONSTANTS_H
-#define CONSTANTS_H
+#ifndef CONSTANT_STACK_H
+#define CONSTANT_STACK_H
 
 #include <ctype.h>
 #include <string.h>
@@ -47,5 +47,5 @@ struct const_list
 	void delete_all_const();
 	~const_list();
 };
-#endif // CONSTANTS_H
 #endif
+#endif // CONSTANT_STACK_H

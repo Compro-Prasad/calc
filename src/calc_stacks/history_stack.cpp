@@ -1,5 +1,5 @@
-#include "calc_history.h"
-#ifdef CALC_HISTORY_H
+#include <calc_stacks/history_stack.hpp>
+#ifdef CALC_HISTORY_STACK_H
 history::history()
 {
   top = 0;
@@ -123,4 +123,4 @@ void history::pop()
       delete temp;
     }
 }
-#endif // CALC_HISTORY_H
+#endif // CALC_HISTORY_STACK_H

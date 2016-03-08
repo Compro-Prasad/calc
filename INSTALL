@@ -1,6 +1,5 @@
-cd to the src/ directory.
-Type in 'make'.
-Wait till the compilation ends.
+Type in 'make' to start compiling using the Makefile.
+Wait untill the compilation ends.
 For installation, copy 'calc'[created after successfull compilation] to
 '/usr/local/bin' or any of the directories available through the PATH variable.
-Start by typing help at the prompt.
+Start by typing 'help' at the prompt.

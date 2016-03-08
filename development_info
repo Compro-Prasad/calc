@@ -6,30 +6,34 @@ PROGRAMMING - Abhishek(Compro) Prasad
 
 
 
-LAST UPGRADE: 10-OCTOBER-2015, 11:56AM
-
-
-
 FEATURES REMOVED:
-	 OUTPUT FILE IN INPUT
 	 FILE REDIRECTION
 
 
 
 RECORD OF FEATURES ADDED
-        --------------------- ----------- ------------------------------------
-       |  Date               |  Time     |  Feature                           |
-        --------------------- ----------- ------------------------------------
+       ------------------------------------------------------------------------
+       |  Date               |  Time     |  Changes                           |
+       |---------------------|-----------|------------------------------------|
        |  14 October   2015  |  01:15pm  |  CORRECTED FACTORIAL NOTATION IN   |
        |                     |           |  INPUT                             |
+       |---------------------|-----------|------------------------------------|
        |  10 October   2015  |  11:56am  |  CURSOR MOVEMENT IN INPUT          |
+       |---------------------|-----------|------------------------------------|
        |  25 September 2015  |  10:55pm  |  COLOR CHANGE                      |
+       |---------------------|-----------|------------------------------------|
        |  11 November  2015  |  04:45pm  |  COMMAND HISTORY SUPPORT           |
+       |---------------------|-----------|------------------------------------|
        |  17 December  2015  |  12:00pm  |  MODIFIED insert() FUNCTION IN     |
        |                     |           |  cal.cpp WHICH INTRODUCES A NEW    |
        |                     |           |  POINTER 'top_optr' TO REDUCE      |
        |                     |           |  CALLS TO link_oprators::get()     |
-        --------------------- ----------- ------------------------------------
+       |---------------------|-----------|------------------------------------|
+       |  07 March     2016  |  10:30am  |  SOURCE FILES REORGANISING STARTED |
+       |                     |-----------|------------------------------------|
+       |                     |  07:15pm  |  SOURCE FILES SUCCESSFULLY         |
+       |                     |           |  REORGANISED                       |
+       ------------------------------------------------------------------------
 
 
 
@@ -41,19 +45,6 @@ TESTERS:
 
 BUG REPORTERS
 	Kishalay Ghosh - extending operator support functionality
-
-
-
-ALGORITHM
-	Ankur Jhunjhunwala - conversion of integer to string which is used in
-	                     '=' operator of class "strings" located in
-			     strings.h which was later removed because it
-			     didn't have any use within the program.
-
-
-
-USERS USING LATEST UPGRADES
-	Abhishek(Compro) Prasad
 
 
 
