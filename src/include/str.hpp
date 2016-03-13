@@ -13,6 +13,8 @@ extern const_list cons;
 #define HIGH 10000
 #define LOW  10
 
+#define SKIP_SPACE(s, i) s[i] == ' ' ? ++i : i
+
 enum data_type
 {
     REAL,

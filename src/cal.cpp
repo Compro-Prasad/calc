@@ -228,12 +228,12 @@ signed char insert(const char *s)
         {
 #ifdef OPTR_DETAILS
             if (oprator_detail == YES)
-                fprintf(PRINTFAST, "\nPriority of \'%s\' is higher than \'%s\'", optr.get(), s);
+                fprintf(PRINTFAST, "\nPriority of \'%s\' is higher than \'%s\'", top_optr, s);
 #endif
             while (check_priority(top_optr, s) == HIGH
-                    && (strcmp(s, ")") || strcmp(top_optr, "(")))
+                   && (strcmp(s, ")") || strcmp(top_optr, "(")))
             {
-                if (!optr.get())
+                if (!top_optr)
                 {
                     Error = Operator;
                     Err;
@@ -276,6 +276,7 @@ signed char insert(const char *s)
                     Error = "!!Number push";
                     Err;
                 }
+                top_optr = optr.get();
             }
             if (strcmp(s, ")"))
             {
@@ -285,7 +286,7 @@ signed char insert(const char *s)
             else
                 optr.pop();
         }
-        else if (check_priority(top_optr, s) == LOW || !top_optr)
+        else if (!top_optr || check_priority(top_optr, s) == LOW)
         {
 #ifdef OPTR_DETAILS
             if (oprator_detail == YES)
@@ -301,7 +302,7 @@ signed char insert(const char *s)
         }
         return SUCCESS;
     }
-    Err;
+  Err;
 }
 
 signed char calculate(char *a, long double &n, unsigned long i, const char ch, const long var)
@@ -312,10 +313,7 @@ signed char calculate(char *a, long double &n, unsigned long i, const char ch, c
     char c[10];
     for (; a[i] != ch;)
     {
-        while (a[i] == ' ')
-            i++;		/* unwanted spaces are already removed in main()
-			   but its better to keep away from exceptions */
-
+        SKIP_SPACE(a, i);
         /* Factorial is a special kind of unary operator which
            stands after the number whose factorial is to be calculated */
         if (a[i] == '!')
@@ -327,6 +325,7 @@ signed char calculate(char *a, long double &n, unsigned long i, const char ch, c
             i++;
             continue;
         }
+        SKIP_SPACE(a, i);
         if (a[i] == '+' || a[i] == '-')
         {
             // condition to tackle continuous random + and/or -
@@ -348,6 +347,7 @@ signed char calculate(char *a, long double &n, unsigned long i, const char ch, c
             else if (insert("+") == ERROR)
                 Err;
         }
+        SKIP_SPACE(a, i);
         if (a[i] == 'i')
         {
             i++;
@@ -357,11 +357,11 @@ signed char calculate(char *a, long double &n, unsigned long i, const char ch, c
             if (!a[i])
                 break;
         }
-        x = 0.0;
+        x = 0.0, SKIP_SPACE(a, i);
         check_extract = extract_math(a, i, x, c);
         if (!check_extract)
             return FAILURE;
-        if (check_extract == 1)
+        else if (check_extract == 1)
         {
             num.push(x);
             x = 0.0;
@@ -379,7 +379,7 @@ signed char calculate(char *a, long double &n, unsigned long i, const char ch, c
                     Err;
         }
 #ifdef ANS_CMD
-        if (check_extract == 4)
+        else if (check_extract == 4)
         {
             if (separate_ans(a, i, ans_no) == ERROR)
             {
@@ -393,14 +393,13 @@ signed char calculate(char *a, long double &n, unsigned long i, const char ch, c
             }
         }
 #endif
-        if (check_extract == 3)
+        else if (check_extract == 3)
         {
             if (insert(c) == ERROR)
                 Err;
             else
             {
-                while (a[i] == ' ')
-                    i++;
+                SKIP_SPACE(a, i);
                 if ((a[i] == '-' || a[i] == '+') && isdigit(a[i + 1]))
                 {
                     atof(a, i, x);
@@ -408,7 +407,7 @@ signed char calculate(char *a, long double &n, unsigned long i, const char ch, c
                 }
             }
         }
-        if (check_extract == 2)
+        else if (check_extract == 2)
         {
             if (!strcmp(c, "("))
             {
@@ -426,8 +425,7 @@ signed char calculate(char *a, long double &n, unsigned long i, const char ch, c
                 }
                 if (insert(c) == ERROR)
                     Err;
-                while (a[i] == ' ')
-                    i++;
+                SKIP_SPACE(a, i);
 #ifdef CONST_CMDS
                 unsigned long j = i;
 #endif

@@ -5,28 +5,28 @@ void help(strings c)
     if (c == "file manager")
     {
         fprintf(PRINTFAST, "\n\
--> rm <file>                  - removes <file>\n\
--> ls <dir>                   - lists files and directories\n\
--> cd <dir>                   - changes directory\n\
--> open <file>                - opens <file> in text mode\n\
--> edit <file>                - for editing <file>\n\
--> pwd                        - shows present working directory");
+-> rm <file>    - removes <file>\n\
+-> ls <dir>     - lists files and directories\n\
+-> cd <dir>     - changes directory\n\
+-> open <file>  - opens <file> in text mode\n\
+-> edit <file>  - for editing <file>\n\
+-> pwd          - shows present working directory");
     }
     else if (c == "constants")
     {
         fprintf(PRINTFAST, "\n\
--> constant <name>=<value>    - for creating a custom constant\n\
--> show constants             - shows all constants\n\
--> remove constant <name>     - removes constant\n\
--> remove constants           - removes all constants\n\
--> load constant pi           - loads pi as a constant");
+-> constant <name>=<value>  - for creating a custom constant\n\
+-> show constants           - shows all constants\n\
+-> remove constant <name>   - removes constant\n\
+-> remove constants         - removes all constants\n\
+-> load constant pi         - loads pi as a constant");
     }
     else if (c == "answers")
     {
         fprintf(PRINTFAST, "\n\
--> start/stop storing answers - starts/stops the storing of answers\n\
--> show/delete answers        - shows/deletes all answers\n\
--> show/delete A31            - shows/deletes answer number 31");
+-> start/stop storing answers  - starts/stops the storing of answers\n\
+-> show/delete answers         - shows/deletes all answers\n\
+-> show/delete A31             - shows/deletes answer number 31");
     }
     else if (c == "font")
     {

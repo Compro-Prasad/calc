@@ -33,6 +33,15 @@ RECORD OF FEATURES ADDED
        |                     |-----------|------------------------------------|
        |                     |  07:15pm  |  SOURCE FILES SUCCESSFULLY         |
        |                     |           |  REORGANISED                       |
+       |---------------------|-----------|------------------------------------|
+       |  13 March     2016  |  12:15pm  |  ADDED AN INSTALL SECTION IN       |
+       |                     |           |  Makefile                          |
+       |                     |-----------|------------------------------------|
+       |                     |  03:15pm  |  REMOVED A VERY DANGEROUS AND      |
+       |                     |           |  DISSATISFYING BUG WHICH ALWAYS    |
+       |                     |           |  SHOWED "operator scarcity error". |
+       |                     |-----------|------------------------------------|
+       |                     |  04:45pm  |  REMOVED AN INPUT BUG              |
        ------------------------------------------------------------------------
 
 

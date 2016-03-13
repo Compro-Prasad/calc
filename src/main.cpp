@@ -265,6 +265,8 @@ int main(int argc, char *argv[])
 
                 if (ch == LF)
                 {
+                    while (shift)
+                        fprintf(PRINTFAST, "%c", a[i++]), shift--;
                     if (a[i - 1] == ' ')
                         a.write(0, i - 1);
                     break /* the loop */ ;
