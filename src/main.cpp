@@ -133,7 +133,10 @@ int main(int argc, char *argv[])
 #endif // SHELL_INPUT
 
 #ifdef DIRECT_INPUT
-    fprintf(PRINTFAST, "Type help and press return to know more.\n");
+    fprintf(PRINTFAST, "\
+This is free software with ABSOLUTELY NO WARRANTY.\n\
+For details type `warranty'.\n\
+Type help and press return to know more.\n");
 
     /* till the user doesnt type exit the loop will go on */
     while (a != "exit")
