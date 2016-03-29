@@ -20,7 +20,7 @@ signed char link_oprators::push(const char *x)
     {
 #ifdef OPTR_DETAILS
       if (oprator_detail == YES)
-	fprintf(PRINTFAST, "\nPushing \'%s\' in operator stack having location at %ld", x, (long)o);
+	fprintf(PRINTFAST, "\nPushing \'%s\' in operator stack having location at %llx", x, (long long unsigned)o);
 #endif
       strcpy(o->c, x);
       o->next = top, top = o;
@@ -39,7 +39,7 @@ signed char link_oprators::pop()
     {
 #ifdef OPTR_DETAILS
       if (oprator_detail == YES)
-	fprintf(PRINTFAST, "\nPoping \'%s\' operator from stack having location at %ld", top->c, (long)top);
+	fprintf(PRINTFAST, "\nPoping \'%s\' operator from stack having location at %llx", top->c, (long long unsigned)top);
 #endif
       oprator *t = top;
       top = top->next;
@@ -61,7 +61,7 @@ void link_oprators::deallocate()
 	{
 #ifdef OPTR_DETAILS
 	  if (oprator_detail == YES)
-	    fprintf(PRINTFAST, "\n\t\'%s\' having location at %ld", top->c, (long)top);
+	    fprintf(PRINTFAST, "\n\t\'%s\' having location at %llx", top->c, (long long unsigned)top);
 #endif
 	  oprator *t = top;
 	  top = top->next;

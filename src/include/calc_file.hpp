@@ -1,13 +1,15 @@
 #include <calc_features.hpp>
 
+#if defined(FILE_MANAGER) || defined(SHELL_INPUT)
+#include <fstream>
+using namespace std;
+#endif
+
 #ifdef FILE_MANAGER
 #include <chatr.hpp>
-#include <fstream>
 #include <iostream>
 #include <string.h>
 #include <stdlib.h>
-
-using namespace std;
 
 extern int getch();
 

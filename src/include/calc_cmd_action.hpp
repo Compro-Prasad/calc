@@ -8,7 +8,10 @@
 #include <calc_help.hpp>
 #include <time.h>
 
+#ifdef CALC_HISTORY
 extern history h;                      /* Object for inserting commands in stack for further retrieval */
+#endif
+
 extern strings Error;                  /* String for storing errors generated after each command */
 extern link_oprators optr;             /* Object for storing operators in the stack for calculation */
 extern link_numbers num;               /* Object for storing numbers in the stack for calculation */

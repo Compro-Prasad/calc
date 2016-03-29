@@ -12,7 +12,7 @@ signed char link_numbers::get(long double &y)
     {
 #ifdef NUM_DETAILS
       if (num_detail == YES)
-	fprintf(PRINTFAST, "\nPoping %Lf from number stack having location at %ld", top->x, (long)top);
+	fprintf(PRINTFAST, "\nPoping %Lf from number stack having location at %llx", top->x, (long long unsigned)top);
 #endif
       number *t = top;
       y = top->x;
@@ -30,7 +30,7 @@ signed char link_numbers::push(const long double y)
     {
 #ifdef NUM_DETAILS
       if (num_detail == YES)
-	fprintf(PRINTFAST, "\nPushing %Lf in number stack having location at %ld", y, (long)n);
+	fprintf(PRINTFAST, "\nPushing %Lf in number stack having location at %llx", y, (long long unsigned)n);
 #endif
       n->x = y;
       n->next = top, top = n;
@@ -55,7 +55,7 @@ void link_numbers::deallocate()
 	{
 #ifdef NUM_DETAILS
 	  if (num_detail == YES)
-	    fprintf(PRINTFAST, "\n\t\'%Lf\' having location at %ld", top->x, (long)top);
+	    fprintf(PRINTFAST, "\n\t\'%Lf\' having location at %llx", top->x, (long long unsigned)top);
 #endif
 	  number *t = top;
 	  top = top->next;

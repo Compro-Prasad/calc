@@ -2,7 +2,7 @@
 #include <calc_cmd_action.hpp>
 #include <conio.h>
 
-history h;                      /* Object for inserting commands in stack for further retrieval */
+
 strings Error;                  /* String for storing errors generated after each command */
 link_oprators optr;             /* Object for storing operators in the stack for calculation */
 link_numbers num;               /* Object for storing numbers in the stack for calculation */
@@ -14,7 +14,10 @@ calc_font output_font = calc_font( GREEN , DEFAULT, REGULAR );
 calc_font prompt_font = calc_font( YELLOW, DEFAULT, REGULAR );
 #endif // CALC_COLORS
 
+#ifdef CALC_HISTORY
+history h;                      /* Object for inserting commands in stack for further retrieval */
 unsigned short record = NORMAL_COMMANDS | EXPRESSION_COMMANDS | UNDEFINED_COMMANDS | EXPRESSIONS_HAVING_ERROR; /* Switch for (not)storing specific types commands */
+#endif
 
 #ifdef ANS_CMD
 bool store = true;              /* Whether or not to store answers */
@@ -88,7 +91,6 @@ int main(int argc, char *argv[])
 #ifdef CALC_COLORS
     output_font.print();
 #endif
-    bool space_flag = 1;
     strings a;
 
 #ifdef SHELL_INPUT
@@ -123,6 +125,7 @@ int main(int argc, char *argv[])
         else
         {
             print_prompt();
+            fprintf(PRINTFAST, "%s", a.str());
             cmd_action(a.str());
         }
     }
@@ -133,6 +136,7 @@ int main(int argc, char *argv[])
 #endif // SHELL_INPUT
 
 #ifdef DIRECT_INPUT
+    bool space_flag = 1;
     fprintf(PRINTFAST, "\
 This is free software with ABSOLUTELY NO WARRANTY.\n\
 For details type `warranty'.\n\
@@ -268,10 +272,15 @@ Type help and press return to know more.\n");
 
                 if (ch == LF)
                 {
+                    if (!a[0])
+                        continue;
                     while (shift)
                         fprintf(PRINTFAST, "%c", a[i++]), shift--;
-                    if (a[i - 1] == ' ')
-                        a.write(0, i - 1);
+                    if (a[i - 2] == ' ')
+                    {
+                        a.write(0, i - 2);
+                        fprintf(PRINTFAST, "\b");
+                    }
                     break /* the loop */ ;
                 }
                 /* if a backspace is the input */
@@ -350,8 +359,8 @@ Type help and press return to know more.\n");
 #endif
 #endif
 #if !defined(SHELL_INPUT) && !defined(DIRECT_INPUT)
-    fprintf(PRINTFAST, "No input was enabled at the time of installation\n");
-    fprintf(PRINTFAST, "Reinstall with either of the following inputs enabled:\n");
+    fprintf(PRINTFAST, "No input was enabled at the time of compilation\n");
+    fprintf(PRINTFAST, "Recompile with either of the following inputs enabled:\n");
     fprintf(PRINTFAST, "1) Shell Input\n");
     fprintf(PRINTFAST, "2) Direct Input\n");
 #endif

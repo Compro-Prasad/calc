@@ -1,5 +1,5 @@
 Type in 'make' to start compiling using the Makefile.
 Wait untill the compilation ends.
-For installation, copy 'calc'[created after successfull compilation] to
-'/usr/local/bin' or any of the directories available through the PATH variable.
-Start by typing 'help' at the prompt.
+For installation, run 'make install' to successfully install it into
+'/usr/local/bin'. You can change the install location by changing the
+value of INSTALL_DIR in the Makefile present at line 7.

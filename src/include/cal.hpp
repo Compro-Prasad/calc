@@ -14,8 +14,14 @@
 
 extern bool steps;
 extern unsigned char angle_type;
+
+#ifdef CONST_CMDS
 extern const_list cons;
+#endif
+
+#ifdef ANS_CMD
 extern link_ans l;
+#endif
 
 long double factorial(long double x);	// factorial is undefined for x<0
 

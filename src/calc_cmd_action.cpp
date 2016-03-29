@@ -11,8 +11,6 @@ void cmd_action(strings a)
 #ifdef ANS_CMD
     ans k;
 #endif
-    unsigned long d;
-    unsigned long i;
     /* commands for dealing with exponentials */
     if (a == "show e")
     {
@@ -154,7 +152,7 @@ Boston, MA 02110-1301  USA\n");
         extract(a.str(), con.name, 9, -1, '=');
         if (ismath(con.name) != SUCCESS)
         {
-            i = 0;
+            unsigned long i = 0, d;
             while (a[i] != '=')
                 i++;
             i++, con.value = 0;
@@ -191,7 +189,7 @@ Boston, MA 02110-1301  USA\n");
         l.show_all_ans();
     else if (!strncasecmp(a.str(), "show a", 6))
     {
-        d = 0, i = 5;
+        unsigned long d = 0, i = 5;
         if (separate_ans(a.str(), i, d) == SUCCESS)
             l.show_ans_x(d);
         else
@@ -204,7 +202,7 @@ Boston, MA 02110-1301  USA\n");
     }
     else if (!strncasecmp(a.str(), "delete a", 8))
     {
-        d = 0, i = 7;
+        unsigned long d = 0, i = 7;
         if (separate_ans(a.str(), i, d) == SUCCESS)
             l.del_ans_x(d);
         else
@@ -415,10 +413,10 @@ Boston, MA 02110-1301  USA\n");
     {
         extract(a.str(), temp_char.str(), 17);
         bool flag = true;
-        for (int d = 0; d < NO_OF_COLORS; d++)
-            if (temp_char == calc_font_colors[d])
+        for (int j = 0; j < NO_OF_COLORS; j++)
+            if (temp_char == calc_font_colors[j])
             {
-                input_font.color = d, flag = false;
+                input_font.color = j, flag = false;
                 input_font.update();
                 break;
             }
@@ -429,10 +427,10 @@ Boston, MA 02110-1301  USA\n");
     {
         extract(a.str(), temp_char.str(), strlen("output font color "));
         bool flag = true;
-        for (int d = 0; d < NO_OF_COLORS; d++)
-            if (temp_char == calc_font_colors[d])
+        for (int j = 0; j < NO_OF_COLORS; j++)
+            if (temp_char == calc_font_colors[j])
             {
-                output_font.color = d, flag = false;
+                output_font.color = j, flag = false;
                 output_font.update();
                 break;
             }
@@ -443,10 +441,10 @@ Boston, MA 02110-1301  USA\n");
     {
         extract(a.str(), temp_char.str(), 17);
         bool flag = true;
-        for (int d = 0; d < NO_OF_COLORS; d++)
-            if (temp_char == calc_font_colors[d])
+        for (int j = 0; j < NO_OF_COLORS; j++)
+            if (temp_char == calc_font_colors[j])
             {
-                error_font.color = d, flag = false;
+                error_font.color = j, flag = false;
                 error_font.update();
                 break;
             }
@@ -457,10 +455,10 @@ Boston, MA 02110-1301  USA\n");
     {
         extract(a.str(), temp_char.str(), 18);
         bool flag = true;
-        for (int d = 0; d < NO_OF_COLORS; d++)
-            if (temp_char == calc_font_colors[d])
+        for (int j = 0; j < NO_OF_COLORS; j++)
+            if (temp_char == calc_font_colors[j])
             {
-                prompt_font.color = d, flag = false;
+                prompt_font.color = j, flag = false;
                 prompt_font.update();
                 break;
             }
@@ -471,10 +469,10 @@ Boston, MA 02110-1301  USA\n");
     {
         extract(a.str(), temp_char.str(), 23);
         bool flag = true;
-        for (int d = 0; d < NO_OF_COLORS; d++)
-            if (temp_char == calc_font_colors[d])
+        for (int j = 0; j < NO_OF_COLORS; j++)
+            if (temp_char == calc_font_colors[j])
             {
-                input_font.bagnd = d, flag = false;
+                input_font.bagnd = j, flag = false;
                 input_font.update();
                 break;
             }
@@ -485,10 +483,10 @@ Boston, MA 02110-1301  USA\n");
     {
         extract(a.str(), temp_char.str(), 23);
         bool flag = true;
-        for (int d = 0; d < NO_OF_COLORS; d++)
-            if (temp_char == calc_font_colors[d])
+        for (int j = 0; j < NO_OF_COLORS; j++)
+            if (temp_char == calc_font_colors[j])
             {
-                output_font.bagnd = d, flag = false;
+                output_font.bagnd = j, flag = false;
                 output_font.update();
                 break;
             }
@@ -499,10 +497,10 @@ Boston, MA 02110-1301  USA\n");
     {
         extract(a.str(), temp_char.str(), 22);
         bool flag = true;
-        for (int d = 0; d < NO_OF_COLORS; d++)
-            if (temp_char == calc_font_colors[d])
+        for (int j = 0; j < NO_OF_COLORS; j++)
+            if (temp_char == calc_font_colors[j])
             {
-                error_font.bagnd = d, flag = false;
+                error_font.bagnd = j, flag = false;
                 error_font.update();
                 break;
             }
@@ -513,10 +511,10 @@ Boston, MA 02110-1301  USA\n");
     {
         extract(a.str(), temp_char.str(), 23);
         bool flag = true;
-        for (int d = 0; d < NO_OF_COLORS; d++)
-            if (temp_char == calc_font_colors[d])
+        for (int j = 0; j < NO_OF_COLORS; j++)
+            if (temp_char == calc_font_colors[j])
             {
-                prompt_font.bagnd = d, flag = false;
+                prompt_font.bagnd = j, flag = false;
                 prompt_font.update();
                 break;
             }
@@ -527,10 +525,10 @@ Boston, MA 02110-1301  USA\n");
     {
         extract(a.str(), temp_char.str(), 17);
         bool flag = true;
-        for (int d = 0; d < NO_OF_COLORS; d++)
-            if (temp_char == calc_font_colors[d])
+        for (int j = 0; j < NO_OF_COLORS; j++)
+            if (temp_char == calc_font_colors[j])
             {
-                input_font.style = d, flag = false;
+                input_font.style = j, flag = false;
                 input_font.update();
                 break;
             }
@@ -541,10 +539,10 @@ Boston, MA 02110-1301  USA\n");
     {
         extract(a.str(), temp_char.str(), 18);
         bool flag = true;
-        for (int d = 0; d < NO_OF_STYLES; d++)
-            if (temp_char == calc_font_styles[d])
+        for (int j = 0; j < NO_OF_STYLES; j++)
+            if (temp_char == calc_font_styles[j])
             {
-                output_font.style = d, flag = false;
+                output_font.style = j, flag = false;
                 output_font.update();
                 break;
             }
@@ -555,10 +553,10 @@ Boston, MA 02110-1301  USA\n");
     {
         extract(a.str(), temp_char.str(), 17);
         bool flag = true;
-        for (int d = 0; d < NO_OF_STYLES; d++)
-            if (temp_char == calc_font_styles[d])
+        for (int j = 0; j < NO_OF_STYLES; j++)
+            if (temp_char == calc_font_styles[j])
             {
-                error_font.style = d, flag = false;
+                error_font.style = j, flag = false;
                 error_font.update();
                 break;
             }
@@ -569,10 +567,10 @@ Boston, MA 02110-1301  USA\n");
     {
         extract(a.str(), temp_char.str(), 18);
         bool flag = true;
-        for (int d = 0; d < NO_OF_STYLES; d++)
-            if (temp_char == calc_font_styles[d])
+        for (int j = 0; j < NO_OF_STYLES; j++)
+            if (temp_char == calc_font_styles[j])
             {
-                prompt_font.style = d, flag = false;
+                prompt_font.style = j, flag = false;
                 prompt_font.update();
                 break;
             }
@@ -586,7 +584,8 @@ Boston, MA 02110-1301  USA\n");
     else if (!strncasecmp(a.str(), "factorise ", 10) || !strncasecmp(a.str(), "factorize ", 10))
     {
         long double x = 0.0;
-        signed char check_calculate = calculate(a.str(), x, i = 10);
+        unsigned long i = 10;
+        signed char check_calculate = calculate(a.str(), x, i);
         if (check_calculate == SUCCESS)
         {
             fprintf(PRINTFAST, "\nFactors : ");
@@ -630,7 +629,7 @@ Boston, MA 02110-1301  USA\n");
     else if (!strncasecmp(a.str(), "sum ", 4))
     {
         long double x = 0.0;
-        i = 4;
+        unsigned long i = 4;
         while (!isdigit(a[i]) && a[i])
             i++;
         if (atof(a.str(), i, x, INT) <= FAILURE)
@@ -677,8 +676,25 @@ Boston, MA 02110-1301  USA\n");
                         i++;
                     long double sum = 0.0;
                     signed char check_calculate;
+#ifdef OPTR_DETAILS
+                    bool temp_oprator_detail = oprator_detail;
+#endif
+#ifdef NUM_DETAILS
+                    bool temp_num_detail = num_detail;
+#endif
+#ifdef ANS_CMD
+                    bool temp_steps = steps;
+#endif
                     unsigned long p = (upper_limit - lower_limit) / 50;
-
+#ifdef OPTR_DETAILS
+                    oprator_detail = NO;
+#endif
+#ifdef NUM_DETAILS
+                    num_detail = NO;
+#endif
+#ifdef ANS_CMD
+                    steps = NO;
+#endif
                     fprintf(PRINTFAST, "\nSuming expression \"");
                     for (unsigned long m = i; a[m]; m++)
                         fprintf(PRINTFAST, "%c", a[m]);
@@ -692,7 +708,6 @@ Boston, MA 02110-1301  USA\n");
                         if (check_calculate == SUCCESS)
                         {
                             sum += x;
-                            oprator_detail = num_detail = NO;
                             if (p && (upper_limit - lower_limit) % p == 0)
                                 fprintf(PRINTFAST, "-");
 #ifdef CALC_HISTORY
@@ -728,8 +743,10 @@ Boston, MA 02110-1301  USA\n");
                             fprintf(PRINTFAST, "\n");
                         fprintf(PRINTFAST, "Sum = ");
                         fprintf(PRINTFAST, precision, sum);
+#ifdef ANS_CMD
                         if (store == 1)
                             l.add_ans(sum);
+#endif
                     }
                     /***************************************************/
 
@@ -737,6 +754,15 @@ Boston, MA 02110-1301  USA\n");
                     num.deallocate();
                     optr.deallocate();
                     /*********************************************************/
+#ifdef OPTR_DETAILS
+                    oprator_detail = temp_oprator_detail;
+#endif
+#ifdef NUM_DETAILS
+                    num_detail = temp_num_detail;
+#endif
+#ifdef ANS_CMD
+                    steps = temp_steps;
+#endif
                 }
             }
         }
@@ -748,7 +774,8 @@ Boston, MA 02110-1301  USA\n");
     else						// for calculating the expression
     {
         long double x = 0.0;
-        signed char check_calculate = calculate(a.str(), x, i = 0);
+        unsigned long i = 0;
+        signed char check_calculate = calculate(a.str(), x, i);
         if (check_calculate == SUCCESS)
         {
             fprintf(PRINTFAST, " = ");

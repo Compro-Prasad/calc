@@ -7,7 +7,9 @@
 #include <chatr.hpp>
 #include <calc_stacks/constant_stack.hpp>
 
+#ifdef CONST_CMDS
 extern const_list cons;
+#endif
 
 /* priority types */
 #define HIGH 10000

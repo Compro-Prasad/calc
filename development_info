@@ -42,6 +42,11 @@ RECORD OF FEATURES ADDED
        |                     |           |  SHOWED "operator scarcity error". |
        |                     |-----------|------------------------------------|
        |                     |  04:45pm  |  REMOVED AN INPUT BUG              |
+       |---------------------|-----------|------------------------------------|
+       |  21 March     2016  |  11:45pm  |  REMOVED BUG FROM sum COMMAND      |
+       |                     |           |  SHOWING ADDRESS LOCATIONS AS HEX  |
+       |                     |-----------|------------------------------------|
+       |                     |  11:50pm  |  PREVENTION OF NULL INPUT          |
        ------------------------------------------------------------------------
 
 

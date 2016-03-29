@@ -19,7 +19,7 @@ $(TARGET): $(OBJECTS)
 	$(CC) -o $(TARGET) $^
 
 $(OBJDIR)%.o: $(SRCDIR)%.cpp
-	@if [ ! -d $(OBJDIR) ]; then mkdir $(OBJDIR); fi
+	@if [ ! -d "$(OBJDIR)" ]; then mkdir $(OBJDIR); fi
 	$(CC) $(CFLAGS) $@ $< $(INCLUDE)
 
 $(OBJDIR)%.o: $(STACKDIR)%.cpp
