@@ -7,6 +7,8 @@
 #include <ctype.h>
 #include <string.h>
 
+#include <calc_colors.hpp>
+
 #define Constants "calculator/data/constants.dat"
 #define Temp "calculator/data/temp"
 #undef Empty
@@ -18,6 +20,13 @@
 */
 
 extern char precision[15];
+
+#ifdef CALC_COLORS
+extern calc_font input_font;
+extern calc_font error_font;
+extern calc_font output_font;
+extern calc_font prompt_font;
+#endif // CALC_COLORS
 
 struct constant
 {

@@ -345,13 +345,8 @@ signed char calculate(char *a, long double &n, unsigned long i, const char ch, c
             if (oprator_detail == YES)
                 fprintf(PRINTFAST, "\nPushing \'%c\' from special area", t < 0 ? '-' : '+');
 #endif
-            /*if (t < 0)
-            {*/
                 if (insert(t < 0 ? "-" : "+") == ERROR)
-                    Err;/*
-            }
-            else if (insert("+") == ERROR)
-                Err;*/
+                    Err;
             SKIP_SPACE(a, i);
         }
         if (a[i] == 'i')

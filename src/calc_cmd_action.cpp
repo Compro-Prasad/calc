@@ -190,16 +190,23 @@ Boston, MA 02110-1301  USA\n");
         if (ismath(con.name) != SUCCESS)
         {
             unsigned long i = 0, d;
-            while (a[i] != '=')
+            while (a[i] != '=' && a[i])
                 i++;
-            i++, con.value = 0;
-            if (separate_ans(a.str(), i, d) == SUCCESS)
-                con.value = l.get_ans_x(d).n;
-            else if (atof(a.str(), i, con.value) != SUCCESS)
-                Error = "!!RHS value is incorrect!!\n";
-            if (!cons.insert_const(con))
-                Error =
-                    "!!Syntax error!!\nSyntax is \"constant <constant name>=<constant value>\"";
+            if (!a[i] || !a[i + 1])
+               Error = "!!Syntax Error!!";
+            else
+            {
+               i++, con.value = 0;
+               if (separate_ans(a.str(), i, d) == SUCCESS)
+               {
+                   con.value = l.get_ans_x(d).n;
+                   cons.insert_const(con);
+               }
+               else if (atof(a.str(), i, con.value) == SUCCESS)
+                   cons.insert_const(con);
+               else
+                   Error = "!!Syntax error!!";
+            }
         }
         else
             sprintf(Error.str(), "!!%s already defined as a mathematical function!!", con.name);

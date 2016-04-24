@@ -171,7 +171,7 @@ public:
 	    return length;
 	}
 
-	char */* strings:: */str()
+	char * /* strings:: */str()
 	{
 	    return c;
 	}

@@ -71,11 +71,17 @@ long double const_list::get_const(const char *x, unsigned long int &i)
 
 bool const_list::insert_const(constant x)
 {
-	if (strcmp(x.name, "") && x.value)
+	if (strcmp(x.name, ""))
 	{
 		if (!check_const(x.name))
 		{
+#ifdef CALC_COLORS
+                        error_font.print();
+#endif
 			fprintf(PRINTFAST, "!!Constant already exists!!");
+#ifdef CALC_COLORS
+                        output_font.print();
+#endif
 			return 1;
 		}
 		constnt *t = new constnt;
@@ -116,7 +122,13 @@ void const_list::delete_const(const char *x)
 				}
 			}
 		}
+#ifdef CALC_COLORS
+                error_font.print();
+#endif
 		fprintf(PRINTFAST, "!!Constant is not recorded yet!!");
+#ifdef CALC_COLORS
+                output_font.print();
+#endif
 	}
 	else
 		fprintf(PRINTFAST, Empty);
