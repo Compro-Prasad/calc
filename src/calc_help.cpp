@@ -105,6 +105,7 @@ and <style> represents one of the folowing:\n\
 -> shell                      - opens up shell\n");
 #endif
 	fprintf(PRINTFAST, "\
+-> input length N             - input string length upto N characters\n\
 -> rad/deg/grad               - shows/input angle in radian/degree/grad\n\
 -> show/hide e                - shows/hides exp part of a number\n\
 -> precision=N                - shows precision upto N decimal places\n");

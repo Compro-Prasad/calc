@@ -47,6 +47,9 @@ RECORD OF FEATURES ADDED
        |                     |           |  SHOWING ADDRESS LOCATIONS AS HEX  |
        |                     |-----------|------------------------------------|
        |                     |  11:50pm  |  PREVENTION OF NULL INPUT          |
+       |---------------------|-----------|------------------------------------|
+       |  24 April     2016  |  12:10pm  |  ADDED SUPPORT FOR CHANGING INPUT  |
+       |                     |           |  LENGTH                            |
        ------------------------------------------------------------------------
 
 
