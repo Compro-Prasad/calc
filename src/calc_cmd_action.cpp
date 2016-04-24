@@ -11,8 +11,45 @@ void cmd_action(strings a)
 #ifdef ANS_CMD
     ans k;
 #endif
+    if (a == "input length ")
+    {
+	long double x = 0;
+        signed char check_calculate;
+        check_calculate = calculate(a.str(), x, 13);
+        if (check_calculate == SUCCESS && x > 24)
+        {
+            strMAX = x + 2;
+            
+#ifdef CALC_HISTORY
+            if (!(record & NORMAL_COMMANDS))
+                h.pop();
+#endif
+        }
+        else if (check_calculate == ERROR)
+#ifdef CALC_HISTORY
+        {
+#endif
+            Error += " Error!!";
+#ifdef CALC_HISTORY
+            if (!(record & EXPRESSIONS_HAVING_ERROR))
+                h.pop();
+        }
+#endif
+        else if (check_calculate == FAILURE)
+#ifdef CALC_HISTORY
+        {
+#endif
+            Error = "!!Invalid Expression!!";
+#ifdef CALC_HISTORY
+            if (!(record & EXPRESSIONS_HAVING_ERROR))
+                h.pop();
+        }
+#endif
+        else if (x < 25)
+            fprintf(PRINTFAST, "\nMinimum length is 25");
+    }
     /* commands for dealing with exponentials */
-    if (a == "show e")
+    else if (a == "show e")
     {
         extract(a.str(), temp_char.str(), strlen("show "));
         strcpy(precision, "%.5Lg");
@@ -146,7 +183,7 @@ Boston, MA 02110-1301  USA\n");
         Error = "!!PI was not declared in program!!";
 #endif // PI
     }
-    else if (!strncasecmp(a.str(), "constant ", 9))
+    else if (a == "constant ")
     {
         constant con;
         extract(a.str(), con.name, 9, -1, '=');
@@ -342,7 +379,7 @@ Boston, MA 02110-1301  USA\n");
             n %= 1000;
             sprintf(precision, "%%.%d%s", n, e);
 #ifdef CALC_HISTORY
-            if (!(record & EXPRESSION_COMMANDS))
+            if (!(record & NORMAL_COMMANDS))
                 h.pop();
 #endif
         }

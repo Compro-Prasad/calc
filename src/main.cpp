@@ -7,6 +7,10 @@ strings Error;                  /* String for storing errors generated after eac
 link_oprators optr;             /* Object for storing operators in the stack for calculation */
 link_numbers num;               /* Object for storing numbers in the stack for calculation */
 
+#if defined(DIRECT_INPUT) || defined(SHELL_INPUT)
+long strMAX = MAX_LEN;
+#endif
+
 #ifdef CALC_COLORS
 calc_font input_font  = calc_font( CYAN  , DEFAULT, REGULAR );
 calc_font error_font  = calc_font( RED   , DEFAULT, BOLD    );
@@ -168,8 +172,7 @@ Type help and press return to know more.\n");
             /* single character as input */
             ch = getch();
 #ifdef CALC_HISTORY
-            if (!i)
-                h.cmd_modify(a);
+            if (!i)  h.cmd_modify(a);
 #endif
             /* processing of character according to condition */
             if (ch == ESC)
@@ -303,7 +306,7 @@ Type help and press return to know more.\n");
                     }
                 }
 
-                else if (i < strMAX - 5 && space_flag)	/* for other characters */
+                else if (i < strMAX - 2 && space_flag)	/* for other characters */
                 {
                     fprintf(PRINTFAST, "%c", ch);
                     a.shift_right(a.len() - shift);
@@ -324,13 +327,16 @@ Type help and press return to know more.\n");
         /* loop for input ends */
 
         reduce_space(a.str());
+#ifdef CALC_HISTORY
         h.cmd_modify(a);
-
-#if defined(CONST_CMDS) && defined(ANS_CMD)
-        if (a == "exit")
-            fprintf(PRINTFAST, "\nExiting...");
-        else
 #endif
+
+        if (a == "exit")
+#if defined(CONST_CMDS) && defined(ANS_CMD)
+            fprintf(PRINTFAST, "\nExiting...")
+#endif
+;
+        else
             cmd_action(a);
         if (Error != "")
         {
@@ -355,14 +361,15 @@ Type help and press return to know more.\n");
     fprintf(PRINTFAST, "[Deleted all Answers]");
 #endif
 #if defined(CONST_CMDS) && defined(ANS_CMD)
-    fprintf(PRINTFAST, "\nCalculator exited successfully\n");
+    fprintf(PRINTFAST, "\nCalculator exited successfully");
 #endif
 #endif
 #if !defined(SHELL_INPUT) && !defined(DIRECT_INPUT)
     fprintf(PRINTFAST, "No input was enabled at the time of compilation\n");
     fprintf(PRINTFAST, "Recompile with either of the following inputs enabled:\n");
     fprintf(PRINTFAST, "1) Shell Input\n");
-    fprintf(PRINTFAST, "2) Direct Input\n");
+    fprintf(PRINTFAST, "2) Direct Input");
 #endif
+    fprintf(PRINTFAST, "\n");
     return 0;
 }

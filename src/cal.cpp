@@ -308,13 +308,17 @@ signed char insert(const char *s)
 signed char calculate(char *a, long double &n, unsigned long i, const char ch, const long var)
 {
     unsigned char check_extract;
+#ifdef ANS_CMD
     unsigned long ans_no;
+#endif
     long double x, y;
     char c[10];
     for (; a[i] != ch;)
     {
         SKIP_SPACE(a, i);
-        /* Factorial is a special kind of unary operator which
+
+        /******************Factorial******************/
+        /* It is a special kind of unary operator which
            stands after the number whose factorial is to be calculated */
         if (a[i] == '!')
         {
@@ -324,8 +328,10 @@ signed char calculate(char *a, long double &n, unsigned long i, const char ch, c
             num.push(y);
             i++;
             continue;
+            SKIP_SPACE(a, i);
         }
-        SKIP_SPACE(a, i);
+        /***********************************************/
+
         if (a[i] == '+' || a[i] == '-')
         {
             // condition to tackle continuous random + and/or -
@@ -339,15 +345,15 @@ signed char calculate(char *a, long double &n, unsigned long i, const char ch, c
             if (oprator_detail == YES)
                 fprintf(PRINTFAST, "\nPushing \'%c\' from special area", t < 0 ? '-' : '+');
 #endif
-            if (t < 0)
-            {
-                if (insert("-") == ERROR)
-                    Err;
+            /*if (t < 0)
+            {*/
+                if (insert(t < 0 ? "-" : "+") == ERROR)
+                    Err;/*
             }
             else if (insert("+") == ERROR)
-                Err;
+                Err;*/
+            SKIP_SPACE(a, i);
         }
-        SKIP_SPACE(a, i);
         if (a[i] == 'i')
         {
             i++;
@@ -356,8 +362,9 @@ signed char calculate(char *a, long double &n, unsigned long i, const char ch, c
                 i++;
             if (!a[i])
                 break;
+            SKIP_SPACE(a, i);
         }
-        x = 0.0, SKIP_SPACE(a, i);
+        x = 0.0;
         check_extract = extract_math(a, i, x, c);
         if (!check_extract)
             return FAILURE;
@@ -365,9 +372,10 @@ signed char calculate(char *a, long double &n, unsigned long i, const char ch, c
         {
             num.push(x);
             x = 0.0;
-            while (a[i] == ' ')
-                i++;
+            SKIP_SPACE(a, i);
+#ifdef CONST_CMDS
             unsigned long j = i;
+#endif
             if ((isalpha(a[i])
                     && (
 #ifdef CONST_CMDS

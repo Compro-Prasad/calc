@@ -7,6 +7,7 @@
 #include <calc_file.hpp>
 #include <calc_help.hpp>
 #include <time.h>
+#include <calc_colors.hpp>
 
 #ifdef CALC_HISTORY
 extern history h;                      /* Object for inserting commands in stack for further retrieval */

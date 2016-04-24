@@ -24,6 +24,7 @@
 #endif
 #define CALC_HISTORY
 #define CALC_VARIABLES
+
 #define MAX_LEN 1000
 
 /* boolean values */
@@ -38,10 +39,5 @@
 #define FAILURE 0
 #define ERROR  -1
 
-#ifdef DYNAMIC_ALLOCATION
-long strMAX = MAX_LEN;
-#else
-#define strMAX MAX_LEN
-#endif // DYNAMIC_ALLOCATION
 #define PRINTFAST (stderr)
 #endif // CALC_FEATURES_H

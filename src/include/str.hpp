@@ -25,6 +25,10 @@ enum data_type
     UNSIGNED_REAL,
 };
 
+#if defined(SHELL_INPUT) || defined(DIRECT_INPUT)
+extern long strMAX;
+#endif
+
 bool ismathchar(const char ch);
 
 bool isbinary(const char *s);
@@ -46,4 +50,5 @@ void extract(const char *a, char *b, unsigned long i, long j = -1, char ch = NUL
 unsigned char extract_math(const char *a, unsigned long &i, long double &x, char *b);
 
 long check_priority(const char *s1, const char *s2);
+
 #endif // CALC_STR_H
