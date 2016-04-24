@@ -374,7 +374,7 @@ signed char calculate(char *a, long double &n, unsigned long i, const char ch, c
             if ((isalpha(a[i])
                     && (
 #ifdef CONST_CMDS
-                        cons.get_const(a, j) ||
+                        cons.get_const(a, j, x) ||
 #endif
                         (a[i] != 'P' && tolower(a[i]) != 'l' && a[i] != 'C')))
                     || a[i] == '(')
@@ -435,7 +435,7 @@ signed char calculate(char *a, long double &n, unsigned long i, const char ch, c
                 if ((isalpha(a[i])
                         && (
 #ifdef CONST_CMDS
-                            cons.get_const(a, j) ||
+                            cons.get_const(a, j, x) ||
 #endif
                             (a[i] != 'P' && tolower(a[i]) != 'l'
                              && a[i] != 'C'))) || a[i] == '('

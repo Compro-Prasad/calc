@@ -173,7 +173,7 @@ unsigned char extract_math(const char *a, unsigned long &i, long double &x, char
        This function is mainly called by
        calculate() in cal.cpp for extracting each
        symbol or operator or identifier from
-       strings *a from position i and placing it as
+       strings a from position i and placing it as
        required.
 
        For example, if its a number then it will
@@ -207,6 +207,7 @@ unsigned char extract_math(const char *a, unsigned long &i, long double &x, char
     }
     else if (ismathchar(a[i]))
     {
+        long unsigned j = i;
         while ((!ismath(b) || (!strcasecmp(b, "c") && a[i] == 'o')
                 || (!strcasecmp(b, "cos") && (a[i] == 'e' || a[i] == 'h'))
                 || (!strcasecmp(b, "sin") && a[i] == 'h')
@@ -215,11 +216,14 @@ unsigned char extract_math(const char *a, unsigned long &i, long double &x, char
             b[k++] = a[i++], b[k] = 0;
         if (ismath(b))
             return 3;
-    }
 #ifdef CONST_CMDS
-    else if ((x = cons.get_const(a, i)) != 0.0)
-        return 1;
+        else
+        {
+            i = j;
+            return cons.get_const(a, i, x);
+        }
 #endif
+    }
     return FAILURE;
 }
 

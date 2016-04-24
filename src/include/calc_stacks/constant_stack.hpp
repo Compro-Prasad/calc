@@ -52,7 +52,7 @@ struct const_list
 	bool insert_const(const constant x);
 	void delete_const(const char *x);
 	void disp_const();
-	long double get_const(const char *c, unsigned long &i);
+	bool get_const(const char *a, unsigned long &i, long double &x);
 	void delete_all_const();
 	~const_list();
 };

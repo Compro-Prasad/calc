@@ -41,30 +41,21 @@ void const_list::disp_const()
 		fprintf(PRINTFAST, Empty);
 }
 
-long double const_list::get_const(const char *x, unsigned long int &i)
+bool const_list::get_const(const char *a, unsigned long int &i, long double &x)
 {
 	if (top)
 	{
-		long double h = 0;
 		char c[15];
-		unsigned long j, p;
-		for (constnt * t = top; t != NULL; t = t->next)
-		{
-			for (j = i; ((j - i) < 15) && isalpha(x[j]); j++)
+                unsigned short k = 0;
+                for (; k <= 15 && isalpha(a[i]); i++, k++)
+                        c[k] = a[i];
+                c[k] = 0;
+		for (constnt * t = top; t; t = t->next)
+			if (!strcmp(c, t->name))
 			{
-				unsigned int k = 0;
-				for (; k <= (j - i); k++)
-					c[k] = x[i + k];
-				c[k] = 0;
-				if (!strcmp(c, t->name))
-					h = t->value, p = j;
+				x = t->value;
+				return 1;
 			}
-		}
-		if (h)
-		{
-			i = p + 1;
-			return h;
-		}
 	}
 	return 0;
 }
