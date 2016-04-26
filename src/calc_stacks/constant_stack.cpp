@@ -7,7 +7,7 @@ constant::constant()
 
 constant::constant(const char *c, long double val)
 {
-	strcpy(name, c);
+	strncpy(name, c, 21);
 	value = val;
 }
 
@@ -79,7 +79,7 @@ bool const_list::insert_const(constant x)
 		if (t)
 		{
 			t->value = x.value;
-			strcpy(t->name, x.name);
+			strncpy(t->name, x.name, 21);
 			t->next = top, top = t;
 			return 1;
 		}

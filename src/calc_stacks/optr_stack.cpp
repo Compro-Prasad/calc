@@ -22,7 +22,7 @@ signed char link_oprators::push(const char *x)
       if (oprator_detail == YES)
 	fprintf(PRINTFAST, "\nPushing \'%s\' in operator stack having location at %llx", x, (long long unsigned)o);
 #endif
-      strcpy(o->c, x);
+      strncpy(o->c, x, 5);
       o->next = top, top = o;
       return SUCCESS;
     }

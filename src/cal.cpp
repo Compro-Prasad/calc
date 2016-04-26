@@ -316,7 +316,6 @@ signed char calculate(char *a, long double &n, unsigned long i, const char ch, c
     for (; a[i] != ch;)
     {
         SKIP_SPACE(a, i);
-
         /******************Factorial******************/
         /* It is a special kind of unary operator which
            stands after the number whose factorial is to be calculated */
@@ -361,6 +360,7 @@ signed char calculate(char *a, long double &n, unsigned long i, const char ch, c
         }
         x = 0.0;
         check_extract = extract_math(a, i, x, c);
+
         if (!check_extract)
             return FAILURE;
         else if (check_extract == 1)

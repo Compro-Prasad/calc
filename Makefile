@@ -1,6 +1,6 @@
 CC = g++
 
-CFLAGS = -c -Wall -ansi -o
+CFLAGS = -c -g -Wall -ansi -o
 
 TARGET = calc
 

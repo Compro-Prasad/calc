@@ -1,5 +1,7 @@
 #include <calc_cmd_action.hpp>
 
+#define CLRSCR fprintf(PRINTFAST, "\x1B[2J\x1B[0;0f")
+
 void cmd_action(strings a)
 {
 #ifdef CALC_PROCESS_TIME
@@ -19,7 +21,7 @@ void cmd_action(strings a)
         if (check_calculate == SUCCESS && x > 24)
         {
             strMAX = x + 2;
-            
+
 #ifdef CALC_HISTORY
             if (!(record & NORMAL_COMMANDS))
                 h.pop();
@@ -83,7 +85,7 @@ Boston, MA 02110-1301  USA\n");
     }
 #ifdef CLEAR_CMD
     else if (a == "clear")
-        clrscr();
+        CLRSCR;
 #endif
 #ifdef HELP_CMD
     else if (!strncasecmp(a.str(), "help ", 5) || a == "help")
@@ -820,6 +822,7 @@ Boston, MA 02110-1301  USA\n");
         long double x = 0.0;
         unsigned long i = 0;
         signed char check_calculate = calculate(a.str(), x, i);
+
         if (check_calculate == SUCCESS)
         {
             fprintf(PRINTFAST, " = ");
