@@ -18,12 +18,12 @@ extern const_list cons;
 #define SKIP_SPACE(s, i) s[i] == ' ' ? ++i : i
 
 enum data_type
-{
+  {
     REAL,
     INT,
     UNSIGNED_INT,
     UNSIGNED_REAL,
-};
+  };
 
 #if defined(SHELL_INPUT) || defined(DIRECT_INPUT)
 extern long strMAX;

@@ -31,7 +31,7 @@
 #define STRIKEOFF 9
 
 const char calc_font_colors[NO_OF_COLORS][8] =
-{
+  {
     "black",
     "red",
     "green",
@@ -41,10 +41,10 @@ const char calc_font_colors[NO_OF_COLORS][8] =
     "cyan",
     "white",
     "default"
-};
+  };
 
 const char calc_font_styles[NO_OF_STYLES][10] =
-{
+  {
     "regular",
     "bold",
     "deep",
@@ -55,18 +55,18 @@ const char calc_font_styles[NO_OF_STYLES][10] =
     "negative",
     "",
     "strikeoff"
-};
+  };
 
 class calc_font
 {
-    char format[20];
+  char format[20];
 public:
-    char color;
-    char bagnd;
-    char style;
-    calc_font(char, char, char);
-    void print();
-    void update();
+  char color;
+  char bagnd;
+  char style;
+  calc_font(char, char, char);
+  void print();
+  void update();
 };
 #endif // CALC_COLORS_H
 #endif // CALC_COLORS

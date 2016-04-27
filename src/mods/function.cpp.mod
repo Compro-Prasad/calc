@@ -237,10 +237,10 @@ bool function::function_def()
   system("\
 if [ -d $HOME/.calc_function ]\n\
 then\n\
-  if diff -q $HOME/.calc_function/\n\
+if diff -q $HOME/.calc_function/\n\
 else\n\
-  mkdir $HOME/calc_function\n\
-  cp function_user.cpp cal_function/functions.cpp\n\
+mkdir $HOME/calc_function\n\
+cp function_user.cpp cal_function/functions.cpp\n\
 fi\n");
   FILE* f = fopen("calc_functions/functions.cpp", "a");
   fprintf(f, "\

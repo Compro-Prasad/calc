@@ -126,7 +126,7 @@ void link_ans::show_ans_x(unsigned long x)
 #endif
     }
   else
-      Error = Empty;
+    Error = Empty;
 }
 
 void link_ans::del_ans_x(unsigned long x)
@@ -170,7 +170,7 @@ void link_ans::del_ans_x(unsigned long x)
 	fprintf(PRINTFAST, Invalid);
     }
   else						// if the answers list is empty
-      Error = Empty;
+    Error = Empty;
 }
 
 void link_ans::show_all_ans()
@@ -186,7 +186,7 @@ void link_ans::show_all_ans()
 	}
     }
   else    // if answers list is empty
-      Error = Empty;
+    Error = Empty;
 }
 
 bool link_ans::deallocate()

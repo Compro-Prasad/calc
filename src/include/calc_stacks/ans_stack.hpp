@@ -37,7 +37,7 @@ class link_ans
 {
   ans *top, *free_list;                              // stores the starting address of answers list
   unsigned long n;                       // stores the number of answers in the list
- public:
+public:
   link_ans();
   void add_ans(double);                  // adds an answer to the list
   ans get_ans_x(unsigned long x);        // returns an answer which is at position x

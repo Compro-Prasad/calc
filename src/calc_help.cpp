@@ -3,9 +3,9 @@
 void help(strings c)
 {
 #ifdef FILE_MANAGER
-    if (c == "file manager")
+  if (c == "file manager")
     {
-        fprintf(PRINTFAST, "\n\
+      fprintf(PRINTFAST, "\n\
 -> rm <file>    - removes <file>\n\
 -> ls <dir>     - lists files and directories\n\
 -> cd <dir>     - changes directory\n\
@@ -16,37 +16,37 @@ void help(strings c)
 #endif
 #ifdef CONST_CMDS
 #ifdef FILE_MANAGER
-    else
+  else
 #endif
-	if (c == "constants")
-    {
+    if (c == "constants")
+      {
         fprintf(PRINTFAST, "\n\
 -> constant <name>=<value>  - for creating a custom constant\n\
 -> show constants           - shows all constants\n\
 -> remove constant <name>   - removes constant\n\
 -> remove constants         - removes all constants\n\
 -> load constant pi         - loads pi as a constant");
-    }
+      }
 #endif
 #ifdef ANS_CMD
 #if defined(FILE_MANAGER) || defined(CONST_CMDS)
     else
 #endif
-	if (c == "answers")
-    {
-        fprintf(PRINTFAST, "\n\
+      if (c == "answers")
+	{
+	  fprintf(PRINTFAST, "\n\
 -> start/stop storing answers  - starts/stops the storing of answers\n\
 -> show/delete answers         - shows/deletes all answers\n\
 -> show/delete A31             - shows/deletes answer number 31");
-    }
+	}
 #endif
 #ifdef CALC_COLORS
 #if defined(FILE_MANAGER) || defined(CONST_CMDS) || defined(ANS_CMD)
-    else
+      else
 #endif
 	if (c == "font")
-    {
-        fprintf(PRINTFAST, "\n\
+	  {
+	    fprintf(PRINTFAST, "\n\
 The following commands are self explanatory:\n\
 -> input font color <color>\n\
 -> input font background <color>\n\
@@ -70,80 +70,80 @@ and <style> represents one of the folowing:\n\
 2. Deep       6. Italic\n\
 3. Underline  7. Blink\n\
 4. Negative   8. Strikeoff");
-    }
+	  }
 #endif
 #ifdef CALC_HISTORY
 #if defined(FILE_MANAGER) || defined(CONST_CMDS) || defined(ANS_CMD) || defined(CALC_COLORS)
-    else
+	else
 #endif
-	if (c == "command history")
-    {
-        fprintf(PRINTFAST, "\n\
+	  if (c == "command history")
+	    {
+	      fprintf(PRINTFAST, "\n\
 -> allow/restrict undefined commands       - Allow/Restrict recording of undefined commands\n\
 -> allow/restrict normal commands          - Allow/Restrict recording of normal commands\n\
 -> allow/restrict expression commands      - Allow/Restrict recording of expression commands\n\
 -> allow/restrict expressions having error - Allow/Restrict recording expression that returns an error\n\
 -> <up arrow key>                          - previous command\n\
 -> <down arrow key>                        - next command");
-    }
+	    }
 #endif
-    else if (c == "miscellaneous")
-    {
-        fprintf(PRINTFAST, "\n-> show settings              - shows all settings\n");
+	  else if (c == "miscellaneous")
+	    {
+	      fprintf(PRINTFAST, "\n-> show settings              - shows all settings\n");
 #ifdef CLEAR_CMD
-	fprintf(PRINTFAST, "-> clear                      - clears the screen\n");
+	      fprintf(PRINTFAST, "-> clear                      - clears the screen\n");
 #endif
-	fprintf(PRINTFAST, "-> exit                       - quits the calculator\n");
+	      fprintf(PRINTFAST, "-> exit                       - quits the calculator\n");
 #ifdef FACTORIZE
-	fprintf(PRINTFAST, "-> factorize <num>            - shows all factors of num\n");
+	      fprintf(PRINTFAST, "-> factorize <num>            - shows all factors of num\n");
 #endif
 #ifdef SUM
-	fprintf(PRINTFAST, "-> sum <lo_lt> <up_lt> <expr> - sums up expression having i as variable\n");
+	      fprintf(PRINTFAST, "-> sum <lo_lt> <up_lt> <expr> - sums up expression having i as variable\n");
 #endif
 #ifdef SHELL_CMD
-	fprintf(PRINTFAST, "-> shell <command> <args>     - command is executed from shell\n\
+	      fprintf(PRINTFAST, "-> shell <command> <args>     - command is executed from shell\n\
 -> shell                      - opens up shell\n");
 #endif
-	fprintf(PRINTFAST, "\
+	      fprintf(PRINTFAST, "\
 -> input length N             - input string length upto N characters\n\
 -> rad/deg/grad               - shows/input angle in radian/degree/grad\n\
 -> show/hide e                - shows/hides exp part of a number\n\
 -> precision=N                - shows precision upto N decimal places\n");
 #ifdef PROMPT
-	fprintf(PRINTFAST, "-> prompt=<new>               - changes present prompt to new one\n");
+	      fprintf(PRINTFAST, "-> prompt=<new>               - changes present prompt to new one\n");
 #endif
 #ifdef CALC_PROCESS_TIME
-	fprintf(PRINTFAST, "-> show/hide processing time  - shows/hides processing time of command\n");
+	      fprintf(PRINTFAST, "-> show/hide processing time  - shows/hides processing time of command\n");
 #endif
 #ifdef OPTR_DETAILS
-	fprintf(PRINTFAST, "-> show/hide operator details - shows/hides operator stack details\n");
+	      fprintf(PRINTFAST, "-> show/hide operator details - shows/hides operator stack details\n");
 #endif
 #ifdef NUM_DETAILS
-	fprintf(PRINTFAST, "-> show/hide number details   - shows/hides number stack details\n");
+	      fprintf(PRINTFAST, "-> show/hide number details   - shows/hides number stack details\n");
 #endif
 #ifdef STEPS_CMD
-	fprintf(PRINTFAST, "-> show/hide steps            - shows/hides steps of each calculation\n");
+	      fprintf(PRINTFAST, "-> show/hide steps            - shows/hides steps of each calculation\n");
 #endif
-	fprintf(PRINTFAST, "-> show/hide e                - shows/hides exp part of a number");
-    }
-    else
-    {
+	      fprintf(PRINTFAST, "-> show/hide e                - shows/hides exp part of a number");
+	    }
+	  else
+	    {
 #ifdef FILE_MANAGER
-        fprintf(PRINTFAST, "\nhelp file manager    - Help on file managing commands");
+	      fprintf(PRINTFAST, "\nhelp file manager    - Help on file managing commands");
 #endif
 #ifdef CONST_CMDS
-	fprintf(PRINTFAST, "\nhelp constants       - Help on constant manipulating commands");
+	      fprintf(PRINTFAST, "\nhelp constants       - Help on constant manipulating commands");
 #endif
 #ifdef ANS_CMD
-	fprintf(PRINTFAST, "\nhelp answers         - Help on answer manipulating commands");
+	      fprintf(PRINTFAST, "\nhelp answers         - Help on answer manipulating commands");
 #endif
 #ifdef CALC_COLORS
-	fprintf(PRINTFAST, "\nhelp font            - Help on font manipulating commands");
+	      fprintf(PRINTFAST, "\nhelp font            - Help on font manipulating commands");
 #endif
 #ifdef CALC_HISTORY
-	fprintf(PRINTFAST, "\nhelp command history - Help on command history manipulating commands");
+	      fprintf(PRINTFAST, "\nhelp command history - Help on command history manipulating commands");
 #endif
-	fprintf(PRINTFAST, "\nhelp miscellaneous   - Help on miscellaneous commands");
-    }
+	      fprintf(PRINTFAST, "\nhelp miscellaneous   - Help on miscellaneous commands");
+	    }
 }
 #endif // HELP_CMD

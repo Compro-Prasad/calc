@@ -2,7 +2,7 @@
 #ifndef string_H
 #define string_H
 #define strMAX 5000
- /***************/
+	/***************/
 #define cmp_length  ((strlen(x) > strMAX || !strlen(x)) ? strMAX : strlen(x))
 
 struct character

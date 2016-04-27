@@ -18,7 +18,7 @@
 #define acosec(x) var(asin(1 / x.val))
 #define asec(x) var(acos(1 / x.val))
 #define acot(x) var(atan(1 / x.val))
-/*template <typename T>
+	/*template <typename T>
   var sin(T x)
 {
 */

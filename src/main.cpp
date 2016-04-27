@@ -66,106 +66,106 @@ char e[3] = "Lg";              /* String for showing or not showing exponential 
 int main(int argc, char *argv[])
 {
 #ifdef CALC_COLORS
-    output_font.print();
+  output_font.print();
 #endif
-    strings a;
+  strings a;
 
 #ifdef SHELL_INPUT
-    for (int index = 1; index < argc; index++)
+  for (int index = 1; index < argc; index++)
     {
-        a = argv[index];
-        Error = "";
-        /* option for reading commands from file */
-        if (a == "-f")
+      a = argv[index];
+      Error = "";
+      /* option for reading commands from file */
+      if (a == "-f")
         {
-            if (index < (argc - 1))
+	  if (index < (argc - 1))
             {
-                a = argv[++index];
-                ifstream f;
-                f.open(a.str());
-                if (f)
+	      a = argv[++index];
+	      ifstream f;
+	      f.open(a.str());
+	      if (f)
                 {
-                    while (!f.eof())
+		  while (!f.eof())
                     {
-                        f.getline(a.str(), 4000, '\n');
-                        print_prompt();
-                        fprintf(PRINTFAST, "%s ", a.str());
-                        cmd_action(a.str());
+		      f.getline(a.str(), 4000, '\n');
+		      print_prompt();
+		      fprintf(PRINTFAST, "%s ", a.str());
+		      cmd_action(a.str());
                     }
                 }
-                else
-                    sprintf(Error.str(), "\"%s\" file could not be read\n", a.str());
+	      else
+		sprintf(Error.str(), "\"%s\" file could not be read\n", a.str());
             }
-            else
-                sprintf(Error.str(), "(null) file can't be opened\n");
+	  else
+	    sprintf(Error.str(), "(null) file can't be opened\n");
         }
-        else
+      else
         {
-            print_prompt();
-            fprintf(PRINTFAST, "%s", a.str());
-            cmd_action(a.str());
+	  print_prompt();
+	  fprintf(PRINTFAST, "%s", a.str());
+	  cmd_action(a.str());
         }
     }
 
-    if (argc != 1)
-        return 0;
+  if (argc != 1)
+    return 0;
 
 #endif // SHELL_INPUT
 
 #ifdef DIRECT_INPUT
-    fprintf(PRINTFAST, "\
+  fprintf(PRINTFAST, "\
 This is free software with ABSOLUTELY NO WARRANTY.\n\
 For details type `warranty'.\n\
 Type help and press return to know more.\n");
 
-    /* till the user doesnt type exit the loop will go on */
-    while (a != "exit")
+  /* till the user doesnt type exit the loop will go on */
+  while (a != "exit")
     {
-        print_prompt();
+      print_prompt();
 
-        a = "";
-        Error = "";
+      a = "";
+      Error = "";
 
 #ifdef CALC_HISTORY
-        h.reset();
+      h.reset();
 #endif
 
 #ifdef CALC_COLORS
-        input_font.print();
+      input_font.print();
 #endif
-        calc_input(a);
+      calc_input(a);
 #ifdef CALC_COLORS
-        output_font.print();
+      output_font.print();
 #endif
-        /* loop for input ends */
+      /* loop for input ends */
 
-        reduce_space(a.str());
+      reduce_space(a.str());
 #ifdef CALC_HISTORY
-        h.cmd_modify(a);
+      h.cmd_modify(a);
 #endif
-        if (a == "exit")
-            break;
-        else
-            cmd_action(a);
-        if (Error != "")
+      if (a == "exit")
+	break;
+      else
+	cmd_action(a);
+      if (Error != "")
         {
 #ifdef CALC_COLORS
-            error_font.print();
+	  error_font.print();
 #endif
-            fprintf(PRINTFAST, "%s\n", Error.str());
+	  fprintf(PRINTFAST, "%s\n", Error.str());
 #ifdef CALC_COLORS
-            output_font.print();
+	  output_font.print();
 #endif
         }
     }
-    /******************************************************/
+  /******************************************************/
 #endif
 #if !defined(SHELL_INPUT) && !defined(DIRECT_INPUT)
-    fprintf(PRINTFAST, "No input was enabled at the time of compilation\n");
-    fprintf(PRINTFAST, "Recompile with either of the following inputs enabled:\n");
-    fprintf(PRINTFAST, "1) Shell Input\n");
-    fprintf(PRINTFAST, "2) Direct Input");
+  fprintf(PRINTFAST, "No input was enabled at the time of compilation\n");
+  fprintf(PRINTFAST, "Recompile with either of the following inputs enabled:\n");
+  fprintf(PRINTFAST, "1) Shell Input\n");
+  fprintf(PRINTFAST, "2) Direct Input");
 #endif
-    fprintf(PRINTFAST, "\n");
-    return 0;
+  fprintf(PRINTFAST, "\n");
+  return 0;
 }
