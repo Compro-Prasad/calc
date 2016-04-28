@@ -137,9 +137,6 @@ Type help and press return to know more.\n");
 #ifdef CALC_COLORS
       output_font.print();
 #endif
-      /* loop for input ends */
-
-      reduce_space(a.str());
 #ifdef CALC_HISTORY
       h.cmd_modify(a);
 #endif

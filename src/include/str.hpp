@@ -43,8 +43,6 @@ signed char atof(const char *a, unsigned long &i, long double &x, data_type d = 
 signed char separate_ans(const char *a, unsigned long &i, unsigned long &x);
 #endif
 
-void reduce_space(char *a);
-
 void extract(const char *a, char *b, unsigned long i, long j = -1, char ch = NUL, unsigned long len = strMAX);
 
 unsigned char extract_math(const char *a, unsigned long &i, long double &x, char *b);

@@ -140,7 +140,7 @@ signed char separate_ans(const char *a, unsigned long &i, unsigned long &ans_no)
   return SUCCESS;
 }
 #endif
-
+/*
 void reduce_space(char *a)
 {
   if (a)
@@ -156,7 +156,7 @@ void reduce_space(char *a)
         }
     }
 }
-
+*/
 void extract(const char *a, char *b, unsigned long i, long j, char ch, unsigned long len)
 {
   unsigned long x = j;
