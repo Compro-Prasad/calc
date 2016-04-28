@@ -122,8 +122,6 @@ signed char atof(const char *a, unsigned long &i, long double &x, data_type d)
     }
   if (s == 1)
     x = -x;
-  //if (t != ERROR)
-  //    t = SUCCESS;
   return SUCCESS;
 }
 
@@ -140,23 +138,7 @@ signed char separate_ans(const char *a, unsigned long &i, unsigned long &ans_no)
   return SUCCESS;
 }
 #endif
-/*
-void reduce_space(char *a)
-{
-  if (a)
-    {
-      for (unsigned long i = 0; a[i]; i++)
-        {
-	  unsigned long k = 0;
-	  while (a[k + i] == ' ')
-	    k++;
-	  if (k > 1 || (!i && a[i] == ' '))
-	    for (unsigned long j = i; a[j]; j++)
-	      a[j] = a[j + k - 1 + (i ? 0 : 1)];
-        }
-    }
-}
-*/
+
 void extract(const char *a, char *b, unsigned long i, long j, char ch, unsigned long len)
 {
   unsigned long x = j;
