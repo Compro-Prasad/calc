@@ -2,27 +2,32 @@
 
 #ifndef CALC_OPTR_STACK_H
 #define CALC_OPTR_STACK_H
-#include <string.h>
 
-struct oprator
+class operators_stack
 {
-  char c[7];
-  oprator *next;
-};
-
-class link_oprators
-{
-  oprator *top;
+  char (*start)[7];
+  char (*current)[7];
+  long unsigned size;
+#if defined(SPEED_UP)
+  long unsigned rate;
+#elif defined(ACCELERATE_UP)
+  long unsigned accelerator;
+#endif
 public:
-  link_oprators();
+  operators_stack();
+  ~operators_stack();
   char *get();
   signed char push(const char *x);
   signed char pop();
-  void deallocate();
+  signed char decrease_size();
+  signed char increase_size();
+  void reset();
   bool check_brac();
 };
 
-extern link_oprators optr;
-extern bool oprator_detail;
+extern operators_stack optr;
+#ifdef OPTR_DETAILS
+extern bool operator_detail;
+#endif
 
 #endif // CALC_OPTR_STACK_H

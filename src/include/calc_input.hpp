@@ -1,10 +1,21 @@
 #ifndef CALC_INPUT_H
 #define CALC_INPUT_H
 
-#include <calc_strings.hpp>
+class strings;
 
-extern int getch();
-extern void calc_input(strings &a);
+extern void change_input_flags(int);
+extern void calc_input();
 extern void print_prompt();
+
+#ifdef PROMPT
+extern char prompt[500];       /* String for storing prompt */
+#endif // PROMPT
+
+extern strings Input;
+
+#ifdef SCREEN_MANIP
+extern unsigned short cur_prompt_line;
+extern unsigned long cur_pos;
+#endif
 
 #endif

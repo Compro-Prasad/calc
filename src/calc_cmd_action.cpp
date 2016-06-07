@@ -1,8 +1,35 @@
+#include <math.h>
+#include <time.h>
+#include <stdlib.h>
+
 #include <calc_cmd_action.hpp>
+#include <str.hpp>
+#include <calc_features.hpp>
+#include <calc_stacks/num_stack.hpp>
+#include <calc_colors.hpp>
+#include <cal.hpp>
+#include <calc_help.hpp>
+#include <calc_stacks/optr_stack.hpp>
+#include <calc_stacks/constant_stack.hpp>
+#include <calc_stacks/history_stack.hpp>
+#include <calc_screen_manip.hpp>
+#include <calc_input.hpp>
 
-#define CLRSCR fprintf(PRINTFAST, "\x1B[2J\x1B[0;0f")
+#ifdef CALC_PROCESS_TIME
+bool calc_time = false;         /* Whether or not to show processing time for each calculation */
+bool calc_avg_time = false;     /* Whether or not to show average processing time for a set of sequential calculations */
+#endif // CALC_PROCESS_TIME
 
-void cmd_action(strings a)
+extern strings Error;                  /* String for storing errors generated after each command */
+
+#ifdef PROMPT
+extern char prompt[500];       /* String for storing prompt */
+#endif // PROMPT
+
+extern char precision[15];  /* String for storing precision */
+extern char e[3];              /* String for showing or not showing exponential */
+
+void cmd_action()
 {
 #ifdef CALC_PROCESS_TIME
   clock_t start;
@@ -13,57 +40,53 @@ void cmd_action(strings a)
 #ifdef ANS_CMD
   ans k;
 #endif
-  if (a == "input length ")
+  if (Input == "exit" || Input == "quit")
+    {
+      fprintf(PRINTFAST, "\n");
+      change_input_flags(1);
+      exit(0);
+    }
+  else if (Input == "input length ")
     {
       long double x = 0;
-      signed char check_calculate;
-      check_calculate = calculate(a.str(), x, 13);
-      if (check_calculate == SUCCESS && x > 24)
+      unsigned long i = 13;
+      if (calculate(Input.str(), x, i) == SUCCESS && x > 24)
         {
 	  strMAX = x + 2;
-
 #ifdef CALC_HISTORY
 	  if (!(record & NORMAL_COMMANDS))
 	    h.pop();
 #endif
         }
-      else if (check_calculate == ERROR)
+      else
 #ifdef CALC_HISTORY
         {
 #endif
-	  Error += " Error!!";
+	  if (Error != "")
+	    Error += " Error!!";
+	  else if (x < 25)
+	    Error = "!!Minimum length is 25!!";
+	  else
+	    Error = "!!Invalid Expression!!";
 #ifdef CALC_HISTORY
 	  if (!(record & EXPRESSIONS_HAVING_ERROR))
 	    h.pop();
         }
 #endif
-      else if (check_calculate == FAILURE)
-#ifdef CALC_HISTORY
-        {
-#endif
-	  Error = "!!Invalid Expression!!";
-#ifdef CALC_HISTORY
-	  if (!(record & EXPRESSIONS_HAVING_ERROR))
-	    h.pop();
-        }
-#endif
-      else if (x < 25)
-	fprintf(PRINTFAST, "\nMinimum length is 25");
     }
   /* commands for dealing with exponentials */
-  else if (a == "show e")
+  else if (Input == "show e")
     {
-      extract(a.str(), temp_char.str(), strlen("show "));
       strcpy(precision, "%.5Lg");
       strcpy(e, "Lg");
     }
-  else if (a == "hide e")
+  else if (Input == "hide e")
     {
       strcpy(precision, "%.5Lf");
       strcpy(e, "Lf");
     }
   /******************************************/
-  else if (a == "warranty")
+  else if (Input == "warranty")
     {
       fprintf(PRINTFAST, "\n\n\t\
 This program is free software; you can redistribute it and/or modify\n\t\
@@ -83,75 +106,79 @@ The Free Software Foundation, Inc.\n\t\t\
 51 Franklin Street, Fifth Floor\n\t\t\
 Boston, MA 02110-1301  USA\n");
     }
-#ifdef CLEAR_CMD
-  else if (a == "clear")
-    CLRSCR;
+#ifdef SCREEN_MANIP
+  else if (Input == "clear")
+    clrscr();
 #endif
+
 #ifdef HELP_CMD
-  else if (!strncasecmp(a.str(), "help ", 5) || a == "help")
+  else if (!strncasecmp(Input.str(), "help ", 5) || Input == "help")
     {
-      extract(a.str(), temp_char.str(), 5, -1, NUL, 30);
+      extract(Input.str(), temp_char.str(), 5, -1, NUL, 30);
       help(temp_char);
     }
 #endif
-#ifdef FILE_MANAGER
 
-#endif
 #ifdef CALC_PROCESS_TIME
-  else if (a == "show processing time")
+  else if (Input == "show processing time")
     calc_time = YES;
-  else if (a == "hide processing time")
+  else if (Input == "hide processing time")
     calc_time = NO;
-  else if (a == "start recording")
+  else if (Input == "start recording")
     calc_avg_time = YES, total_time = expressions = 0.0;
-  else if (a == "stop recording")
+  else if (Input == "stop recording")
     {
       calc_avg_time = NO;
       fprintf(PRINTFAST, "\nAverage time = %.8Lf", (total_time / expressions));
     }
 #endif
+
 #ifdef OPTR_DETAILS
-  else if (a == "show operator details")
-    oprator_detail = YES;
-  else if (a == "hide operator details")
-    oprator_detail = NO;
+  else if (Input == "show operator details")
+    operator_detail = YES;
+  else if (Input == "hide operator details")
+    operator_detail = NO;
 #endif
+
 #ifdef NUM_DETAILS
-  else if (a == "show number details")
+  else if (Input == "show number details")
     num_detail = YES;
-  else if (a == "hide number details")
+  else if (Input == "hide number details")
     num_detail = NO;
 #endif
+
 #ifdef STEPS_CMD
   /* commands to show/hide steps */
-  else if (a == "show steps")
+  else if (Input == "show steps")
     steps = YES;
-  else if (a == "hide steps")
+  else if (Input == "hide steps")
     steps = NO;
   /*******************************/
 #endif
+
 #ifdef ANS_CMD
   /* commands to manipulate storing of answers */
-  else if (a == "start storing answers")
+  else if (Input == "store answers")
     store = YES;
-  else if (a == "stop storing answers")
+  else if (Input == "dont store answers")
     store = NO;
   /*********************************************/
 #endif
 #ifdef CHANGE_ANGLE
   /* commands for changing angle type */
-  else if (a == "deg")
+  else if (Input == "deg")
     angle_type = DEG;
-  else if (a == "rad")
+  else if (Input == "rad")
     angle_type = RAD;
-  else if (a == "grad")
+  else if (Input == "grad")
     angle_type = GRAD;
   /************************************/
 #endif // CHANGE_ANGLE
+
 #ifdef CALC_HISTORY
-  else if (!strncasecmp(a.str(), "allow ", 6))
+  else if (Input == "allow ")
     {
-      extract(a.str(), temp_char.str(), 6, -1, NUL, 30);
+      extract(Input.str(), temp_char.str(), 6, -1, NUL, 25);
       if (temp_char == "UNDEFINED COMMANDS")
 	record |= UNDEFINED_COMMANDS;
       else if (temp_char == "NORMAL COMMANDS")
@@ -161,9 +188,9 @@ Boston, MA 02110-1301  USA\n");
       else if (temp_char == "EXPRESSIONS HAVING ERROR")
 	record |= EXPRESSIONS_HAVING_ERROR;
     }
-  else if (!strncasecmp(a.str(), "restrict ", 9))
+  else if (Input == "restrict ")
     {
-      extract(a.str(), temp_char.str(), 9, -1, NUL, 30);
+      extract(Input.str(), temp_char.str(), 9, -1, NUL, 30);
       if (temp_char == "UNDEFINED COMMANDS")
 	record &= ~UNDEFINED_COMMANDS;
       else if (temp_char == "NORMAL COMMANDS")
@@ -174,9 +201,10 @@ Boston, MA 02110-1301  USA\n");
 	record &= ~EXPRESSIONS_HAVING_ERROR;
     }
 #endif
+
 #ifdef CONST_CMDS
   /* commands for dealing with constants */
-  else if (a == "load constant pi")
+  else if (!strcasecmp(Input.str(), "load constant pi"))
     {
 #ifdef PI
       constant x = constant("pi", PI);
@@ -185,26 +213,26 @@ Boston, MA 02110-1301  USA\n");
       Error = "!!PI was not declared in program!!";
 #endif // PI
     }
-  else if (a == "constant ")
+  else if (Input == "constant ")
     {
       constant con;
-      extract(a.str(), con.name, 9, -1, '=');
-      if (ismath(con.name) != SUCCESS)
+      extract(Input.str(), con.name, 9, -1, '=');
+      if (isidentifier(con.name) && ismath(con.name) != SUCCESS)
         {
 	  unsigned long i = 0, d;
-	  while (a[i] != '=' && a[i])
+	  while (Input[i] != '=' && Input[i])
 	    i++;
-	  if (!a[i] || !a[i + 1])
+	  if (!Input[i] || !Input[i + 1])
 	    Error = "!!Syntax Error!!";
 	  else
             {
 	      i++, con.value = 0;
-	      if (separate_ans(a.str(), i, d) == SUCCESS)
+	      if (separate_ans(Input.str(), i, d) == SUCCESS)
 		{
-		  con.value = l.get_ans_x(d).n;
+		  con.value = l.get_ans_x(d).num;
 		  cons.insert_const(con);
 		}
-	      else if (atof(a.str(), i, con.value) == SUCCESS)
+	      else if (atof(Input.str(), i, con.value) == SUCCESS)
 		cons.insert_const(con);
 	      else
 		Error = "!!Syntax error!!";
@@ -213,176 +241,114 @@ Boston, MA 02110-1301  USA\n");
       else
 	sprintf(Error.str(), "!!%s already defined as a mathematical function!!", con.name);
     }
-  else if (a == "show constants")
+  else if (Input == "constants")
     cons.disp_const();
-  else if (!strncasecmp(a.str(), "remove constant ", 16))
+  else if (Input == "remove constant ")
     {
       char name[15];
-      extract(a.str(), name, strlen("remove constant "), 16 + 15);
+      extract(Input.str(), name, strlen("remove constant "), 16 + 15);
       cons.delete_const(name);
     }
-  else if (a == "remove constants")
+  else if (!strcasecmp(Input.str(), "remove constants"))
     {
       fprintf(PRINTFAST, "\nDelete all constants?(Y for yes)");
-      if (getch() == 'y')
+      if (getchar() == 'y')
 	cons.delete_all_const();
     }
   /***************************************/
 #endif // CONST_CMDS
+
 #ifdef ANS_CMD
   /* commands for dealing with answers */
-  else if (a == "show answers")
+  else if (!strcasecmp(Input.str(), "answers"))
     l.show_all_ans();
-  else if (!strncasecmp(a.str(), "show a", 6))
+  else if (Input == "show a")
     {
       unsigned long d = 0, i = 5;
-      if (separate_ans(a.str(), i, d) == SUCCESS)
+      if (separate_ans(Input.str(), i, d) == SUCCESS)
 	l.show_ans_x(d);
       else
-	Error = "!!Syntax Error!!\nSyntax is : show a<positive integer>";
+	Error = "!!Syntax Error!!\nSyntax is : show A<positive integer>";
     }
-  else if (a == "delete answers")
+  else if (!strcasecmp(Input.str(), "delete answers"))
     {
       if (!l.deallocate())
 	fprintf(PRINTFAST, "!!Answers list empty!!");
     }
-  else if (!strncasecmp(a.str(), "delete a", 8))
+  else if (Input == "delete answers leaving ")
+    {
+      long double x = 0.0;
+      unsigned long y, i = 23;
+      if (atof(Input.str(), i, x, UNSIGNED_INT) == SUCCESS)
+	if (y = x, !l.has_ans())
+	  Error = "!!Answers list empty!!";
+	else
+	  while (l.has_ans() > y)
+	    l.del_ans_x(1);
+      else
+	Error = "!!Syntax Error!!\nSyntax is : delete answers leaving <positive integer>";
+    }
+  else if (Input == "delete answers first ")
+    {
+      long double x = 0.0;
+      unsigned long y, i = 21;
+      if (atof(Input.str(), i, x, UNSIGNED_INT) == SUCCESS)
+	if (y = x, !l.has_ans())
+	  Error = "!!Answers list empty!!";
+	else
+	  while (l.has_ans() && y--)
+	    l.del_ans_x(1);
+      else
+	Error = "!!Syntax Error!!\nSyntax is : delete answers first <positive integer>";
+    }
+  else if (Input == "delete a")
     {
       unsigned long d = 0, i = 7;
-      if (separate_ans(a.str(), i, d) == SUCCESS)
+      if (separate_ans(Input.str(), i, d) == SUCCESS)
 	l.del_ans_x(d);
       else
-	Error = "!!Syntax Error!!\nSyntax is : show a<positive integer>";
+	Error = "!!Syntax Error!!\nSyntax is : delete A<positive integer>";
     }
   /*************************************/
 #endif // ANS_CMD
+
 #ifdef CALC_HISTORY
-  else if (a == "show history")
+  else if (!strcasecmp(Input.str(), "history"))
     h.display();
 #endif
+
 #ifdef SHELL_CMD
   /* commands to deal with shell */
-  else if (!strncasecmp(a.str(), "shell ", 6))
+  else if (Input == "shell ")
     {
-      extract(a.str(), temp_char.str(), 6);
+      extract(Input.str(), temp_char.str(), 6);
       fprintf(PRINTFAST, "\nConnecting to shell...\n");
-      system(temp_char.str());
+      fprintf(PRINTFAST, "Return value %d", system(temp_char.str()));
     }
-  else if (a == "shell")
+  else if (!strcasecmp(Input.str(), "shell"))
     {
-      char t[MAX_LEN] = "cd ";
-#ifdef FILE_MANAGER
-      strcat(t, pwd);
-#endif // FILE_MANAGER
-      strcat(t, " && bash");
       fprintf(PRINTFAST, "\nConnecting to shell...\n");
-      if (system(t))
-	Error = "!!Unable to connect to shell!!";
-      else
-	fprintf(PRINTFAST, "Shell disconnected...");
+      change_input_flags(1);
+      fprintf(PRINTFAST, "Return value %d", system("bash"));
+      change_input_flags(0);
     }
   /*******************************/
 #endif // SHELL_CMD
+
 #ifdef PROMPT
-  else if (!strncasecmp(a.str(), "prompt=", 7))
+  else if (Input == "prompt=")
     {
-      extract(a.str(), temp_char.str(), 7, -1, NUL, 500);
+      extract(Input.str(), temp_char.str(), 7, -1, NUL, 500);
       strncpy(prompt, temp_char.str(), 500);
     }
 #endif // PROMPT
-#ifdef FILE_MANAGER
-  else if (a == "show pwd" || a == "show path")
-    printpwd = YES;
-  else if (a == "hide pwd" || a == "hide path")
-    printpwd = NO;
-  /* commands to show/hide line numbers */
-  else if (a == "show line numbers")
-    line_no = YES;
-  else if (a == "hide line numbers")
-    line_no = NO;
-  /**************************************/
-  else if (!strncasecmp(a.str(), "edit ", 5))
-    {
-      strings t;
-      t = pwd;
-      extract(a.str(), temp_char.str(), 5);
-      t += temp_char;
-      edit_file(t.str());
-    }
-  else if (!strncasecmp(a.str(), "open ", 5))
-    {
-      extract(a.str(), temp_char.str(), 5);
-      strings t;
-      t = pwd;
-      t += temp_char;
-      if (open_file(t.str()) == FAILURE)
-	edit_file(t.str());
-    }
-  else if (!strncmp(a.str(), "ls ", 3) || !strcmp(a.str(), "ls"))
-    {
-      if (a[3] == NUL)
-        {
-	  a += " ";
-	  a += pwd;
-        }
-      else if (a[3] != '/')
-        {
-	  strings t;
-	  extract(a.str(), temp_char.str(), 3, -1, '\0');
-	  t = pwd;
-	  t += temp_char;
-	  a.write(NUL, 3);
-	  a += t;
-        }
-      fprintf(PRINTFAST, "\n");
-      system(a.str());
-    }
-  else if (!strncasecmp(a.str(), "cd ", 3))
-    {
-      extract(a.str(), temp_char.str(), 3);
-      if (temp_char[0] != '/')
-        {
-	  strings t = pwd;
-	  t += temp_char;
-	  temp_char = t;
-        }
-      strings t = "cd ";
-      t += temp_char;
-      if (!system(t.str()))
-        {
-	  extract(t.str(), pwd, 3);
-	  if (pwd[strlen(pwd) - 1] != '/')
-	    strncat(pwd, "/", MAX_LEN);
-        }
-      else
-	Error = "\nSystem Error : Directory not accessable";
-      remove_dot(pwd);
-    }
-  else if (a == "pwd")
-    fprintf(PRINTFAST, "\n%s", pwd);
-  else if (!strncasecmp(a.str(), "rm ", 3))
-    {
-      extract(a.str(), temp_char.str(), 3);
-      if (temp_char[0] != '/')
-        {
-	  strings t;
-	  t = pwd;
-	  t += temp_char;
-	  temp_char = t;
-        }
-      if (remove(temp_char.str()) == ERROR)
-	Error = "!!File does not exist!!";
-    }
-#endif // FILE_MANAGER
-
 
 #ifdef CHANGE_PRECISION
-  else if (!strncasecmp(a.str(), "precision=", 10) || !strncasecmp(a.str(), "precision ", 10))
+  else if (Input == "precision=" || Input == "precision ")
     {
       long double x = 0;
-      signed char check_calculate;
-      check_calculate = calculate(a.str(), x, 10);
-      if (check_calculate == SUCCESS)
+      unsigned long i = 10;
+      if (calculate(Input.str(), x, i) == SUCCESS)
         {
 	  unsigned short n = x;
 	  n %= 1000;
@@ -392,21 +358,14 @@ Boston, MA 02110-1301  USA\n");
 	    h.pop();
 #endif
         }
-      else if (check_calculate == ERROR)
+      else
 #ifdef CALC_HISTORY
         {
 #endif
-	  Error += " Error!!";
-#ifdef CALC_HISTORY
-	  if (!(record & EXPRESSIONS_HAVING_ERROR))
-	    h.pop();
-        }
-#endif
-      else if (check_calculate == FAILURE)
-#ifdef CALC_HISTORY
-        {
-#endif
-	  Error = "!!Invalid Expression!!";
+	  if (Error != "")
+	    Error += " Error!!";
+	  else
+	    Error = "!!Invalid Expression!!";
 #ifdef CALC_HISTORY
 	  if (!(record & EXPRESSIONS_HAVING_ERROR))
 	    h.pop();
@@ -416,7 +375,7 @@ Boston, MA 02110-1301  USA\n");
 #endif // CHANGE_PRECISION
 
 
-  else if (a == "show settings")
+  else if (!strcasecmp(Input.str(), "settings"))
     {
 #ifdef PROMPT
       fprintf(PRINTFAST, "\n");
@@ -432,12 +391,6 @@ Boston, MA 02110-1301  USA\n");
 #endif // CHANGE_PRECISION
       fprintf(PRINTFAST, "\n");
       fprintf(PRINTFAST, "Show Exponential   =  %s", strcasecmp(e, "Lf") ? "NO" : "YES");
-#ifdef FILE_MANAGER
-      fprintf(PRINTFAST, "\n");
-      fprintf(PRINTFAST, "Present Directory  =  %s\n", pwd);
-      fprintf(PRINTFAST, "Path Prompt        =  %s\n", printpwd == YES ? "YES" : "NO");
-      fprintf(PRINTFAST, "Show Line Number   =  %s", line_no == YES ? "YES" : "NO");
-#endif // FILE_MANAGER
       fprintf(PRINTFAST, "\n");
       fprintf(PRINTFAST, "Angle Mode         =  %s", angle_type == DEG ? "DEGREE" : angle_type == GRAD ? "GRAD" : "RADIAN");
 #ifdef STEPS_CMD
@@ -446,18 +399,14 @@ Boston, MA 02110-1301  USA\n");
 #endif // STEPS_CMD
 #ifdef OPTR_DETAILS
       fprintf(PRINTFAST, "\n");
-      fprintf(PRINTFAST, "Operator details   =  %s", oprator_detail == YES ? "YES" : "NO");
+      fprintf(PRINTFAST, "Operator details   =  %s", operator_detail == YES ? "YES" : "NO");
 #endif // OPTR_DETAILS
-#ifdef NUM_DETAILS
-      fprintf(PRINTFAST, "\n");
-      fprintf(PRINTFAST, "Number details     =  %s", num_detail == YES ? "YES" : "NO");
-#endif // NUM_DETAILS
     }
 
 #ifdef CALC_COLORS
-  else if (!strncasecmp(a.str(), "input font color ", 17))
+  else if (Input == "input font color ")
     {
-      extract(a.str(), temp_char.str(), 17);
+      extract(Input.str(), temp_char.str(), 17);
       bool flag = true;
       for (int j = 0; j < NO_OF_COLORS; j++)
 	if (temp_char == calc_font_colors[j])
@@ -469,9 +418,9 @@ Boston, MA 02110-1301  USA\n");
       if (flag)
 	sprintf(Error.str(), "Error: Color mismatch");
     }
-  else if (!strncasecmp(a.str(), "output font color ", 18))
+  else if (Input == "output font color ")
     {
-      extract(a.str(), temp_char.str(), strlen("output font color "));
+      extract(Input.str(), temp_char.str(), strlen("output font color "));
       bool flag = true;
       for (int j = 0; j < NO_OF_COLORS; j++)
 	if (temp_char == calc_font_colors[j])
@@ -483,9 +432,9 @@ Boston, MA 02110-1301  USA\n");
       if (flag)
 	sprintf(Error.str(), "Error: Color mismatch");
     }
-  else if (!strncasecmp(a.str(), "error font color ", 17))
+  else if (Input == "error font color ")
     {
-      extract(a.str(), temp_char.str(), 17);
+      extract(Input.str(), temp_char.str(), 17);
       bool flag = true;
       for (int j = 0; j < NO_OF_COLORS; j++)
 	if (temp_char == calc_font_colors[j])
@@ -497,9 +446,9 @@ Boston, MA 02110-1301  USA\n");
       if (flag)
 	sprintf(Error.str(), "Error: Color mismatch");
     }
-  else if (!strncasecmp(a.str(), "prompt font color ", 18))
+  else if (Input == "prompt font color ")
     {
-      extract(a.str(), temp_char.str(), 18);
+      extract(Input.str(), temp_char.str(), 18);
       bool flag = true;
       for (int j = 0; j < NO_OF_COLORS; j++)
 	if (temp_char == calc_font_colors[j])
@@ -511,9 +460,9 @@ Boston, MA 02110-1301  USA\n");
       if (flag)
 	sprintf(Error.str(), "Error: Color mismatch");
     }
-  else if (!strncasecmp(a.str(), "input font background ", 22))
+  else if (Input == "input font background ")
     {
-      extract(a.str(), temp_char.str(), 23);
+      extract(Input.str(), temp_char.str(), 23);
       bool flag = true;
       for (int j = 0; j < NO_OF_COLORS; j++)
 	if (temp_char == calc_font_colors[j])
@@ -525,9 +474,9 @@ Boston, MA 02110-1301  USA\n");
       if (flag)
 	sprintf(Error.str(), "Error: Color mismatch");
     }
-  else if (!strncasecmp(a.str(), "output font background ", 23))
+  else if (Input == "output font background ")
     {
-      extract(a.str(), temp_char.str(), 23);
+      extract(Input.str(), temp_char.str(), 23);
       bool flag = true;
       for (int j = 0; j < NO_OF_COLORS; j++)
 	if (temp_char == calc_font_colors[j])
@@ -539,9 +488,9 @@ Boston, MA 02110-1301  USA\n");
       if (flag)
 	sprintf(Error.str(), "Error: Color mismatch");
     }
-  else if (!strncasecmp(a.str(), "error font background ", 22))
+  else if (Input == "error font background ")
     {
-      extract(a.str(), temp_char.str(), 22);
+      extract(Input.str(), temp_char.str(), 22);
       bool flag = true;
       for (int j = 0; j < NO_OF_COLORS; j++)
 	if (temp_char == calc_font_colors[j])
@@ -553,9 +502,9 @@ Boston, MA 02110-1301  USA\n");
       if (flag)
 	sprintf(Error.str(), "Error: Color mismatch");
     }
-  else if (!strncasecmp(a.str(), "prompt font background ", 23))
+  else if (Input == "prompt font background ")
     {
-      extract(a.str(), temp_char.str(), 23);
+      extract(Input.str(), temp_char.str(), 23);
       bool flag = true;
       for (int j = 0; j < NO_OF_COLORS; j++)
 	if (temp_char == calc_font_colors[j])
@@ -567,12 +516,12 @@ Boston, MA 02110-1301  USA\n");
       if (flag)
 	sprintf(Error.str(), "Error: Color mismatch");
     }
-  else if (!strncasecmp(a.str(), "input font style ", 17))
+  else if (Input == "input font style ")
     {
-      extract(a.str(), temp_char.str(), 17);
+      extract(Input.str(), temp_char.str(), 17);
       bool flag = true;
       for (int j = 0; j < NO_OF_COLORS; j++)
-	if (temp_char == calc_font_colors[j])
+	if (temp_char == calc_font_styles[j])
 	  {
 	    input_font.style = j, flag = false;
 	    input_font.update();
@@ -581,9 +530,9 @@ Boston, MA 02110-1301  USA\n");
       if (flag)
 	sprintf(Error.str(), "Error: Font style not defined");
     }
-  else if (!strncasecmp(a.str(), "output font style ", 18))
+  else if (Input == "output font style ")
     {
-      extract(a.str(), temp_char.str(), 18);
+      extract(Input.str(), temp_char.str(), 18);
       bool flag = true;
       for (int j = 0; j < NO_OF_STYLES; j++)
 	if (temp_char == calc_font_styles[j])
@@ -595,9 +544,9 @@ Boston, MA 02110-1301  USA\n");
       if (flag)
 	sprintf(Error.str(), "Error: Font style not defined");
     }
-  else if (!strncasecmp(a.str(), "error font style ", 17))
+  else if (Input == "error font style ")
     {
-      extract(a.str(), temp_char.str(), 17);
+      extract(Input.str(), temp_char.str(), 17);
       bool flag = true;
       for (int j = 0; j < NO_OF_STYLES; j++)
 	if (temp_char == calc_font_styles[j])
@@ -609,9 +558,9 @@ Boston, MA 02110-1301  USA\n");
       if (flag)
 	sprintf(Error.str(), "Error: Font style not defined");
     }
-  else if (!strncasecmp(a.str(), "prompt font style ", 18))
+  else if (Input == "prompt font style ")
     {
-      extract(a.str(), temp_char.str(), 18);
+      extract(Input.str(), temp_char.str(), 18);
       bool flag = true;
       for (int j = 0; j < NO_OF_STYLES; j++)
 	if (temp_char == calc_font_styles[j])
@@ -627,14 +576,15 @@ Boston, MA 02110-1301  USA\n");
 
 
 #ifdef FACTORIZE
-  else if (!strncasecmp(a.str(), "factorise ", 10) || !strncasecmp(a.str(), "factorize ", 10))
+  else if (Input == "factorize " || Input == "factorise ")
     {
-      long double x = 0.0;
+      long double x = 0, y = 0;
       unsigned long i = 10;
-      signed char check_calculate = calculate(a.str(), x, i);
-      if (check_calculate == SUCCESS)
+      if (calculate(Input.str(), y, i) == SUCCESS)
         {
-	  fprintf(PRINTFAST, "\nFactors : ");
+	  y < 0 ? y = -y : 0;
+	  modfl(y, &x);
+	  fprintf(PRINTFAST, "\nFactors of %.0Lf: ", x);
 	  for (long double g = 1; g <= x / 2; g++)
 	    if (!fmodl(x, g))
 	      fprintf(PRINTFAST, "%.0Lf, ", g);
@@ -644,185 +594,93 @@ Boston, MA 02110-1301  USA\n");
 	    h.pop();
 #endif
         }
-      else if (check_calculate == ERROR)
+      else
 #ifdef CALC_HISTORY
         {
 #endif
-	  Error += " Error!!";
+	  if (Error != "")
+	    Error += " Error!!";
+	  else
+	    sprintf(Error.str(), "\nUndefined symbols in \'%s\'", Input.str());
 #ifdef CALC_HISTORY
 	  if (!(record & EXPRESSIONS_HAVING_ERROR))
 	    h.pop();
         }
 #endif
-      else if (check_calculate == FAILURE)
-#ifdef CALC_HISTORY
-        {
-#endif
-	  sprintf(Error.str(), "\nUndefined symbols in \'%s\'", a.str());
-#ifdef CALC_HISTORY
-	  if (!(record & EXPRESSIONS_HAVING_ERROR))
-	    h.pop();
-        }
-#endif
-      num.deallocate();
-      optr.deallocate();
+      num.reset();
+      optr.reset();
     }
 #endif // FACTORIZE
 
 
 #ifdef SUM
   /* Condition for calculating sum */
-  else if (!strncasecmp(a.str(), "sum ", 4))
+  else if (Input == "sum ")
     {
       long double x = 0.0;
       unsigned long i = 4;
-      while (!isdigit(a[i]) && a[i])
-	i++;
-      if (atof(a.str(), i, x, INT) <= FAILURE)
-#ifdef CALC_HISTORY
+      signed char check;
+      if ((check = calculate(Input.str(), x, i, ' ', 0, 1)) == SUCCESS)
         {
-#endif
-	  Error = "!!Limit should be integer!!";
-#ifdef CALC_HISTORY
-	  if (!(record & EXPRESSIONS_HAVING_ERROR))
-	    h.pop();
-        }
-#endif
-      else
-        {
-	  long lower_limit = x;
-	  while (!isdigit(a[i]) && a[i])
-	    i++;
-	  if (atof(a.str(), i, x = 0.0, INT) <= FAILURE)
-#ifdef CALC_HISTORY
-            {
-#endif
-	      Error = "!!Limit should be integer!!";
-#ifdef CALC_HISTORY
-	      if (!(record & EXPRESSIONS_HAVING_ERROR))
-		h.pop();
-            }
-#endif
-	  else
-            {
-	      long upper_limit = x;
-	      if (lower_limit > upper_limit)
-#ifdef CALC_HISTORY
-                {
-#endif
-		  Error = "!!Lower limit should not be greater than upper limit!!";
-#ifdef CALC_HISTORY
-		  if (!(record & EXPRESSIONS_HAVING_ERROR))
-		    h.pop();
-                }
-#endif
-	      else
-                {
-		  while (!ismathchar(a[i]) && !isdigit(a[i]) && a[i])
-		    i++;
-		  long double sum = 0.0;
-		  signed char check_calculate;
+	  long double lower_limit = x;
+	  i++;
+	  if ((check = calculate(Input.str(), x, i, ' ', 0, 1)) == SUCCESS)
+	    {
+	      long double upper_limit = x;
+	      i++;
+	      if ((check = calculate(Input.str(), x, i, ' ', 0, 1)) == SUCCESS)
+		{
+		  i++;
+		  long double rate = x;
 #ifdef OPTR_DETAILS
-		  bool temp_oprator_detail = oprator_detail;
-#endif
-#ifdef NUM_DETAILS
-		  bool temp_num_detail = num_detail;
+		  bool temp_operator_detail = operator_detail;
+		  operator_detail = NO;
 #endif
 #ifdef ANS_CMD
 		  bool temp_steps = steps;
-#endif
-		  unsigned long p = (upper_limit - lower_limit) / 50;
-#ifdef OPTR_DETAILS
-		  oprator_detail = NO;
-#endif
-#ifdef NUM_DETAILS
-		  num_detail = NO;
-#endif
-#ifdef ANS_CMD
 		  steps = NO;
 #endif
-		  fprintf(PRINTFAST, "\nSuming expression \"");
-		  for (unsigned long m = i; a[m]; m++)
-		    fprintf(PRINTFAST, "%c", a[m]);
-		  fprintf(PRINTFAST, "\" from i = %ld to i = %ld\n", lower_limit, upper_limit);
-
-		  /* Loop for summing expression from lower to upper limit */
-		  for (; lower_limit <= upper_limit; lower_limit++)
-                    {
-		      unsigned long m = i;
-		      check_calculate = calculate(a.str(), x, m, '\0', lower_limit);
-		      if (check_calculate == SUCCESS)
-                        {
-			  sum += x;
-			  if (p && (upper_limit - lower_limit) % p == 0)
-			    fprintf(PRINTFAST, "-");
-#ifdef CALC_HISTORY
-			  if (!(record & EXPRESSION_COMMANDS))
-			    h.pop();
-#endif
-                        }
-		      else if (check_calculate == ERROR)
-                        {
-			  Error += " Error!! in expression";
-#ifdef CALC_HISTORY
-			  if (!(record & EXPRESSIONS_HAVING_ERROR))
-			    h.pop();
-#endif
-			  break;
-                        }
-		      else if (check_calculate == FAILURE)
-                        {
-			  sprintf(Error.str(), "Failure to recognise expression in \"%s\"", a.str());
-#ifdef CALC_HISTORY
-			  if (!(record & EXPRESSIONS_HAVING_ERROR))
-			    h.pop();
-#endif
-			  break;
-                        }
-                    }
-		  /********************************************************/
-
-		  /* For printing the sum and storing in answer list */
-		  if (check_calculate == SUCCESS)
-                    {
-		      if (p)
-			fprintf(PRINTFAST, "\n");
-		      fprintf(PRINTFAST, "Sum = ");
-		      fprintf(PRINTFAST, precision, sum);
-#ifdef ANS_CMD
-		      if (store == 1)
-			l.add_ans(sum);
-#endif
-                    }
-		  /***************************************************/
-
-		  /* Deallocating num and oprator stacks in case of errors */
-		  num.deallocate();
-		  optr.deallocate();
-		  /*********************************************************/
-#ifdef OPTR_DETAILS
-		  oprator_detail = temp_oprator_detail;
-#endif
 #ifdef NUM_DETAILS
-		  num_detail = temp_num_detail;
+		  bool temp_num_detail = num_detail;
+		  num_detail = NO;
+#endif
+		  fprintf(PRINTFAST, "\n");
+		  sum(lower_limit, upper_limit, rate, i);
+#ifdef OPTR_DETAILS
+		  operator_detail = temp_operator_detail;
 #endif
 #ifdef ANS_CMD
 		  steps = temp_steps;
 #endif
-                }
-            }
-        }
+#ifdef NUM_DETAILS
+		  num_detail = temp_num_detail;
+#endif
+		}
+	    }
+	}
+      if (check != SUCCESS)
+#ifdef CALC_HISTORY
+	{
+#endif
+	  if (Error != "")
+	    Error += " Error!!";
+	  else
+	    sprintf(Error.str(), "\nUndefined symbols in \'%s\'", Input.str());
+#ifdef CALC_HISTORY
+	  if (!(record & EXPRESSIONS_HAVING_ERROR))
+	    h.pop();
+	}
+#endif
+      num.reset();
+      optr.reset();
     }
-  /**************************/
 #endif // SUM
 
-
-  else						// for calculating the expression
+  else
     {
       long double x = 0.0;
       unsigned long i = 0;
-      signed char check_calculate = calculate(a.str(), x, i);
-
+      signed char check_calculate = calculate(Input.str(), x, i);
       if (check_calculate == SUCCESS)
         {
 	  fprintf(PRINTFAST, " = ");
@@ -850,14 +708,14 @@ Boston, MA 02110-1301  USA\n");
 #ifdef CALC_HISTORY
         {
 #endif
-	  sprintf(Error.str(), "\nUndefined command \"%s\"", a.str());
+	  sprintf(Error.str(), "\nUndefined command \"%s\"", Input.str());
 #ifdef CALC_HISTORY
 	  if (!(record & UNDEFINED_COMMANDS))
 	    h.pop();
         }
 #endif
-      num.deallocate();
-      optr.deallocate();
+      num.reset();
+      optr.reset();
     }
 
   if (Error == "")
@@ -869,7 +727,7 @@ Boston, MA 02110-1301  USA\n");
       time_taken = ((long double)(clock() - start)) / CLOCKS_PER_SEC;
 
       if (calc_time == YES)
-	fprintf(PRINTFAST, "Expression Processing Time : %.8Lf seconds\n", time_taken);
+	fprintf(PRINTFAST, "Command Processing Time : %.8Lf seconds\n", time_taken);
 
       if (calc_time == YES && calc_avg_time == YES)
 	expressions++, total_time += time_taken;

@@ -7,61 +7,39 @@
 #include <calc_input.hpp>
 #include <calc_colors.hpp>
 #include <calc_stacks/history_stack.hpp>
+#include <calc_screen_manip.hpp>
 
-extern bool printpwd;
-extern calc_font input_font, prompt_font, output_font;
-extern char pwd[MAX_LEN];
-extern char prompt[500];
+strings Input;
+
+#ifdef SCREEN_MANIP
+unsigned short cur_prompt_line;
+unsigned long cur_pos = 0;
+#endif
+
+#ifdef PROMPT
+char prompt[500] = ">> "; /* String for storing prompt */
+#endif // PROMPT
 
 /* Copied from source code of conio.h
- * in C4droid
+ * in C4droid app on Android
+ * And later modified on 28 May 2016
  */
-void terminal_lnbuf(int yn)
+void change_input_flags(int yn)
 {
   struct termios oldt, newt;
   tcgetattr(0, &oldt);
   newt = oldt;
-  if (!yn) newt.c_lflag &= ~ICANON;
-  else newt.c_lflag |= ICANON;
+  if (!yn)
+    newt.c_lflag &= ~ICANON & ~ECHO;
+  else
+    newt.c_lflag |= ICANON | ECHO;
   tcsetattr(0, TCSANOW, &newt);
 }
+/* ******************************* */
 
-void terminal_echo(int yn)
-{
-  struct termios oldt, newt;
-  tcgetattr(0, &oldt);
-  newt = oldt;
-  if (!yn) newt.c_lflag &= ~ECHO;
-  else newt.c_lflag |= ECHO;
-  tcsetattr(0, TCSANOW, &newt);
-}
-
-int getch()
-{
-  register int ch;
-  terminal_lnbuf(0);
-  terminal_echo(0);
-  ch = getchar();
-  terminal_lnbuf(1);
-  terminal_echo(1);
-  return ch;
-}
-/* ******************** */
 void print_prompt()
 {
 #ifdef PROMPT
-#ifdef FILE_MANAGER
-  if (printpwd == YES)
-#ifdef CALC_COLORS
-    {
-      prompt_font.print();
-#endif
-      fprintf(PRINTFAST, "%s", pwd);
-#ifdef CALC_COLORS
-      output_font.print();
-    }
-#endif
-#endif // FILE_MANAGER
   /* show prompt */
 #ifdef CALC_COLORS
   prompt_font.print();
@@ -73,72 +51,143 @@ void print_prompt()
   /***************/
 #endif // PROMPT
 }
-void calc_input(strings &a)
+
+void calc_input()
 {
   bool space_flag = 1;
-  char ch = 0, tempch = 0;
-  long shift = 1;
-  for (long i = 0;;)
+  register char ch = 0, tempch = 0;
+  register unsigned long shift = 1;
+  register unsigned long z, temp;
+#ifdef SCREEN_MANIP
+  unsigned short t1, t2;
+  current_pos(cur_col, cur_line);
+#endif
+  Input = "";
+  for (register unsigned long i = 0;;)
     {
-      if (!(i % 5) && tempch)
+#ifdef SCREEN_MANIP
+      cur_pos = i;
+#endif
+      if (tempch && !(i % 5))
 	fflush(stdin);
       /* single character as input */
-      ch = getch();
+      ch = getchar();
+      //fprintf(stderr, "%d", ch);
 #ifdef CALC_HISTORY
-      if (!i)  h.cmd_modify(a);
+      if (!i)  h.cmd_modify(Input);
 #endif
       /* processing of character according to condition */
       if (ch == ESC)
         {
-	  tempch = ch;
+	  tempch = ESC;
 	  continue;
         }
       if (tempch == ESC && ch == '[')
         {
-	  ch = getch();
+	  ch = getchar();
+
+
 	  /* When Right Arrow Key is pressed */
 	  if (ch == 'C')
             {
 	      if (shift > 1)
                 {
+#ifdef SCREEN_MANIP
+		  cur_col = cur_col == max_cols ? 1 : cur_col + 1;
+		  if (cur_line == max_lines && !(cur_col >> 1))
+		    {
+		      for (z = i; Input[z] && cur_col <= max_cols; ++z, ++cur_col)
+			fprintf(PRINTFAST, "%c", Input[z]);
+		      fprintf(PRINTFAST, "\r"), cur_col = 1;
+		    }
+#endif
 		  shift--, tempch = 0;
-		  fprintf(PRINTFAST, "%c", a[i++]);
+		  fprintf(PRINTFAST, "%c", Input[i++]);
                 }
 	      continue;
             }
 
+
 	  /* When Left Arrow Key is pressed */
 	  if (ch == 'D')
             {
-	      if (shift <= a.len())
+	      if (shift <= Input.len())
                 {
-		  i--, shift++, tempch = 0;
+#ifdef SCREEN_MANIP
+		  if (cur_col == 1 && cur_line == 1)
+		    scroll_down;
+		  DEC_CUR_POS;
+		  if (cur_col == max_cols && cur_line == 1)
+		    {
+		      if (cur_pos < max_cols)
+#ifdef CALC_COLORS
+			{
+			  prompt_font.print();
+#endif
+			  for (z = strlen(prompt) - cur_pos; prompt[z]; --z)
+			    fprintf(PRINTFAST, "%c", prompt[z]);
+#ifdef CALC_COLORS
+			  input_font.print();
+			}
+#endif
+		      z = cur_pos < max_cols ? 0 : cur_pos - max_cols;
+		      Input.print(z, cur_pos);
+		    }
+		  move(cur_col, cur_line);
+#endif
+		  --i, ++shift, tempch = 0;
+#ifndef SCREEN_MANIP
 		  fprintf(PRINTFAST, "\b");
+#endif
                 }
 	      continue;
             }
+
 
 #ifdef CALC_HISTORY
 	  /* When Up/Down Arrow Key is pressed */
 	  if (ch == 'A' || ch == 'B')
             {
-	      command *temp = ch == 'A' ? h.get_prev_cmd() : h.get_next_cmd();
-	      if (temp && temp->c != a)
+	      command *t = ch == 'A' ? h.get_prev_cmd() : h.get_next_cmd();
+	      if (t && t->c != Input)
                 {
 		  shift = 1;
-		  i = temp->c.len();
-		  long l = a.len();
-		  a = temp->c;
+		  i = t->c.len();
+		  temp = Input.len();
+		  Input = t->c.str();
 		  fprintf(PRINTFAST, "\r");
 		  print_prompt();
 #ifdef CALC_COLORS
 		  input_font.print();
 #endif
-		  fprintf(PRINTFAST, "%s", a.str());
-		  for (long j = l - i; j > 0; j--)
+		  fprintf(PRINTFAST, "%s", Input.str());
+#ifdef SCREEN_MANIP
+		  current_pos(cur_col, cur_line);
+		  CUsave;
+#endif
+		  for (z = temp - i
+#ifdef SCREEN_MANIP
+			 , t1 = cur_col, t2 = cur_line
+#endif
+			 ;
+		       z > 0
+#ifdef SCREEN_MANIP
+			 && (t1 < max_cols || t2 < max_lines)
+#endif
+			 ;
+		       --z
+#ifdef SCREEN_MANIP
+			 , t1 = t1 == max_cols ? 1 : t1 + 1,
+			 t2 < max_lines ? ++t2 : 0
+#endif
+		       )
 		    fprintf(PRINTFAST, " ");
-		  for (l = l - i; l > 0; l--)
+#ifdef SCREEN_MANIP
+		  CUrestore;
+#else
+		  for (z = temp - i; z > 0; --z)
 		    fprintf(PRINTFAST, "\b");
+#endif
                 }
 	      continue;
             }
@@ -147,9 +196,9 @@ void calc_input(strings &a)
 	  /* If Home Key is pressed */
 	  if (ch == 'H')
             {
-	      if (shift <= a.len())
+	      if (shift <= Input.len())
                 {
-		  i = 0, shift = a.len() + 1, tempch = 0;
+		  i = 0, shift = Input.len() + 1, tempch = 0;
 		  fprintf(PRINTFAST, "\r");
 		  print_prompt();
 #ifdef CALC_COLORS
@@ -164,13 +213,13 @@ void calc_input(strings &a)
             {
 	      if (shift > 1)
                 {
-		  shift = 1, i = a.len(), tempch = 0;
+		  shift = 1, i = Input.len(), tempch = 0;
 		  fprintf(PRINTFAST, "\r");
 		  print_prompt();
 #ifdef CALC_COLORS
 		  input_font.print();
 #endif
-		  fprintf(PRINTFAST, "%s", a.str());
+		  fprintf(PRINTFAST, "%s", Input.str());
                 }
 	      continue;
             }
@@ -180,58 +229,112 @@ void calc_input(strings &a)
         }
       if ((ch >= ' ' && ch <= DEL) || ch == LF)
         {
-	  /* if a line feed(LF) is the input */
-	  if (ch != ' ' || (i && a[i - 1] != ' '))
+	  /* if a space is the input */
+	  if (ch != ' ' || (i && Input[i - 1] != ' '))
 	    space_flag = 1;
 	  else
 	    space_flag = 0;
+	  /* *********************** */
 
+
+	  /* When return[enter] key is the input
+	     prepare for evacuation              */
 	  if (ch == LF)
             {
-	      if (!a[0])
-		continue;
+	      /* Don't leave if Input is empty */
+	      if (!Input[0])
+		continue/* taking Input */;
+	      /* ***************************** */
+
+
+	      /* Dumping all Input to output screen
+		 if user was inserting instead of appending */
 	      while (shift)
-		fprintf(PRINTFAST, "%c", a[i++]), shift--;
-	      if (a[i - 2] == ' ')
+		fprintf(PRINTFAST, "%c", Input[i++]), --shift;
+	      /* ****************************************** */
+
+
+	      /* Remove trailing space if any just leaving a single case */
+	      if (Input[i - 2] == ' ' && Input != "prompt=")
                 {
-		  a.write(0, i - 2);
+		  Input.write(0, i - 2);
 		  fprintf(PRINTFAST, "\b");
                 }
+	      /* ******************************************************* */
+
+
+#ifdef CALC_HISTORY
+	      h.cmd_modify(Input); // Modify the history in case of changes
+#endif
 	      break /* the loop */ ;
             }
+	  /* *********************************** */
+
+
 	  /* if a backspace is the input */
 	  if (ch == DEL)
             {
-	      /* if i is zero then there is nothing to delete */
-	      /* so */ if (i > 0)
-                {
-		  a.del(--i);
+	      /* Dont join the two if conditions using and(&&)
+		 It is a protection so that none other than
+		 printing characters are passed to the else
+		 condition
+		 if i is zero then there is nothing to delete
+		 so */ if (i > 0)
+		{
+		  Input.del(--i);
 #ifdef CALC_HISTORY
-		  h.cmd_modify(a);
+		  h.cmd_modify(Input);
 #endif
 		  /* remove a character from output screen */
+#ifdef SCREEN_MANIP
+		  DEC_CUR_POS;
+		  move(cur_col, cur_line);
+		  CUsave;
+#else
 		  fprintf(PRINTFAST, "\b");
-		  for (long z = a.len() - shift + 1; z < a.len(); z++)
-		    fprintf(PRINTFAST, "%c", a[z]);
-		  fprintf(PRINTFAST, " ");
-		  for (long z = a.len() - shift; z < a.len(); z++)
-		    fprintf(PRINTFAST, "\b");
-                }
-            }
-
-	  else if (i < strMAX - 2 && space_flag)	/* for other characters */
-            {
-	      fprintf(PRINTFAST, "%c", ch);
-	      a.shift_right(a.len() - shift);
-	      a.write(ch, i++);
-#ifdef CALC_HISTORY
-	      h.cmd_modify(a);
 #endif
-	      for (long z = a.len() - shift + 1; z < a.len(); z++)
-		fprintf(PRINTFAST, "%c", a[z]);
-	      for (long z = a.len() - shift + 1; z < a.len(); z++)
+		  z = i;
+		  Input.print(z);
+#ifdef SCREEN_MANIP
+		  if (z < Input.len())
+		    fprintf(PRINTFAST, "%c", Input[z]);
+		  else
+#endif
+		    fprintf(PRINTFAST, " ");
+#ifdef SCREEN_MANIP
+		  CUrestore;
+#else
+		  temp = Input.len();
+		  for (z = i - 1; z < temp; ++z)
+		    fprintf(PRINTFAST, "\b");
+#endif
+		}
+	    }
+
+	  else if (i < strMAX - 2 && space_flag) /* for other characters */
+            {
+#ifdef SCREEN_MANIP
+	      INC_CUR_POS;
+#endif
+	      fprintf(PRINTFAST, "%c", ch);
+	      Input.shift_right(i - 1);
+	      Input.write(ch, i++);
+#ifdef CALC_HISTORY
+	      h.cmd_modify(Input);
+#endif
+	      z = i;
+	      Input.print(z);
+#ifdef SCREEN_MANIP
+	      move(cur_col, cur_line);
+#else
+	      temp = Input.len();
+	      for (z = i; z < temp; ++z)
 		fprintf(PRINTFAST, "\b");
-            }
-        }
+#endif
+	    }
+	}
     }
+#ifdef SCREEN_MANIP
+  cur_line = 0;
+#endif
 }

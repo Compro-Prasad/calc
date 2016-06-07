@@ -1,19 +1,24 @@
 #include <calc_stacks/ans_stack.hpp>
-#ifdef ANS_STACK_H
+
+#ifdef ANS_CMD
+bool store = true;              /* Whether or not to store answers */
+link_ans l;                     /* Object for storing answers in stack */
+#endif // ANS_CMD
+
 void answer::display()
 {
   fprintf(PRINTFAST, " = ");
-  fprintf(PRINTFAST, precision, n);
+  fprintf(PRINTFAST, precision, num);
 }
 
 ans::ans()
 {
-  n = 0.0, next = 0;
+  num = 0.0, next = 0;
 }
 
 link_ans::link_ans()
 {
-  free_list = top = 0, n = 0;
+  top = end = 0, n = 0;
 }
 
 link_ans::~link_ans()
@@ -21,190 +26,136 @@ link_ans::~link_ans()
   deallocate();
 }
 
-// single answers list is to be used throughout the program
+unsigned long link_ans::has_ans()
+{
+  return n;
+}
 
 void link_ans::add_ans(const double a)
 {
-  if (free_list)
+  ans *temp = new ans;
+  if (temp)
     {
-      free_list->n = a;
+      temp->num = a;
+      temp->next = 0;
       n++;
-      if (top == 0)		// checking if answer list is empty
-	top = free_list;	// copying the address of the first answer
-      else			// if the answers list has some answers
-	{
-	  ans *z = top;		// another temporary pointer
-	  for (; z->next != 0; z = z->next)
-	    // travelling to the end of the answers list
-	    ;
-	  z->next = free_list;
-	  // adding the newly made answer to the end of the answers list
-	}
+
+      if (top == 0)
+	top = end = temp;
+      else
+	end->next = temp, end = temp;
       fprintf(PRINTFAST, "[ A%ld ]", n);
-      // printing the position of the newly made answer in the answers list
-      free_list = free_list->next;
+    }
+  else
+    fprintf(PRINTFAST, "<Answer not saved. Please delete some answers to free memory>");
+}
+
+ans link_ans::get_ans_x(unsigned long pos)
+{
+  if (!pos && end)
+    return *end;
+  ans * t = top;
+  for (; t && --pos; t = t->next);
+  if (pos)
+    {
+      fprintf(PRINTFAST, Not_Calc, pos);
+      ans k;
+      return k;
+    }
+  else
+    return *t;
+}
+
+void link_ans::show_ans_x(unsigned long pos)
+{
+  if (!top)
+    {
+      Error = Empty;
+      return;
+    }
+  ans *t;
+  if (pos)
+    for (t = top; t && --pos; t = t->next);
+  else
+    t = end;
+  if (pos)
+#ifdef CALC_COLORS
+    {
+      error_font.print();
+#endif
+      fprintf(PRINTFAST, "!!Answer not found!!");
+#ifdef CALC_COLORS
+      output_font.print();
+    }
+#endif
+  else
+    {
+      char printf_format_string[20] = " = ";
+      strcat(printf_format_string, precision);
+      fprintf(PRINTFAST, printf_format_string, t->num);
+    }
+}
+
+void link_ans::del_ans_x(unsigned long pos)
+{
+  if (!top)
+    {
+      Error = Empty;
+      return;
+    }
+  if (pos == 1)
+    {
+      ans *z = top;
+      delete z;
+      top = top->next, n--;
+      if (!n)
+	end = 0;
     }
   else
     {
-      ans *temp = new ans;
-      if (temp)					// memory allocated successfully
-	{
-	  temp->n = a;			// initialising the newly allocated memory
-	  temp->next = 0;
-	  n++;
-	  // incrementing the size of answers list as a new answer is added
-	  if (top == 0)			// checking if answer list is empty
-	    top = temp;			// copying the address of the first answer
-	  else					// if the answers list has some answers
-	    {
-	      ans *z = top;		// another temporary pointer
-	      for (; z->next != 0; z = z->next)
-		// travelling to the end of the answers list
-		;
-	      z->next = temp;
-	      // adding the newly made answer to the end of the answers list
-	    }
-	  fprintf(PRINTFAST, "[ A%ld ]", n);
-	  // printing the position of the newly made answer in the answers list
-	}
-      else						// if the memory is full
-	fprintf(PRINTFAST, "<Answer not saved. Please delete some answers to free memory>");
-    }
-}
-
-ans link_ans::get_ans_x(unsigned long x)
-{
-  if (top)					// answers list has some answers
-    {
-      unsigned long m = 1;
-      for (ans * t = top; m <= n && t; m++, t = t->next)
-	// traversing through the answers list
-	if (m == x)			// position matching or not
-	  return *t;		// returning the value if position matches
-      // execution will come here iff answer is not found in the answer list
-      fprintf(PRINTFAST, Not_Calc, x);
-      ans k;
-      return k;				// returning blank answer
-    }
-  else						// if answers list is empty
-    {
-      fprintf(PRINTFAST, Not_Calc, x);
-      ans k;
-      return k;				// blank answer is returned
-    }
-}
-
-void link_ans::show_ans_x(unsigned long x)
-{
-  if (top)					// answers list has some answers
-    {
-      unsigned long m = 1;
-      ans *t;
-      // declaration is here so that it can be used outside the loop
-      bool f = 1;				// a flag
-      for (t = top; m <= n && t; m++, t = t->next)
-	{
-	  if (m == x)			// checking position match
-	    {
-	      f = 0;
-	      char ch[20] = ". A%d = ";
-	      strcat(ch, precision);
-	      fprintf(PRINTFAST, ch, x, t->n);
-	      break;
-	      // speeding up by not traversing after answer has been found
-	    }
-	}
-      if (f)					// answer is not in the list
-#ifdef CALC_COLORS
-	{
-	  error_font.print();
-#endif
-	  fprintf(PRINTFAST, "!!Answer not found!!");
-#ifdef CALC_COLORS
-	  output_font.print();
-	}
-#endif
-    }
-  else
-    Error = Empty;
-}
-
-void link_ans::del_ans_x(unsigned long x)
-{
-  if (top)					// answer list is not empty
-    {
-      if (x == 1)				// only one answer is there in the answer list
-	{
-	  ans *z = top;
-	  delete z;			// deleting the 1st and the last answer
-	  top = top->next;	// same as top = NULL
-	  n--;				// same as n = 0
-	}
-      else if (top->next)
-	// more than one answer is there in the answer list
-	{
-	  bool f = 1;			// flag
-	  ans *t = top;
-	  for (unsigned long m = 1; m < n && t->next; t = t->next, m++)
-	    {
-	      // traversal through the list
-	      if (m == x - 1)	// position is found
-		{
-		  f = 0;		// changing the flag
-		  break;
-		}
-	    }
-	  if (f)				// out of range
-	    fprintf(PRINTFAST, Invalid);
-	  else				// if inside the range
-	    {
-	      ans *z = t->next;	// address to be deleted
-	      t->next = t->next->next;
-	      // leaving the address which is to be deleted by jumping to the ext address
-	      delete z;
-	      n--;			// after deltion reducing the size of the
-	      // answers list
-	    }
-	}
-      else					// if an unwanted error occurs
+      --pos;
+      ans *t = top;
+      for (;t->next && --pos; t = t->next);
+      if (pos)
 	fprintf(PRINTFAST, Invalid);
+      else
+	{
+	  ans *z = t->next;
+	  t->next = t->next->next;
+	  delete z;
+	  n--;
+	}
     }
-  else						// if the answers list is empty
-    Error = Empty;
 }
 
 void link_ans::show_all_ans()
 {
-  if (top)					// answers list is not empty
+  if (top)
     {
-      long m = 1;
-      for (ans * t = top; t != 0; t = t->next)	// traversal through the
-	// answers list
+      unsigned long m = 1;
+      for (ans * t = top; t; t = t->next)
 	{
 	  fprintf(PRINTFAST, "\nA%ld", m++);
 	  t->display();
 	}
     }
-  else    // if answers list is empty
+  else
     Error = Empty;
 }
 
 bool link_ans::deallocate()
 {
-  if (top)					// answers list is not empty
+  if (top)
     {
       for (; top;)
 	{
-	  // traversal till the answers list becomes empty
-	  ans *t = top;		// answer to be deleted
-	  top = top->next;	// jumping to the next answer
+	  ans *t = top;
+	  top = top->next;
 	  delete t;
 	}
-      n = 0, top = 0;
-      // nullifying the count and top address of answers list as the answers list is empty
+      n = 0, top = end = 0;
       return 1;
     }
-  else						// if the answers list is empty
+  else
     return 0;
 }
-#endif // ANS_H

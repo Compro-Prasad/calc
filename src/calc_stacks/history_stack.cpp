@@ -1,5 +1,14 @@
 #include <calc_stacks/history_stack.hpp>
 #ifdef CALC_HISTORY_STACK_H
+
+#ifdef CALC_HISTORY
+history h;                      /* Object for inserting commands in stack for further retrieval */
+unsigned short record = NORMAL_COMMANDS |
+                        EXPRESSION_COMMANDS |
+                        UNDEFINED_COMMANDS |
+                        EXPRESSIONS_HAVING_ERROR; /* Switch for (not)storing specific types commands */
+#endif
+
 history::history()
 {
   top = 0;
@@ -41,7 +50,7 @@ void history::push(strings cmd)
       top = temp;
     }
 }
-void history::cmd_modify(strings cmd)
+void history::cmd_modify(const strings &cmd)
 {
   if (current == (void *)-1)
     {
@@ -53,11 +62,13 @@ void history::cmd_modify(strings cmd)
 	  if (top)
 	    top->prev = temp;
 	  current = top = temp;
+	  top->prev = 0;
 	}
     }
   else if (current)
     top->c = cmd;
 }
+
 command* history::get_prev_cmd()
 {
   if (top)
@@ -82,6 +93,7 @@ command* history::get_prev_cmd()
     }
   return 0;
 }
+
 command* history::get_next_cmd()
 {
   if (top && current != (void *)-1)
@@ -93,14 +105,21 @@ command* history::get_next_cmd()
     }
   return 0;
 }
+
 void history::pop()
 {
   if (top)
     {
       command *temp;
-      if (current == (void *)-1)
-	temp = top, top = top->next, top->prev = 0;
-      else if (current)
+      if (current == (command *)-1 || !current)
+	{
+	  temp = top;
+	  top = top->next;
+	  top->prev = 0;
+	  if (!current)
+	    current = (command *)-1;
+	}
+      else
 	{
 	  temp = current, current = current->next;
 	  if (top->next == current)
@@ -109,17 +128,12 @@ void history::pop()
 	      if (current)
 		current->prev = 0;
 	    }
-	  else
+	  else if (current)
 	    {
-	      if (current)
-		{
-		  current->prev->prev->next = current;
-		  current->prev = current->prev->prev;
-		}
+	      current->prev->prev->next = current;
+	      current->prev = current->prev->prev;
 	    }
 	}
-      if (!current)
-	current = (command *)-1;
       delete temp;
     }
 }

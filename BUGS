@@ -1,14 +1,16 @@
-1)Use of long double gives wrong precision in longer precisions and wrong
-  integers in longer integers.
-2)Using long expressions/commands in input without providing any space
-  crashes the program due to overflow.
+1) Use of long double gives wrong precision in longer precisions and wrong
+   integers in longer integers.
+2) SCREEN_MANIP is still under development so its better to avoid its use.
+3) Some bugs may have poped up due to sudden change of all 'long int' datatypes
+   to 'unsigned long' datatypes.
 
 Solution:
-1)Use 'show e' command to view values in exponentials by setting maximum
-  precision to 5[using command 'precision 5']. This will throw out the wrong
-  values and thus you will get a precise answer which is always better than a
-  wrong answer.
-2)Provide a small expression/command before providing first space to be on
-  the safe side. Then you are free to provide any long command/expression.
+1) Use 'show e' command to view values in exponentials by setting maximum
+   precision to 15[using command 'precision 15']. This will throw out the wrong
+   values and thus you will get a precise answer which is always better than a
+   wrong answer.
+2) Remove/comment out the line "# define SCREEN_MANIP" and then compile.
+3) No solution is there untill now as no rigorous testing has been done. This
+   line will be removed after testing properly.
 
 Report Bugs to 'compro.prasad@gmail.com'

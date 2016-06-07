@@ -1,5 +1,10 @@
 #include <calc_stacks/constant_stack.hpp>
 #ifdef CONSTANT_STACK_H
+
+#ifdef CONST_CMDS
+const_list cons;                /* Object for storing constants in stack */
+#endif // CONST_CMDS
+
 constant::constant()
 {
   name[0] = 0, value = 0.0;
@@ -7,7 +12,8 @@ constant::constant()
 
 constant::constant(const char *c, long double val)
 {
-  strncpy(name, c, 21);
+  strncpy(name, c, 20);
+  name[20] = 0;
   value = val;
 }
 
@@ -38,7 +44,15 @@ void const_list::disp_const()
 	}
     }
   else
-    fprintf(PRINTFAST, Empty);
+#ifdef CALC_COLORS
+    {
+      error_font.print();
+#endif
+      fprintf(PRINTFAST, "!!Constant list empty!!");
+#ifdef CALC_COLORS
+      output_font.print();
+    }
+#endif
 }
 
 bool const_list::get_const(const char *a, unsigned long int &i, long double &x)
@@ -79,12 +93,21 @@ bool const_list::insert_const(constant x)
       if (t)
 	{
 	  t->value = x.value;
-	  strncpy(t->name, x.name, 21);
+	  strncpy(t->name, x.name, 20);
+	  t->name[20] = 0;
 	  t->next = top, top = t;
 	  return 1;
 	}
       else
-	fprintf(PRINTFAST, "!!Cannot allocate memory!!");
+#ifdef CALC_COLORS
+	{
+	  error_font.print();
+#endif
+	  fprintf(PRINTFAST, "!!Cannot allocate memory!!");
+#ifdef CALC_COLORS
+	  output_font.print();
+	}
+#endif
     }
   return 0;
 }
@@ -122,7 +145,15 @@ void const_list::delete_const(const char *x)
 #endif
     }
   else
-    fprintf(PRINTFAST, Empty);
+#ifdef CALC_COLORS
+    {
+      error_font.print();
+#endif
+      fprintf(PRINTFAST, "!!Constant list empty!!");
+#ifdef CALC_COLORS
+      output_font.print();
+    }
+#endif
 }
 
 bool const_list::check_const(const char *x)

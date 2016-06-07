@@ -1,52 +1,88 @@
 #ifndef CALC_STR_H
 #define CALC_STR_H
 
-#include <ctype.h>
-#include <math.h>
-#include <string.h>
 #include <chatr.hpp>
-#include <calc_stacks/constant_stack.hpp>
-
-#ifdef CONST_CMDS
-extern const_list cons;
-#endif
 
 /* priority types */
 #define HIGH 10000
 #define LOW  10
 
+/* extract_math return values */
+#define GOT_NUMBER    1
+#define GOT_ANSWER    2
+#define GOT_BRACKET   3
+#define GOT_MATH_FUNC 4
+
 #define SKIP_SPACE(s, i) s[i] == ' ' ? ++i : i
+
+#define isupper(c) ((c) > 64 && (c) < 91  ? 1 : 0)
+#define islower(c) ((c) > 96 && (c) < 123 ? 1 : 0)
+#define isdigit(c) ((c) > 47 && (c) < 58  ? 1 : 0)
+#define isalpha(c) (islower(c) || isupper(c))
+#define isalnum(c) (isalpha(c) || isdigit(c))
+#define tolower(c) (isupper(c) ? (c) + 32 : c)
+#define toupper(c) (islower(c) ? (c) - 32 : c)
 
 enum data_type
   {
     REAL,
     INT,
     UNSIGNED_INT,
-    UNSIGNED_REAL,
+    UNSIGNED_REAL
   };
 
-#if defined(SHELL_INPUT) || defined(DIRECT_INPUT)
-extern long strMAX;
-#endif
+extern unsigned long strMAX;
 
-bool ismathchar(const char ch);
+extern unsigned int strlen(const char *s);
+extern signed char strcmp(const char *s1, const char *s2);
+extern signed char strncmp(const char *s1, const char *s2, unsigned int l);
+extern signed char strcasecmp(const char *s1, const char *s2);
+extern signed char strncasecmp(const char *s1, const char *s2, unsigned int l);
+extern void strcpy(char *s1, const char *s2);
+extern void strncpy(char *s1, const char *s2, unsigned int l);
+extern void strcat(char *s1, const char *s2);
+extern void strncat(char *s1, const char *s2, unsigned int l);
 
-bool isbinary(const char *s);
+extern bool ismathchar(const char ch);
+extern bool isbinary(const char *s);
+extern bool isunary(const char *s);
+extern bool ismath(const char *s);
+extern bool isidentifier(const char *s);
 
-bool isunary(const char *s);
-
-bool ismath(const char *s);
-
-signed char atof(const char *a, unsigned long &i, long double &x, data_type d = REAL);
+extern signed char atof(const char *a, unsigned long &i, long double &x, data_type d = REAL);
 
 #ifdef ANS_CMD
-signed char separate_ans(const char *a, unsigned long &i, unsigned long &x);
+extern signed char separate_ans(const char *a, unsigned long &i, unsigned long &x);
 #endif
 
-void extract(const char *a, char *b, unsigned long i, long j = -1, char ch = NUL, unsigned long len = strMAX);
+/* Extract a substring from a string either on
+ * the basis of ending character or position in
+ * the given string.
+ */
+extern void extract(const char *a,              /* Source string */
+		    char *b,                    /* Destination string */
+		    unsigned long i,            /* Starting position of extraction */
+		    unsigned long j = -1,       /* Stopping position of extraction
+						 * -1 for not stopping at any
+						 * numerical position */
+		    char ch = NUL,              /* Stopping character of extraction */
+		    unsigned long len = strMAX);/* Length of the source string */
 
-unsigned char extract_math(const char *a, unsigned long &i, long double &x, char *b);
+/* Extract a number/answer/operator/constant from
+ * a given string and return a specific integer
+ * to inform about the type of thing extracted
+ */
+extern unsigned char extract_math(const char *a,   /* The source string */
+			   unsigned long &i,/* Starting point of extraction */
+			   long double &x,  /* Number stored here if got */
+			   char *b);        /* Things other than numbers are
+					     * stored in this string */
 
-long check_priority(const char *s1, const char *s2);
+/* Check priority of two operators contained in string s1 and s2
+ * The function returns HIGH for higher priority of s1 than s2
+ * and LOW for s1's priority is less than s2. Full documentation
+ * is given inthe function's defination in str.cpp
+ */
+extern long check_priority(const char *s1, const char *s2);
 
 #endif // CALC_STR_H

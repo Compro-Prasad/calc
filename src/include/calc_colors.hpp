@@ -68,5 +68,8 @@ public:
   void print();
   void update();
 };
+
+extern calc_font input_font, prompt_font, output_font;
+
 #endif // CALC_COLORS_H
 #endif // CALC_COLORS

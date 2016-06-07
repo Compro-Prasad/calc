@@ -7,3 +7,9 @@ For example if you want to get rid of colors/fonts from the calculator
 permanently then remove or comment out '#define CALC_COLORS' from
 'calc_features.h' header file and compile the program[See INSTALL for
 compilation].
+
+Remove or comment out the line having '# define SCREEN_MANIP' in the file
+calc_features.hpp if you are not a developer or rigorous user of this program
+as it has a buggy behaviour(not so anoying) while passing a SIGWINCH signal.
+It is still in usable state but some more features will be improved in near
+future.

@@ -1,10 +1,12 @@
 CC = g++
+CXX = $(CC)
 
-CFLAGS = -c -g -Wall -ansi -o
+CFLAGS = -O4 -floop-nest-optimize -Wall -ansi -pedantic
+CXXFLAGS = $(CFLAGS)
+ALL_CFLAGS = $(CFLAGS) -c -o
+ALL_CXXFLAGS = $(CXXFLAGS) -c -o
 
 TARGET = calc
-
-INSTALL_DIR = /usr/local/bin
 
 SRCDIR = src/
 STACKDIR = $(SRCDIR)calc_stacks/
@@ -15,15 +17,25 @@ OBJECTS = $(addprefix $(OBJDIR), $(subst .cpp,.o,$(notdir $(SOURCES))))
 
 INCLUDE = -I$(SRCDIR)include/
 
+PREFIX=/usr/local/
+INSTALL_PREFIX=$(PREFIX)
+
+INSTALL_DIR = $(INSTALL_PREFIX)bin/
+
+MANPATH=$(INSTALL_PREFIX)share/man/man1/
+MANPAGE=doc/man/man1/$(TARGET).1
+
+all: $(TARGET) doc
+
 $(TARGET): $(OBJECTS)
-	$(CC) -o $(TARGET) $^
+	$(CXX) -o $(TARGET) $^
 
 $(OBJDIR)%.o: $(SRCDIR)%.cpp
 	@if [ ! -d "$(OBJDIR)" ]; then mkdir $(OBJDIR); fi
-	$(CC) $(CFLAGS) $@ $< $(INCLUDE)
+	$(CXX) $(ALL_CXXFLAGS) $@ $< $(INCLUDE)
 
 $(OBJDIR)%.o: $(STACKDIR)%.cpp
-	$(CC) $(CFLAGS) $@ $< $(INCLUDE)
+	$(CXX) $(ALL_CXXFLAGS) $@ $< $(INCLUDE)
 
 .PHONY: clean cleanall install
 clean:
@@ -34,8 +46,6 @@ cleanall:
 	@if [ -d $(OBJDIR) ]; then rm -r $(OBJDIR); else echo "Objects already removed"; fi
 
 install:
-	@if [ ! -w $(INSTALL_DIR) ]; then echo $(INSTALL_DIR) has no write permissions for $(USER).; fi
-	@if [ "$(USER)" != "root" ]; then echo "$(USER) has no sudo rights. Try using \"sudo make install\" or\
-	\nconsult your administrator."; fi
-	@if [ ! -f $(TARGET) ]; then echo "$(TARGET) is not build yet. Use make to build the source first."; exit; fi
-	@if [ "$(USER)" = "root" -o "$(USER)" = "$(SUDO_USER)" -o -w "$(INSTALL_DIR)" ]; then cp "$(TARGET)" "$(INSTALL_DIR)" && echo Successfully installed; fi
+	@cp "$(TARGET)" "$(INSTALL_DIR)" && echo Successfully installed;
+	-mkdir -p $(MANPATH);
+	@cp "$(MANPAGE)" "$(MANPATH)" && echo Man page made available;

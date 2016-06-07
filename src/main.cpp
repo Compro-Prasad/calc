@@ -1,168 +1,173 @@
 #include <calc_features.hpp>
+
+#include <signal.h>
+
+#ifdef SHELL_INPUT
+#include <fstream>
+using namespace std;
+#endif
+
 #include <calc_cmd_action.hpp>
+#include <calc_shell_options.hpp>
 #include <calc_input.hpp>
+#include <calc_colors.hpp>
+#include <calc_screen_manip.hpp>
 
+#include <calc_stacks/optr_stack.hpp>
+#include <calc_stacks/num_stack.hpp>
+#include <calc_stacks/history_stack.hpp>
+#include <calc_stacks/constant_stack.hpp>
+#include <calc_stacks/ans_stack.hpp>
 
-strings Error;                  /* String for storing errors generated after each command */
-link_oprators optr;             /* Object for storing operators in the stack for calculation */
-link_numbers num;               /* Object for storing numbers in the stack for calculation */
+strings Error;
 
-#if defined(DIRECT_INPUT) || defined(SHELL_INPUT)
-long strMAX = MAX_LEN;
-#endif
+unsigned long strMAX = 1000;
 
-#ifdef CALC_COLORS
-calc_font input_font  = calc_font( CYAN  , DEFAULT, REGULAR );
-calc_font error_font  = calc_font( RED   , DEFAULT, BOLD    );
-calc_font output_font = calc_font( GREEN , DEFAULT, REGULAR );
-calc_font prompt_font = calc_font( YELLOW, DEFAULT, REGULAR );
-#endif // CALC_COLORS
-
-#ifdef CALC_HISTORY
-history h;                      /* Object for inserting commands in stack for further retrieval */
-unsigned short record = NORMAL_COMMANDS | EXPRESSION_COMMANDS | UNDEFINED_COMMANDS | EXPRESSIONS_HAVING_ERROR; /* Switch for (not)storing specific types commands */
-#endif
-
-#ifdef ANS_CMD
-bool store = true;              /* Whether or not to store answers */
-link_ans l;                     /* Object for storing answers in stack */
-#endif // ANS_CMD
-
-#ifdef CONST_CMDS
-const_list cons;                /* Object for storing constants in stack */
-#endif // CONST_CMDS
-
-#ifdef STEPS_CMD
-bool steps = false;             /* Whether or not to show steps */
-#endif // STEPS_CMD
-
-#ifdef FILE_MANAGER
-bool line_no = false;           /* Whether or not to show line numbers */
-bool printpwd = false;          /* Whether or not to show pwd */
-char pwd[MAX_LEN] = HOME;       /* String for storing pwd */
-#endif // FILE_MANAGER
-
-#ifdef CALC_PROCESS_TIME
-bool calc_time = false;         /* Whether or not to show processing time for each calculation */
-bool calc_avg_time = false;     /* Whether or not to show average processing time for a set of sequential calculations */
-#endif // CALC_PROCESS_TIME
-
-#ifdef OPTR_DETAILS
-bool oprator_detail = false;    /* Whether or not to show status of operators stack */
-#endif // OPTR_DETAILS
-
-#ifdef NUM_DETAILS
-bool num_detail = false;        /* Whether or not to show status of numbers stack */
-#endif // NUM_DETAILS
-
-#ifdef PROMPT
-char prompt[500] = ">> ";       /* String for storing prompt */
-#endif // PROMPT
-
-unsigned char angle_type = DEG;/* Type of angle to be taken input and shown output */
 char precision[15] = "%.5Lg";  /* String for storing precision */
 char e[3] = "Lg";              /* String for showing or not showing exponential */
+
+#ifdef DIRECT_INPUT
+#ifdef SHELL_INPUT
+bool direct_input = 1;
+#endif
+bool welcome_msg = true;
+#endif
 
 int main(int argc, char *argv[])
 {
 #ifdef CALC_COLORS
   output_font.print();
 #endif
-  strings a;
+
 
 #ifdef SHELL_INPUT
-  for (int index = 1; index < argc; index++)
-    {
-      a = argv[index];
-      Error = "";
-      /* option for reading commands from file */
-      if (a == "-f")
-        {
-	  if (index < (argc - 1))
-            {
-	      a = argv[++index];
-	      ifstream f;
-	      f.open(a.str());
-	      if (f)
-                {
-		  while (!f.eof())
-                    {
-		      f.getline(a.str(), 4000, '\n');
-		      print_prompt();
-		      fprintf(PRINTFAST, "%s ", a.str());
-		      cmd_action(a.str());
-                    }
-                }
-	      else
-		sprintf(Error.str(), "\"%s\" file could not be read\n", a.str());
-            }
-	  else
-	    sprintf(Error.str(), "(null) file can't be opened\n");
-        }
-      else
-        {
-	  print_prompt();
-	  fprintf(PRINTFAST, "%s", a.str());
-	  cmd_action(a.str());
-        }
-    }
 
-  if (argc != 1)
+
+  /* ****************************************************************** */
+  /*                     checking out shell arguments                   */
+  /*                   */ parse_options(argc, argv); /*                 */
+  /*                           parsing complete                         */
+  /* ****************************************************************** */
+
+
+  /* ****************************************************************** */
+  /*                          if an error occured                       */
+  if (Error != "")
+#ifdef CALC_COLORS
+  {
+    error_font.print();
+#endif
+    fprintf(PRINTFAST, "%s\n", Error.str());
+#ifdef CALC_COLORS
+    output_font.print();
+  }
+#endif
+  /*                                print it                            */
+  /* ****************************************************************** */
+
+
+  if (argc != 1
+#ifdef DIRECT_INPUT
+      && !direct_input
+#endif
+      )
     return 0;
+
 
 #endif // SHELL_INPUT
 
-#ifdef DIRECT_INPUT
-  fprintf(PRINTFAST, "\
-This is free software with ABSOLUTELY NO WARRANTY.\n\
-For details type `warranty'.\n\
-Type help and press return to know more.\n");
 
-  /* till the user doesnt type exit the loop will go on */
-  while (a != "exit")
+#ifdef DIRECT_INPUT
+
+
+#ifdef SCREEN_MANIP
+  unsigned short t;
+  get_screen_size(0);
+  if (signal(SIGWINCH, change_screen_values) == SIG_ERR)
+    fprintf(stderr, "\nUnable to catch signal\n");
+#endif
+
+
+  /* ****************************************************************** */
+  /* Changing input flags to prevent printing while typing and every    */
+  /*      character is returned without pressing the return key         */
+  /*                    */change_input_flags(0);/*                      */
+  /* ****************************************************************** */
+
+
+  /* ******************************************************************* */
+  /*                             Welcome message                         */
+  if (welcome_msg)
+    fprintf(PRINTFAST,
+	    "This is free software with ABSOLUTELY NO WARRANTY.\n"
+	    "For details type `warranty'.\n"
+	    "Type help and press return to know more.\n");
+  /* ******************************************************************* */
+
+
+  while (Input != "exit")
     {
+#ifdef SCREEN_MANIP
+      current_pos(t, cur_prompt_line);
+#endif
       print_prompt();
 
-      a = "";
+      Input = "";
       Error = "";
 
-#ifdef CALC_HISTORY
-      h.reset();
-#endif
 
-#ifdef CALC_COLORS
-      input_font.print();
-#endif
-      calc_input(a);
-#ifdef CALC_COLORS
-      output_font.print();
-#endif
+      /* ************************************************************** */
+      /*                  input functioning begins here                 */
 #ifdef CALC_HISTORY
-      h.cmd_modify(a);
+      /*   reset the positioning of history scroller to a new position  */
+      /*  */                      h.reset();                        /*  */
 #endif
-      if (a == "exit")
-	break;
-      else
-	cmd_action(a);
-      if (Error != "")
-        {
 #ifdef CALC_COLORS
+      /*              change to input font characteristics              */
+      /*  */                 input_font.print();                    /*  */
+#endif
+      /*                      start taking in input                     */
+      /*  */                    calc_input();                       /*  */
+#ifdef CALC_COLORS
+      /*            reset font characteristics to output mode           */
+      /*  */                 output_font.print();                   /*  */
+#endif
+      /*                           Input over                           */
+      /* ************************************************************** */
+
+
+      /* ************************************************************** */
+      /*                   bring the input in action                    */
+      /*  */                     cmd_action();                      /*  */
+      /* ************************************************************** */
+
+
+      /* ************************************************************** */
+      /*                     if an error occured                        */
+      if (Error != "")
+#ifdef CALC_COLORS
+	{
 	  error_font.print();
 #endif
 	  fprintf(PRINTFAST, "%s\n", Error.str());
 #ifdef CALC_COLORS
 	  output_font.print();
+	}
 #endif
-        }
+      /*                         then print it                          */
+      /*                                                                */
+      /*                   input fuctioning over(reloop)                */
+      /* ************************************************************** */
+
     }
-  /******************************************************/
-#endif
-#if !defined(SHELL_INPUT) && !defined(DIRECT_INPUT)
-  fprintf(PRINTFAST, "No input was enabled at the time of compilation\n");
-  fprintf(PRINTFAST, "Recompile with either of the following inputs enabled:\n");
-  fprintf(PRINTFAST, "1) Shell Input\n");
-  fprintf(PRINTFAST, "2) Direct Input");
-#endif
+#endif // DIRECT_INPUT
+
+
   fprintf(PRINTFAST, "\n");
+
+
+  change_input_flags(1);
+
+
   return 0;
 }

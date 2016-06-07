@@ -4,15 +4,8 @@
 #ifndef CONSTANT_STACK_H
 #define CONSTANT_STACK_H
 
-#include <ctype.h>
-#include <string.h>
-
 #include <calc_colors.hpp>
 
-#define Constants "calculator/data/constants.dat"
-#define Temp "calculator/data/temp"
-#undef Empty
-#define Empty "!!Constant list empty!!"
 /*
   structure made for storing real constants This is made so that the contents
   are stored in a file for storing many constants This would reduce the
@@ -43,7 +36,7 @@ struct constnt:public constant
   constnt();
 };
 
-struct const_list
+class const_list
 {
   constnt *top;
 public:
@@ -56,5 +49,12 @@ public:
   void delete_all_const();
   ~const_list();
 };
+
+#ifdef CONST_CMDS
+extern const_list cons;                /* Object for storing constants in stack */
+#endif // CONST_CMDS
+
+#include <str.hpp>
+
 #endif
 #endif // CONSTANT_STACK_H

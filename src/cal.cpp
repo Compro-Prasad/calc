@@ -1,8 +1,23 @@
 #include <cal.hpp>
+#include <math.h>
 #include <calc_stacks/optr_stack.hpp>
 #include <calc_stacks/num_stack.hpp>
+#include <calc_stacks/history_stack.hpp>
+#include <calc_strings.hpp>
 
-#ifdef CALC_CAL_H
+unsigned char angle_type = DEG;
+#ifdef CONST_CMDS
+extern const_list cons;
+#endif
+
+#ifdef ANS_CMD
+extern link_ans l;
+#endif
+
+#ifdef STEPS_CMD
+bool steps = false;             /* Whether or not to show steps */
+#endif // STEPS_CMD
+
 long double factorial(long double x)
 {
   long double t = 1;
@@ -10,6 +25,62 @@ long double factorial(long double x)
     t *= i;
   return t;
 }
+
+
+void sum(long double lower_limit, long double &upper_limit, long double &rate, const unsigned long &i)
+{
+  fprintf(PRINTFAST, "Suming expression \"");
+  bool flag = 0, f = 1;
+  extern strings Input;
+  unsigned long m = i;
+  long double sum = 0, x = 0;
+  Input.print(m);
+  fprintf(PRINTFAST, "\" from i = %Lg to i = %Lg at the rate of %Lg per sum\n", lower_limit, upper_limit, rate);
+  if (lower_limit > upper_limit && rate < 0.0)
+    {
+      swap(lower_limit, upper_limit, long double);
+      rate = -rate;
+      flag = 1;
+    }
+
+  for (; lower_limit <= upper_limit; lower_limit += rate)
+    {
+      m = i;
+      if (calculate(Input.str(), x, m, '\0', lower_limit, true) == SUCCESS)
+	sum += x;
+      else
+	{
+	  f = 0;
+	  if (Error != "")
+	    Error += " Error!! in expression";
+	  else
+	    sprintf(Error.str(), "Failure to recognise expression in \"%s\"", Input.str());
+#ifdef CALC_HISTORY
+	  if (!(record & EXPRESSIONS_HAVING_ERROR))
+	    h.pop();
+#endif
+	  break;
+	}
+    }
+
+  /* For printing the sum and storing in answer list */
+  if (f)
+    {
+      fprintf(PRINTFAST, "Sum = ");
+      if (flag)
+	sum = -sum;
+      fprintf(PRINTFAST, precision, sum);
+#ifdef ANS_CMD
+      if (store == 1)
+	l.add_ans(sum);
+#endif
+    }
+  /***************************************************/
+
+  num.reset();
+  optr.reset();
+}
+
 
 signed char calculateit(const char *a, long double &ans, long double x, long double y)
 {
@@ -27,7 +98,7 @@ signed char calculateit(const char *a, long double &ans, long double x, long dou
       else
         {
 	  Error = "!!Divide";
-	  Err;
+	  return ERROR;
         }
     }
   else if (!strcmp(a, "!"))
@@ -37,128 +108,128 @@ signed char calculateit(const char *a, long double &ans, long double x, long dou
       else
         {
 	  Error = "!!Factorial";
-	  Err;
+	  return ERROR;
         }
     }
-  else if (!strcasecmp(a, "p"))
+  else if (!strcmp(a, "p"))
     {
       if (x >= 0 && y >= 0 && x >= y && !(x - floorl(x)) && !(y - floorl(y)))
 	ans = factorial(x) / factorial(x - y);
       else
         {
 	  Error = "!!Factorial";
-	  Err;
+	  return ERROR;
         }
     }
-  else if (!strcasecmp(a, "c"))
+  else if (!strcmp(a, "c"))
     {
       if (x >= 0 && y >= 0 && x >= y && !(x - floorl(x)) && !(y - floorl(y)))
 	ans = factorial(x) / (factorial(y) * factorial(x - y));
       else
         {
 	  Error = "!!Factorial";
-	  Err;
+	  return ERROR;
         }
     }
   else if (!strcmp(a, ">>"))
-    ans = (long)x >> (long)y;
+    ans = (unsigned long)x >> (unsigned long)y;
   else if (!strcmp(a, "<<"))
-    ans = (long)x << (long)y;
+    ans = (unsigned long)x << (unsigned long)y;
   else if (!strcmp(a, "~"))
-    ans = ~(long)x;
+    ans = ~(unsigned long)x;
   else if (!strcmp(a, "|"))
-    ans = (long)x | (long)y;
+    ans = (unsigned long)x | (unsigned long)y;
   else if (!strcmp(a, "&"))
-    ans = (long)x & (long)y;
+    ans = (unsigned long)x & (unsigned long)y;
   else if (!strcmp(a, "%"))
-    ans = (long)x % (long)y;
-  else if (!strcasecmp(a, "log"))
+    ans = fmodl(x, y);
+  else if (!strcmp(a, "log"))
     {
       if (y > 0 && x >= 0)
 	ans = logl(y) / logl(x);
       else
         {
 	  Error = "!!log";
-	  Err;
+	  return ERROR;
         }
     }
-  else if (!strcasecmp(a, "abs"))
+  else if (!strcmp(a, "abs"))
     ans = fabsl(x);
-  else if (!strcasecmp(a, "ceil"))
+  else if (!strcmp(a, "ceil"))
     ans = ceill(x);
-  else if (!strcasecmp(a, "floor"))
+  else if (!strcmp(a, "floor"))
     ans = floorl(x);
-  else if (!strcasecmp(a, "ln"))
+  else if (!strcmp(a, "ln"))
     {
       if (x > 0)
 	ans = logl(x);
       else
         {
 	  Error = "!!log";
-	  Err;
+	  return ERROR;
         }
     }
-  else if (!strcasecmp(a, "logten"))
+  else if (!strcmp(a, "logten"))
     {
       if (x > 0)
 	ans = log10l(x);
       else
         {
 	  Error = "!!log";
-	  Err;
+	  return ERROR;
         }
     }
-  else if (!strcasecmp(a, "sinh"))
+  else if (!strcmp(a, "sinh"))
     ans = sinhl(z);
-  else if (!strcasecmp(a, "cosh"))
+  else if (!strcmp(a, "cosh"))
     ans = coshl(z);
-  else if (!strcasecmp(a, "tanh"))
+  else if (!strcmp(a, "tanh"))
     ans = tanhl(z);
-  else if (!strcasecmp(a, "sin"))
+  else if (!strcmp(a, "sin"))
     ans = sinl(z);
-  else if (!strcasecmp(a, "cos"))
+  else if (!strcmp(a, "cos"))
     ans = cosl(z);
-  else if (!strcasecmp(a, "tan"))
+  else if (!strcmp(a, "tan"))
     {
       if (cosl(z))
 	ans = tanl(z);
       else
         {
 	  Error = "!!tan Undefined";
-	  Err;
+	  return ERROR;
         }
     }
-  else if (!strcasecmp(a, "cosec"))
+  else if (!strcmp(a, "cosec"))
     {
       if (sinl(z))
 	ans = 1 / sinl(z);
       else
         {
 	  Error = "!!cosec undefined";
-	  Err;
+	  return ERROR;
         }
     }
-  else if (!strcasecmp(a, "sec"))
+  else if (!strcmp(a, "sec"))
     {
       if (cosl(z))
 	ans = 1 / cosl(z);
       else
         {
 	  Error = "!!sec undefined";
-	  Err;
+	  return ERROR;
         }
     }
-  else if (!strcasecmp(a, "cot"))
+  else if (!strcmp(a, "cot"))
     {
       if (sinl(z))
 	ans = 1 / tanl(z);
       else
         {
 	  Error = "!!cot undefined";
-	  Err;
+	  return ERROR;
         }
     }
-  else if (!strcasecmp(a, "asin"))
+  else if (!strcmp(a, "asin"))
     {
       if (x <= 1 && x >= -1)
 	ans = angle_type == DEG ? (asinl(x) * 180 / PI) :
@@ -166,10 +237,10 @@ signed char calculateit(const char *a, long double &ans, long double x, long dou
       else
         {
 	  Error = "!!asin(x) domain";
-	  Err;
+	  return ERROR;
         }
     }
-  else if (!strcasecmp(a, "acos"))
+  else if (!strcmp(a, "acos"))
     {
       if (x <= 1 && x >= -1)
 	ans = angle_type == DEG ? (acosl(x) * 180 / PI) :
@@ -177,13 +248,13 @@ signed char calculateit(const char *a, long double &ans, long double x, long dou
       else
         {
 	  Error = "!!acos(x) domain";
-	  Err;
+	  return ERROR;
         }
     }
-  else if (!strcasecmp(a, "atan"))
+  else if (!strcmp(a, "atan"))
     ans = angle_type == DEG ? (atanl(x) * 180 / PI) :
       angle_type == GRAD ? (atanl(x) * 200 / PI) : (atanl(x));
-  else if (!strcasecmp(a, "acosec"))
+  else if (!strcmp(a, "acosec"))
     {
       if (x <= -1 && x >= 1)
 	ans = angle_type == DEG ? (asinl(1 / x) * 180 / PI) :
@@ -191,10 +262,10 @@ signed char calculateit(const char *a, long double &ans, long double x, long dou
       else
         {
 	  Error = "!!acosec(x) domain";
-	  Err;
+	  return ERROR;
         }
     }
-  else if (!strcasecmp(a, "asec"))
+  else if (!strcmp(a, "asec"))
     {
       if (x <= -1 && x >= 1)
 	ans = angle_type == DEG ? (acosl(1 / x) * 180 / PI) :
@@ -202,10 +273,10 @@ signed char calculateit(const char *a, long double &ans, long double x, long dou
       else
         {
 	  Error = "!!asec(x) domain";
-	  Err;
+	  return ERROR;
         }
     }
-  else if (!strcasecmp(a, "acot"))
+  else if (!strcmp(a, "acot"))
     ans = angle_type == DEG ? (atanl(1 / x) * 180 / PI) :
       angle_type == GRAD ? (atanl(1 / x) * 200 / PI) : (atanl(1 / x));
   else if (!strcmp(a, "^"))
@@ -227,8 +298,8 @@ signed char insert(const char *s)
       if (check_priority(top_optr, s) == HIGH)
         {
 #ifdef OPTR_DETAILS
-	  if (oprator_detail == YES)
-	    fprintf(PRINTFAST, "\nPriority of \'%s\' is higher than \'%s\'", top_optr, s);
+	  if (operator_detail == YES)
+	    fprintf(PRINTFAST, "\nPriority of %6s\tis higher than\t%6s", top_optr, s);
 #endif
 	  while (check_priority(top_optr, s) == HIGH
 		 && (strcmp(s, ")") || strcmp(top_optr, "(")))
@@ -236,17 +307,17 @@ signed char insert(const char *s)
 	      if (!top_optr)
                 {
 		  Error = Operator;
-		  Err;
+		  return ERROR;
                 }
 	      if (isbinary(top_optr))
                 {
 		  if (num.get(y) != SUCCESS || num.get(x) != SUCCESS)
                     {
 		      Error = Number;
-		      Err;
+		      return ERROR;
                     }
 		  if (calculateit(top_optr, z, x, y) != SUCCESS)
-		    Err;
+		    return ERROR;
 #ifdef STEPS_CMD
 		  else if (steps == YES)
 		    fprintf(PRINTFAST, "\n-> %.3LG %s %.3LG = %.3LG", x, top_optr, y, z);
@@ -257,10 +328,10 @@ signed char insert(const char *s)
 		  if (num.get(x) != SUCCESS)
                     {
 		      Error = Number;
-		      Err;
+		      return ERROR;
                     }
 		  if (calculateit(top_optr, z, x) != SUCCESS)
-		    Err;
+		    return ERROR;
 #ifdef STEPS_CMD
 		  else if (steps == YES)
 		    fprintf(PRINTFAST, "\n-> %s(%.3LG) = %.3LG", top_optr, x, z);
@@ -269,12 +340,12 @@ signed char insert(const char *s)
 	      if (optr.pop() != SUCCESS)
                 {
 		  Error = "!!Operator pop";
-		  Err;
+		  return ERROR;
                 }
 	      if (num.push(z) != SUCCESS)
                 {
 		  Error = "!!Number push";
-		  Err;
+		  return ERROR;
                 }
 	      top_optr = optr.get();
             }
@@ -289,8 +360,8 @@ signed char insert(const char *s)
       else if (!top_optr || check_priority(top_optr, s) == LOW)
         {
 #ifdef OPTR_DETAILS
-	  if (oprator_detail == YES)
-	    fprintf(PRINTFAST, "\nPriority of \'%s\' is lower than \'%s\'", top_optr, s);
+	  if (operator_detail == YES)
+	    fprintf(PRINTFAST, "\nPriority of %6s\tis lower than\t%6s", top_optr, s);
 #endif
 	  if (optr.push(s) == ERROR)
 	    return 5;
@@ -298,14 +369,14 @@ signed char insert(const char *s)
       else
         {
 	  Error = "!!Priority";
-	  Err;
+	  return ERROR;
         }
       return SUCCESS;
     }
-  Err;
+  return ERROR;
 }
 
-signed char calculate(char *a, long double &n, unsigned long i, const char ch, const long var)
+signed char calculate(const char *a, long double &n, unsigned long &i, const char ch, const long double var, bool issum)
 {
   unsigned char check_extract;
 #ifdef ANS_CMD
@@ -313,61 +384,81 @@ signed char calculate(char *a, long double &n, unsigned long i, const char ch, c
 #endif
   long double x, y;
   char c[10];
+  unsigned long first = i;
+  bool flag = ch != ' ';
   for (; a[i] != ch;)
     {
-      SKIP_SPACE(a, i);
-      /******************Factorial******************/
-      /* It is a special kind of unary operator which
-	 stands after the number whose factorial is to be calculated */
+      flag ? SKIP_SPACE(a, i) : 0;
+
+      /* *********************************Factorial***************** */
+      /* It is a special kind of unary operator which                */
+      /* stands after the number whose factorial is to be calculated */
       if (a[i] == '!')
         {
 	  num.get(x);
 	  if (calculateit("!", y, x) != SUCCESS)
-	    Err;
+	    return ERROR;
 	  num.push(y);
 	  i++;
+	  flag ? SKIP_SPACE(a, i) : 0;
 	  continue;
-	  SKIP_SPACE(a, i);
         }
-      /***********************************************/
+      /* *********************************************************** */
 
       if (a[i] == '+' || a[i] == '-')
         {
 	  // condition to tackle continuous random + and/or -
 	  int t = 1;
-	  if (i == 0)
+	  if (i == first)
 	    num.push(0);
 	  while (a[i] == '+' || a[i] == '-')
 	    if (a[i++] == '-')
 	      t = t * (-1);
-#ifdef OPTR_DETAILS
-	  if (oprator_detail == YES)
-	    fprintf(PRINTFAST, "\nPushing \'%c\' from special area", t < 0 ? '-' : '+');
-#endif
 	  if (insert(t < 0 ? "-" : "+") == ERROR)
-	    Err;
-	  SKIP_SPACE(a, i);
+	    return ERROR;
+	  flag ? SKIP_SPACE(a, i) : 0;
         }
-      if (a[i] == 'i')
+
+      /* i represents the value during suming an expresseion */
+      if (a[i] == 'i' && issum)
         {
 	  i++;
 	  num.push(var);
-	  while (a[i] == ' ')
-	    i++;
 	  if (!a[i])
 	    break;
-	  SKIP_SPACE(a, i);
         }
-      x = 0.0;
-      check_extract = extract_math(a, i, x, c);
 
+      x = 0.0;
+
+
+      /* extract a part of the expression */
+      check_extract = extract_math(a, i, x, c);
+      /* ******************************** */
+
+
+      /* if the expression has invalid mathematical part */
       if (!check_extract)
 	return FAILURE;
-      else if (check_extract == 1)
+      /* *********************************************** */
+
+
+      else if (check_extract == GOT_NUMBER)
         {
 	  num.push(x);
 	  x = 0.0;
-	  SKIP_SPACE(a, i);
+	  flag ? SKIP_SPACE(a, i) : 0;
+
+	  /* This part is the work of 'of' in BODMAS
+
+	     For example if you have written sin3sin3 then it is actually
+	     sin(3*sin(3)).
+
+	     This is also valid for expressions like '3e' [where 'e' is a
+	     constant] where it behaves like '3*e'.
+
+	     So writting things like sin(3(pi+pi/2)) [where 'pi' is a constant]
+	     becomes a breeze
+	  */ 
 #ifdef CONST_CMDS
 	  unsigned long j = i;
 #endif
@@ -378,31 +469,38 @@ signed char calculate(char *a, long double &n, unsigned long i, const char ch, c
 #endif
 		   (a[i] != 'P' && tolower(a[i]) != 'l' && a[i] != 'C')))
 	      || a[i] == '(')
-	    if (insert("*") == ERROR)
-	      Err;
+	    {
+	      /* We just have to insert the '*' operator when the above
+		 condition is satisfied*/
+	      if (insert("*") == ERROR)
+		return ERROR;
+	    }
+	  /* *************************************************************** */
         }
 #ifdef ANS_CMD
-      else if (check_extract == 4)
+      else if (check_extract == GOT_ANSWER)
         {
+	  // extracting the answer location from an expression[13 from 3+A13]
 	  if (separate_ans(a, i, ans_no) == ERROR)
             {
 	      Error = "!!Answer";
-	      Err;
+	      return ERROR;
             }
-	  if (num.push(l.get_ans_x(ans_no).n) == ERROR)
+	  // pushing the answer after extracting it from answer list
+	  if (num.push(l.get_ans_x(ans_no).num) == ERROR)
             {
 	      Error = "!!Number linker";
-	      Err;
+	      return ERROR;
             }
         }
 #endif
-      else if (check_extract == 3)
+      else if (check_extract == GOT_MATH_FUNC)
         {
 	  if (insert(c) == ERROR)
-	    Err;
+	    return ERROR;
 	  else
             {
-	      SKIP_SPACE(a, i);
+	      flag ? SKIP_SPACE(a, i) : 0;
 	      if ((a[i] == '-' || a[i] == '+') && isdigit(a[i + 1]))
                 {
 		  atof(a, i, x);
@@ -410,7 +508,7 @@ signed char calculate(char *a, long double &n, unsigned long i, const char ch, c
                 }
             }
         }
-      else if (check_extract == 2)
+      else if (check_extract == GOT_BRACKET)
         {
 	  if (!strcmp(c, "("))
             {
@@ -424,11 +522,11 @@ signed char calculate(char *a, long double &n, unsigned long i, const char ch, c
 	      if (!optr.check_brac())
                 {
 		  Error = "!!Bracket";
-		  Err;
+		  return ERROR;
                 }
 	      if (insert(c) == ERROR)
-		Err;
-	      SKIP_SPACE(a, i);
+		return ERROR;
+	      flag ? SKIP_SPACE(a, i) : 0;
 #ifdef CONST_CMDS
 	      unsigned long j = i;
 #endif
@@ -441,24 +539,24 @@ signed char calculate(char *a, long double &n, unsigned long i, const char ch, c
 			&& a[i] != 'C'))) || a[i] == '('
 		  || isdigit(a[i]))
 		if (insert("*") == ERROR)
-		  Err;
+		  return ERROR;
             }
         }
     }							// loop ends
   while (optr.get())
     if (insert(")") == ERROR)
-      Err;
+      return ERROR;
   if (num.get(n) != SUCCESS)
     return FAILURE;
   if (num.get(y) == SUCCESS)
     {
       Error = Operator;
-      Err;
+      return ERROR;
     }
   if (optr.get())
     {
       Error = Number;
-      Err;
+      return ERROR;
     }
 #if defined(STEPS_CMD) || defined(OPTR_DETAILS) || defined(NUM_DETAILS)
   if (
@@ -468,7 +566,7 @@ signed char calculate(char *a, long double &n, unsigned long i, const char ch, c
       0
 #endif
 #ifdef OPTR_DETAILS
-      || oprator_detail == YES
+      || operator_detail == YES
 #endif
 #ifdef NUM_DETAILS
       || num_detail == YES
@@ -478,4 +576,3 @@ signed char calculate(char *a, long double &n, unsigned long i, const char ch, c
 #endif
   return SUCCESS;
 }
-#endif // CALC_CAL_H

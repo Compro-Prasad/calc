@@ -2,46 +2,33 @@
 #ifdef HELP_CMD
 void help(strings c)
 {
-#ifdef FILE_MANAGER
-  if (c == "file manager")
-    {
-      fprintf(PRINTFAST, "\n\
--> rm <file>    - removes <file>\n\
--> ls <dir>     - lists files and directories\n\
--> cd <dir>     - changes directory\n\
--> open <file>  - opens <file> in text mode\n\
--> edit <file>  - for editing <file>\n\
--> pwd          - shows present working directory");
-    }
-#endif
 #ifdef CONST_CMDS
-#ifdef FILE_MANAGER
-  else
-#endif
     if (c == "constants")
       {
         fprintf(PRINTFAST, "\n\
 -> constant <name>=<value>  - for creating a custom constant\n\
--> show constants           - shows all constants\n\
+-> constants                - shows all constants\n\
 -> remove constant <name>   - removes constant\n\
 -> remove constants         - removes all constants\n\
 -> load constant pi         - loads pi as a constant");
       }
 #endif
 #ifdef ANS_CMD
-#if defined(FILE_MANAGER) || defined(CONST_CMDS)
+#if defined(CONST_CMDS)
     else
 #endif
       if (c == "answers")
 	{
 	  fprintf(PRINTFAST, "\n\
 -> start/stop storing answers  - starts/stops the storing of answers\n\
--> show/delete answers         - shows/deletes all answers\n\
+-> answers                     - shows all answers\n\
+-> delete answers              - deletes all answers\n\
+-> delete answers leaving NUM  - deletes all answers leaving NUM of them\n\
 -> show/delete A31             - shows/deletes answer number 31");
 	}
 #endif
 #ifdef CALC_COLORS
-#if defined(FILE_MANAGER) || defined(CONST_CMDS) || defined(ANS_CMD)
+#if defined(CONST_CMDS) || defined(ANS_CMD)
       else
 #endif
 	if (c == "font")
@@ -73,7 +60,7 @@ and <style> represents one of the folowing:\n\
 	  }
 #endif
 #ifdef CALC_HISTORY
-#if defined(FILE_MANAGER) || defined(CONST_CMDS) || defined(ANS_CMD) || defined(CALC_COLORS)
+#if defined(CONST_CMDS) || defined(ANS_CMD) || defined(CALC_COLORS)
 	else
 #endif
 	  if (c == "command history")
@@ -89,8 +76,8 @@ and <style> represents one of the folowing:\n\
 #endif
 	  else if (c == "miscellaneous")
 	    {
-	      fprintf(PRINTFAST, "\n-> show settings              - shows all settings\n");
-#ifdef CLEAR_CMD
+	      fprintf(PRINTFAST, "\n-> settings                   - shows all settings\n");
+#ifdef SCREEN_MANIP
 	      fprintf(PRINTFAST, "-> clear                      - clears the screen\n");
 #endif
 	      fprintf(PRINTFAST, "-> exit                       - quits the calculator\n");
@@ -98,7 +85,7 @@ and <style> represents one of the folowing:\n\
 	      fprintf(PRINTFAST, "-> factorize <num>            - shows all factors of num\n");
 #endif
 #ifdef SUM
-	      fprintf(PRINTFAST, "-> sum <lo_lt> <up_lt> <expr> - sums up expression having i as variable\n");
+	      fprintf(PRINTFAST, "-> sum <lo_lt> <up_lt> <rate> <expr> - sums up expression having i as variable\n");
 #endif
 #ifdef SHELL_CMD
 	      fprintf(PRINTFAST, "-> shell <command> <args>     - command is executed from shell\n\
@@ -128,9 +115,6 @@ and <style> represents one of the folowing:\n\
 	    }
 	  else
 	    {
-#ifdef FILE_MANAGER
-	      fprintf(PRINTFAST, "\nhelp file manager    - Help on file managing commands");
-#endif
 #ifdef CONST_CMDS
 	      fprintf(PRINTFAST, "\nhelp constants       - Help on constant manipulating commands");
 #endif

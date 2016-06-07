@@ -1,18 +1,19 @@
 #ifndef string_H
 #define string_H
-#include <string.h>
-#include <chatr.hpp>
 #include <malloc.h>
 #include <assert.h>
+#include <chatr.hpp>
+#include <str.hpp>
+#include <calc_screen_manip.hpp>
+
 #define cmp_length  ((strlen(x) > (unsigned long)strMAX || !strlen(x)) ? (unsigned long)strMAX : strlen(x))
 
-extern int getch();
-extern long strMAX;
+extern unsigned long strMAX;
 
 class strings
 {
   char *c;
-  short length;
+  unsigned long length;
 public:
   /* strings:: */strings()
   {
@@ -35,7 +36,7 @@ public:
 
   }
 
-  bool /* strings:: */newsize(long size)
+  bool /* strings:: */newsize(unsigned long size)
   {
     char *z = (char *)realloc(c, size);
     if (z) c = z, length = size;
@@ -48,9 +49,23 @@ public:
     length = strlen(c);
   }
 
-  char /* strings:: */operator[] (const long i)
+  void /* strings:: */operator=(const char *x)
   {
-    return (i < len()? c[i] : NUL);
+    strncpy(c, x, strMAX);
+    length = strlen(c);
+  }
+
+  void /* strings:: */operator=(char **x)
+  {
+    if (c)
+      free(c);
+    c = *x;
+    length = strlen(c);
+  }
+
+  char /* strings:: */operator[] (const unsigned long i)
+  {
+    return (i < length ? c[i] : NUL);
   }
 
   bool /* strings:: */operator==(const char *x)
@@ -113,16 +128,30 @@ public:
     return (strncmp(c, x.c, strMAX) >= 0);
   }
 
+  void /* strings:: */operator+=(const char x)
+  {
+    if (length < strMAX - 1)
+      this->c[length++] = x,
+	this->c[length] = 0;
+  }
+
   void /* strings:: */operator+=(const char *x)
   {
-    strncat(c, x, strMAX);
-    length = strlen(c);
+    --strMAX;
+    while (*x && length < strMAX)
+      c[length++] = *(x++);
+    c[length] = 0;
+    ++strMAX;
   }
 
   void /* strings:: */operator+=(const strings x)
   {
-    strncat(c, x.c, strMAX);
-    length = strlen(c);
+    --strMAX;
+    register char *temp = x.c;
+    while (*temp && this->length < strMAX)
+      c[this->length++] = *(temp++);
+    c[this->length] = 0;
+    ++strMAX;
   }
 
   strings /* strings:: */operator+(const char *x)
@@ -139,34 +168,36 @@ public:
     return y;
   }
 
-  bool /* strings:: */write(const char x, const long i)
+  bool /* strings:: */write(const char x, const unsigned long i)
   {
-    if ((i == (strMAX - 1) && !x) || i < (strMAX - 1))
+    if (x > 31 && x < 127 &&
+	((i == (strMAX - 1) && !x) || i < (strMAX - 1)))
       {
-	c[i] = x;
+	c[i]   = x;
+	i == length ? c[i+1] = 0 : 0;
 	length = strlen(c);
 	return true;
       }
     return false;
   }
 
-  void /* strings:: */shift_right(long i)
+  void /* strings:: */shift_right(unsigned long i)
   {
-    for (long j = length; j >= i; j--)
+    for (register unsigned long j = length; (signed long)j > (signed long)i; --j)
       c[j + 1] = c[j];
     length = strlen(c);
   }
 
-  void /* strings:: */del(long i)
+  void /* strings:: */del(unsigned long i)
   {
     if (i < 0)
       return;
-    for (unsigned long j = i; j <= strlen(c); j++)
+    for (register unsigned long j = i; j <= strlen(c); ++j)
       c[j] = c[j + 1];
     length = strlen(c);
   }
 
-  const long /* strings:: */len()
+  const unsigned long /* strings:: */len()
   {
     return length;
   }
@@ -176,9 +207,23 @@ public:
     return c;
   }
 
-  void /* strings:: */print()
+  void /* strings:: */print(unsigned long &start, unsigned long end = strMAX)
   {
-    fprintf(PRINTFAST, "%s", c);
+    end == strMAX ? end = length : 0;
+#ifdef SCREEN_MANIP
+    register int t1 = cur_col, t2 = cur_line;
+#endif
+    for (register char *ch = c + start;
+#ifdef SCREEN_MANIP
+	 (t1 < max_cols || t2 < max_lines) &&
+#endif
+	   *ch && start < end; ++ch, ++start
+#ifdef SCREEN_MANIP
+	   , t1 = t1 == max_cols ? 1 : t1 + 1,
+	   !(t1 >> 1) && t2 < max_lines ? ++t2 : 0
+#endif
+	 )
+      fprintf(PRINTFAST, "%c", *ch);
   }
 };
 extern strings Error;

@@ -7,27 +7,40 @@
 #include <calc_strings.hpp>
 #include <calc_stacks/constant_stack.hpp>
 
-#define Err return ERROR
 #define Operator "!!Operator scarcity"
 #define Number "!!Number scarcity"
 #define PI 3.14159265358979323846264338327950288419716939937510
 
-extern bool steps;
+/* type of angles */
+#define DEG  20
+#define RAD  30
+#define GRAD 40
+
+/* boolean values */
+#define YES 1
+#define NO  0
+
+#define swap(x, y, t) do {			\
+  t T = x;					\
+  x = y;					\
+  y = T;					\
+  }while (0);					\
+
+#ifdef STEPS_CMD
+extern bool steps;             /* Whether or not to show steps */
+#endif // STEPS_CMD
+
 extern unsigned char angle_type;
 
-#ifdef CONST_CMDS
-extern const_list cons;
-#endif
+extern long double factorial(long double x);	// factorial is undefined for x<0
 
-#ifdef ANS_CMD
-extern link_ans l;
-#endif
+extern signed char calculateit(const char *a, long double &ans, long double x, long double y = 0);
 
-long double factorial(long double x);	// factorial is undefined for x<0
+extern signed char insert(const char *s);
 
-signed char calculateit(const char *a, long double &ans, long double x, long double y = 0);
+extern signed char calculate(const char *a, long double &n, unsigned long &i, const char ch = '\0', const long double var = 0, bool issum = 0);
 
-signed char insert(const char *s);
+extern void sum(long double lower_limit, long double &upper_limit, long double &rate, const unsigned long &i);
 
-signed char calculate(char *a, long double &n, unsigned long i, const char ch = '\0', const long var = 0);
+
 #endif // CALC_CAL_H

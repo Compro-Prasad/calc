@@ -8,5 +8,5 @@
 #define NUL '\0'  // null
 #define ESC '\033'  // escape
 #define DEL 127   // del char on keyboard
-#include "calc_features.hpp"
+#include <calc_features.hpp>
 #endif  // CHAR_H
