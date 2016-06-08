@@ -1,0 +1,30 @@
+input length 10+10
+asdf sdfg dfgh fghj ghjk hjkl jkl; kl;'
+input length 50+50
+hide e
+show e
+warranty
+clear
+show processing time
+hide processing time
+start recording
+stop recording
+show operator details
+show number   details
+show steps
+3+2
+hide operator details
+deg
+sintancos3
+rad
+sintancos3
+grad
+sintancos3
+deg
+stop storing answers
+2+2
+sin90
+start storing answers
+sum 0 100 1 i
+show a0
+exit
