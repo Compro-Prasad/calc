@@ -34,28 +34,29 @@ void help(strings c)
 	if (c == "font")
 	  {
 	    fprintf(PRINTFAST, "\n\
-The following commands are self explanatory:\n\
--> input font color <color>\n\
--> input font background <color>\n\
--> input font style <style>\n\
--> error font color <color>\n\
--> error font background <color>\n\
--> error font style <style>\n\
--> output font color <color>\n\
--> output font background <color>\n\
--> output font style <style>\n\
--> prompt font color <color>\n\
--> prompt font background <color>\n\
--> prompt font style <style>\n\
-where <color> represents one of the following:\n\
-1. Black      5. Red\n\
-2. Green      6. Yellow\n\
-3. Blue       7. Magenta\n\
-4. Cyan       8. White\n\
-and <style> represents one of the folowing:\n\
-1. Regular    5. Bold\n\
-2. Deep       6. Italic\n\
-3. Underline  7. Blink\n\
+-> change <object> <attribute> <color/style>\n\n\
+\
+<object> :\n\t\
+Input\n\t\
+Output\n\t\
+Error\n\t\
+Prompt\n\n\
+\
+<attribute> :\n\t\
+Color\n\t\
+Background\n\t\
+Style\n\n\
+\
+<color> :\n\t\
+1. Black      5. Red\n\t\
+2. Green      6. Yellow\n\t\
+3. Blue       7. Magenta\n\t\
+4. Cyan       8. White\n\n\
+\
+<style> :\n\t\
+1. Regular    5. Bold\n\t\
+2. Deep       6. Italic\n\t\
+3. Underline  7. Blink\n\t\
 4. Negative   8. Strikeoff");
 	  }
 #endif
@@ -76,42 +77,42 @@ and <style> represents one of the folowing:\n\
 #endif
 	  else if (c == "miscellaneous")
 	    {
-	      fprintf(PRINTFAST, "\n-> settings                   - shows all settings\n");
+	      fprintf(PRINTFAST, "\n-> settings                   - shows all settings");
 #ifdef SCREEN_MANIP
-	      fprintf(PRINTFAST, "-> clear                      - clears the screen\n");
+	      fprintf(PRINTFAST, "\n-> clear                      - clears the screen");
 #endif
-	      fprintf(PRINTFAST, "-> exit                       - quits the calculator\n");
+	      fprintf(PRINTFAST, "\n-> exit                       - quits the calculator");
 #ifdef FACTORIZE
-	      fprintf(PRINTFAST, "-> factorize <num>            - shows all factors of num\n");
+	      fprintf(PRINTFAST, "\n-> factorize <num>            - shows all factors of num");
 #endif
 #ifdef SUM
-	      fprintf(PRINTFAST, "-> sum <lo_lt> <up_lt> <rate> <expr> - sums up expression having i as variable\n");
+	      fprintf(PRINTFAST, "\n-> sum <lo_lt> <up_lt> <rate> <expr> - sums up expression having i as variable");
 #endif
 #ifdef SHELL_CMD
-	      fprintf(PRINTFAST, "-> shell <command> <args>     - command is executed from shell\n\
--> shell                      - opens up shell\n");
+	      fprintf(PRINTFAST, "\n-> shell <command> <args>     - command is executed from shell\n\
+-> shell                      - opens up shell");
 #endif
-	      fprintf(PRINTFAST, "\
+	      fprintf(PRINTFAST, "\n\
 -> input length N             - input string length upto N characters\n\
 -> rad/deg/grad               - shows/input angle in radian/degree/grad\n\
 -> show/hide e                - shows/hides exp part of a number\n\
--> precision=N                - shows precision upto N decimal places\n");
+-> precision=N                - shows precision upto N decimal places");
 #ifdef PROMPT
-	      fprintf(PRINTFAST, "-> prompt=<new>               - changes present prompt to new one\n");
+	      fprintf(PRINTFAST, "\n-> prompt=<new>               - changes present prompt to new one");
 #endif
 #ifdef CALC_PROCESS_TIME
-	      fprintf(PRINTFAST, "-> show/hide processing time  - shows/hides processing time of command\n");
+	      fprintf(PRINTFAST, "\n-> show/hide processing time  - shows/hides processing time of command");
 #endif
 #ifdef OPTR_DETAILS
-	      fprintf(PRINTFAST, "-> show/hide operator details - shows/hides operator stack details\n");
+	      fprintf(PRINTFAST, "\n-> show/hide operator details - shows/hides operator stack details");
 #endif
 #ifdef NUM_DETAILS
-	      fprintf(PRINTFAST, "-> show/hide number details   - shows/hides number stack details\n");
+	      fprintf(PRINTFAST, "\n-> show/hide number details   - shows/hides number stack details");
 #endif
 #ifdef STEPS_CMD
-	      fprintf(PRINTFAST, "-> show/hide steps            - shows/hides steps of each calculation\n");
+	      fprintf(PRINTFAST, "\n-> show/hide steps            - shows/hides steps of each calculation");
 #endif
-	      fprintf(PRINTFAST, "-> show/hide e                - shows/hides exp part of a number");
+	      fprintf(PRINTFAST, "\n-> show/hide e                - shows/hides exp part of a number");
 	    }
 	  else
 	    {

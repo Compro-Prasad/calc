@@ -10,6 +10,8 @@ unsigned char angle_type = DEG;
 extern const_list cons;
 #endif
 
+extern strings Input;
+
 #ifdef ANS_CMD
 extern link_ans l;
 #endif
@@ -26,12 +28,44 @@ long double factorial(long double x)
   return t;
 }
 
+void factorize(unsigned long &i)
+{
+  long double x = 0, y = 0;
+  if (calculate(Input.str(), y, i) == SUCCESS)
+    {
+      y < 0 ? y = -y : 0;
+      modfl(y, &x);
+      fprintf(PRINTFAST, "\nFactors of %.0Lf: ", x);
+      for (long double g = 1; g <= x / 2; g++)
+	if (!fmodl(x, g))
+	  fprintf(PRINTFAST, "%.0Lf, ", g);
+      fprintf(PRINTFAST, "%.0Lf", x);
+#ifdef CALC_HISTORY
+      if (!(record & EXPRESSION_COMMANDS))
+	h.pop();
+#endif
+    }
+  else
+#ifdef CALC_HISTORY
+    {
+#endif
+      if (Error != "")
+	Error += " Error!!";
+      else
+	sprintf(Error.str(), "\nUndefined symbols in \'%s\'", Input.str());
+#ifdef CALC_HISTORY
+      if (!(record & EXPRESSIONS_HAVING_ERROR))
+	h.pop();
+    }
+#endif
+  num.reset();
+  optr.reset();
+}
 
 void sum(long double lower_limit, long double &upper_limit, long double &rate, const unsigned long &i)
 {
   fprintf(PRINTFAST, "Suming expression \"");
   bool flag = 0, f = 1;
-  extern strings Input;
   unsigned long m = i;
   long double sum = 0, x = 0;
   Input.print(m);

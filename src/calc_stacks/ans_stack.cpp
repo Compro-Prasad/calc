@@ -3,7 +3,6 @@
 #ifdef ANS_CMD
 bool store = true;              /* Whether or not to store answers */
 link_ans l;                     /* Object for storing answers in stack */
-#endif // ANS_CMD
 
 void answer::display()
 {
@@ -159,3 +158,5 @@ bool link_ans::deallocate()
   else
     return 0;
 }
+
+#endif // ANS_CMD

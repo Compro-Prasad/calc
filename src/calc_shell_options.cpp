@@ -6,7 +6,10 @@
 using namespace std;
 
 #include <math.h>
+#include <signal.h>
 
+#include <calc_screen_manip.hpp>
+#include <calc_process_time.hpp>
 #include <calc_cmd_action.hpp>
 #include <calc_strings.hpp>
 #include <cal.hpp>
@@ -36,8 +39,12 @@ void parse_options(int argc, char *argv[])
 	{
 	  ret_value = 1;
 	  max_ret_value = -1;
-	  while (*(++c) && (ret_value = option_action(c, argv + i + 1)) >= 0)
+	  while (*(++c))
 	    {
+	      kill(my_pid, SIGUSR1);
+	      if ((ret_value = option_action(c, argv + i + 1)) < 0)
+		break;
+	      kill(my_pid, SIGUSR1);
 	      max_ret_value < ret_value ? max_ret_value = ret_value : 0;
 	      if (*c == '-' || !*c)
 		break;
@@ -103,8 +110,10 @@ signed char option_action(const char *action, char **action_args)
 	  strcpy(e, "Lg");
 	}
     }
+#ifdef DIRECT_INPUT
   else if (CHECK_OPTION_AMONG('w', "welcome"))
     welcome_msg = YES - negate;
+#endif
 #ifdef ANS_CMD
   else if (CHECK_OPTION_AMONG('a', "store-answers"))
     store = YES - negate;
@@ -125,7 +134,11 @@ signed char option_action(const char *action, char **action_args)
   else if (CHECK_OPTION_AMONG('t', "show-processing-time"))
     calc_time = YES - negate;
   else if (CHECK_OPTION_AMONG('r', "start-recording"))
-    calc_avg_time = YES - negate;
+    {
+      calc_avg_time = YES - negate;
+      kill(my_pid, SIGUSR2);
+      fprintf(PRINTFAST, "\n");
+    }
 #endif
 #ifdef DIRECT_INPUT
   else if (CHECK_OPTION_AMONG('q', "quit") ||
@@ -213,7 +226,6 @@ signed char option_action(const char *action, char **action_args)
 	  ++ret_value;
 	}
 #endif
-#ifdef DIRECT_INPUT
       else if (*action_args && CHECK_OPTION_AMONG('f', "file"))
 	{
 	  Input = *action_args;
@@ -248,7 +260,6 @@ signed char option_action(const char *action, char **action_args)
 #endif
 	  ++ret_value;
 	}
-#endif
       else if (*action_args && CHECK_OPTION_AMONG('A', "angle-type"))
 	{
 	  if (!strcmp(*action_args, "deg"))
@@ -266,7 +277,7 @@ signed char option_action(const char *action, char **action_args)
 	clrscr();
 #endif
 #ifdef CALC_HISTORY
-      else if (CHECK_OPTION_AMONG('h', "store-history"))
+      else if (CHECK_OPTION_AMONG('H', "store-history"))
 	{
 	  if (!strcmp(*action_args, "undef_cmd"))
 	    record |= UNDEFINED_COMMANDS;

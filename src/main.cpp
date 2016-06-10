@@ -12,6 +12,7 @@ using namespace std;
 #include <calc_input.hpp>
 #include <calc_colors.hpp>
 #include <calc_screen_manip.hpp>
+#include <calc_process_time.hpp>
 
 #include <calc_stacks/optr_stack.hpp>
 #include <calc_stacks/num_stack.hpp>
@@ -35,8 +36,18 @@ bool welcome_msg = true;
 
 int main(int argc, char *argv[])
 {
+
+
 #ifdef CALC_COLORS
   output_font.print();
+#endif
+
+
+#ifdef CALC_PROCESS_TIME
+  if (signal(SIGUSR1, calc_process_time) == SIG_ERR)
+    fprintf(stderr, "\nUnable to attach signal 'SIGUSR1'\n");
+  if (signal(SIGUSR2, calc_process_time) == SIG_ERR)
+    fprintf(stderr, "\nUnable to attach signal 'SIGUSR2'\n");
 #endif
 
 
@@ -84,7 +95,7 @@ int main(int argc, char *argv[])
   unsigned short t;
   get_screen_size(0);
   if (signal(SIGWINCH, change_screen_values) == SIG_ERR)
-    fprintf(stderr, "\nUnable to catch signal\n");
+    fprintf(stderr, "\nUnable to attach signal 'SIGWINCH'\n");
 #endif
 
 
@@ -163,11 +174,5 @@ int main(int argc, char *argv[])
 #endif // DIRECT_INPUT
 
 
-  fprintf(PRINTFAST, "\n");
-
-
-  change_input_flags(1);
-
-
-  return 0;
+  PACKUP_AND_LEAVE;
 }

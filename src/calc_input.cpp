@@ -4,10 +4,12 @@
 #include <sys/select.h>
 
 #include <calc_features.hpp>
+#include <chatr.hpp>
 #include <calc_input.hpp>
 #include <calc_colors.hpp>
 #include <calc_stacks/history_stack.hpp>
 #include <calc_screen_manip.hpp>
+#include <calc_strings.hpp>
 
 strings Input;
 

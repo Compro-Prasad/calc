@@ -27,10 +27,11 @@
 #ifdef DIRECT_INPUT
 # define SCREEN_MANIP
 # define CALC_HISTORY
-# if defined(SCREEN_MANIP) || defined(SHELL_INPUT)
-#  define CALC_COLORS
-# endif
 #endif
+
+#if defined(SCREEN_MANIP) || defined(SHELL_INPUT)
+# define CALC_COLORS
+# endif
 
 #define CALC_VARIABLES // under development
 
@@ -38,6 +39,13 @@
 #define SUCCESS 1
 #define FAILURE 0
 #define ERROR  -1
+
+#include <stdlib.h>
+#define PACKUP_AND_LEAVE do {			\
+    fprintf(PRINTFAST, "\n");			\
+    change_input_flags(1);			\
+    exit(0);					\
+  } while (0)
 
 #include <stdio.h>
 #define PRINTFAST (stderr)

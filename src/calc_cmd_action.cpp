@@ -1,6 +1,5 @@
-#include <math.h>
-#include <time.h>
-#include <stdlib.h>
+#include <signal.h>
+//#include <math.h>
 
 #include <calc_cmd_action.hpp>
 #include <str.hpp>
@@ -9,43 +8,33 @@
 #include <calc_colors.hpp>
 #include <cal.hpp>
 #include <calc_help.hpp>
+#include <calc_process_time.hpp>
 #include <calc_stacks/optr_stack.hpp>
 #include <calc_stacks/constant_stack.hpp>
 #include <calc_stacks/history_stack.hpp>
 #include <calc_screen_manip.hpp>
 #include <calc_input.hpp>
 
-#ifdef CALC_PROCESS_TIME
-bool calc_time = false;         /* Whether or not to show processing time for each calculation */
-bool calc_avg_time = false;     /* Whether or not to show average processing time for a set of sequential calculations */
-#endif // CALC_PROCESS_TIME
-
-extern strings Error;                  /* String for storing errors generated after each command */
-
 #ifdef PROMPT
 extern char prompt[500];       /* String for storing prompt */
-#endif // PROMPT
+#endif
 
-extern char precision[15];  /* String for storing precision */
+extern char precision[15];     /* String for storing precision */
 extern char e[3];              /* String for showing or not showing exponential */
 
 void cmd_action()
 {
-#ifdef CALC_PROCESS_TIME
-  clock_t start;
-  static long double time_taken, expressions, total_time;
-  start = clock();
-#endif
+
+  kill(my_pid, SIGUSR1);
+
   strings temp_char;
+
 #ifdef ANS_CMD
   ans k;
 #endif
+
   if (Input == "exit" || Input == "quit")
-    {
-      fprintf(PRINTFAST, "\n");
-      change_input_flags(1);
-      exit(0);
-    }
+    PACKUP_AND_LEAVE;
   else if (Input == "input length ")
     {
       long double x = 0;
@@ -125,11 +114,14 @@ Boston, MA 02110-1301  USA\n");
   else if (Input == "hide processing time")
     calc_time = NO;
   else if (Input == "start recording")
-    calc_avg_time = YES, total_time = expressions = 0.0;
+    {
+      calc_avg_time = YES;
+      kill(my_pid, SIGUSR2);
+    }
   else if (Input == "stop recording")
     {
       calc_avg_time = NO;
-      fprintf(PRINTFAST, "\nAverage time = %.8Lf", (total_time / expressions));
+      kill(my_pid, SIGUSR2);
     }
 #endif
 
@@ -378,199 +370,79 @@ Boston, MA 02110-1301  USA\n");
   else if (!strcasecmp(Input.str(), "settings"))
     {
 #ifdef PROMPT
-      fprintf(PRINTFAST, "\n");
-      fprintf(PRINTFAST, "Prompt             =  \"%s\"", prompt);
+      fprintf(PRINTFAST, "\nPrompt             =  \"%s\"", prompt);
 #endif // PROMPT
 #ifdef ANS_CMD
-      fprintf(PRINTFAST, "\n");
-      fprintf(PRINTFAST, "Storing Answers    =  %s", store == YES ? "YES" : "NO");
+      fprintf(PRINTFAST, "\nStoring Answers    =  %s", store == YES ? "YES" : "NO");
 #endif // ANS_CMD
 #ifdef CHANGE_PRECISION
-      fprintf(PRINTFAST, "\n");
-      fprintf(PRINTFAST, "Precision          =  \"%s\"", precision);
+      fprintf(PRINTFAST, "\nPrecision          =  \"%s\"", precision);
 #endif // CHANGE_PRECISION
-      fprintf(PRINTFAST, "\n");
-      fprintf(PRINTFAST, "Show Exponential   =  %s", strcasecmp(e, "Lf") ? "NO" : "YES");
-      fprintf(PRINTFAST, "\n");
-      fprintf(PRINTFAST, "Angle Mode         =  %s", angle_type == DEG ? "DEGREE" : angle_type == GRAD ? "GRAD" : "RADIAN");
+      fprintf(PRINTFAST, "\nShow Exponential   =  %s", strcasecmp(e, "Lf") ? "NO" : "YES");
+      fprintf(PRINTFAST, "\nAngle Mode         =  %s", angle_type == DEG ? "DEGREE" : angle_type == GRAD ? "GRAD" : "RADIAN");
 #ifdef STEPS_CMD
-      fprintf(PRINTFAST, "\n");
-      fprintf(PRINTFAST, "Steps              =  %s", steps == YES ? "YES" : "NO");
+      fprintf(PRINTFAST, "\nSteps              =  %s", steps == YES ? "YES" : "NO");
 #endif // STEPS_CMD
 #ifdef OPTR_DETAILS
-      fprintf(PRINTFAST, "\n");
-      fprintf(PRINTFAST, "Operator details   =  %s", operator_detail == YES ? "YES" : "NO");
+      fprintf(PRINTFAST, "\nOperator details   =  %s", operator_detail == YES ? "YES" : "NO");
 #endif // OPTR_DETAILS
     }
 
 #ifdef CALC_COLORS
-  else if (Input == "input font color ")
+  else if (Input == "change ")
     {
-      extract(Input.str(), temp_char.str(), 17);
+      unsigned long i = 7;
+      extract(Input.str(), temp_char.str(), i, -1, ' ');
+      calc_font *font_t;
+      char *x;
+      temp_char.update_len();
+      i += temp_char.len() + 1;
+      if (temp_char == "input")
+	font_t = &input_font;
+      else if (temp_char == "output")
+	font_t = &output_font;
+      else if (temp_char == "error")
+	font_t = &error_font;
+      else if (temp_char == "prompt")
+	font_t = &prompt_font;
+      else
+	{
+	  Error = "Invalid font object";
+	  return;
+	}
+      extract(Input.str(), temp_char.str(), i, -1, ' ');
+      temp_char.update_len();
+      i += temp_char.len() + 1;
       bool flag = true;
-      for (int j = 0; j < NO_OF_COLORS; j++)
-	if (temp_char == calc_font_colors[j])
-	  {
-	    input_font.color = j, flag = false;
-	    input_font.update();
-	    break;
-	  }
-      if (flag)
-	sprintf(Error.str(), "Error: Color mismatch");
-    }
-  else if (Input == "output font color ")
-    {
-      extract(Input.str(), temp_char.str(), strlen("output font color "));
-      bool flag = true;
-      for (int j = 0; j < NO_OF_COLORS; j++)
-	if (temp_char == calc_font_colors[j])
-	  {
-	    output_font.color = j, flag = false;
-	    output_font.update();
-	    break;
-	  }
-      if (flag)
-	sprintf(Error.str(), "Error: Color mismatch");
-    }
-  else if (Input == "error font color ")
-    {
-      extract(Input.str(), temp_char.str(), 17);
-      bool flag = true;
-      for (int j = 0; j < NO_OF_COLORS; j++)
-	if (temp_char == calc_font_colors[j])
-	  {
-	    error_font.color = j, flag = false;
-	    error_font.update();
-	    break;
-	  }
-      if (flag)
-	sprintf(Error.str(), "Error: Color mismatch");
-    }
-  else if (Input == "prompt font color ")
-    {
-      extract(Input.str(), temp_char.str(), 18);
-      bool flag = true;
-      for (int j = 0; j < NO_OF_COLORS; j++)
-	if (temp_char == calc_font_colors[j])
-	  {
-	    prompt_font.color = j, flag = false;
-	    prompt_font.update();
-	    break;
-	  }
-      if (flag)
-	sprintf(Error.str(), "Error: Color mismatch");
-    }
-  else if (Input == "input font background ")
-    {
-      extract(Input.str(), temp_char.str(), 23);
-      bool flag = true;
-      for (int j = 0; j < NO_OF_COLORS; j++)
-	if (temp_char == calc_font_colors[j])
-	  {
-	    input_font.bagnd = j, flag = false;
-	    input_font.update();
-	    break;
-	  }
-      if (flag)
-	sprintf(Error.str(), "Error: Color mismatch");
-    }
-  else if (Input == "output font background ")
-    {
-      extract(Input.str(), temp_char.str(), 23);
-      bool flag = true;
-      for (int j = 0; j < NO_OF_COLORS; j++)
-	if (temp_char == calc_font_colors[j])
-	  {
-	    output_font.bagnd = j, flag = false;
-	    output_font.update();
-	    break;
-	  }
-      if (flag)
-	sprintf(Error.str(), "Error: Color mismatch");
-    }
-  else if (Input == "error font background ")
-    {
-      extract(Input.str(), temp_char.str(), 22);
-      bool flag = true;
-      for (int j = 0; j < NO_OF_COLORS; j++)
-	if (temp_char == calc_font_colors[j])
-	  {
-	    error_font.bagnd = j, flag = false;
-	    error_font.update();
-	    break;
-	  }
-      if (flag)
-	sprintf(Error.str(), "Error: Color mismatch");
-    }
-  else if (Input == "prompt font background ")
-    {
-      extract(Input.str(), temp_char.str(), 23);
-      bool flag = true;
-      for (int j = 0; j < NO_OF_COLORS; j++)
-	if (temp_char == calc_font_colors[j])
-	  {
-	    prompt_font.bagnd = j, flag = false;
-	    prompt_font.update();
-	    break;
-	  }
-      if (flag)
-	sprintf(Error.str(), "Error: Color mismatch");
-    }
-  else if (Input == "input font style ")
-    {
-      extract(Input.str(), temp_char.str(), 17);
-      bool flag = true;
-      for (int j = 0; j < NO_OF_COLORS; j++)
-	if (temp_char == calc_font_styles[j])
-	  {
-	    input_font.style = j, flag = false;
-	    input_font.update();
-	    break;
-	  }
-      if (flag)
-	sprintf(Error.str(), "Error: Font style not defined");
-    }
-  else if (Input == "output font style ")
-    {
-      extract(Input.str(), temp_char.str(), 18);
-      bool flag = true;
-      for (int j = 0; j < NO_OF_STYLES; j++)
-	if (temp_char == calc_font_styles[j])
-	  {
-	    output_font.style = j, flag = false;
-	    output_font.update();
-	    break;
-	  }
-      if (flag)
-	sprintf(Error.str(), "Error: Font style not defined");
-    }
-  else if (Input == "error font style ")
-    {
-      extract(Input.str(), temp_char.str(), 17);
-      bool flag = true;
-      for (int j = 0; j < NO_OF_STYLES; j++)
-	if (temp_char == calc_font_styles[j])
-	  {
-	    error_font.style = j, flag = false;
-	    error_font.update();
-	    break;
-	  }
-      if (flag)
-	sprintf(Error.str(), "Error: Font style not defined");
-    }
-  else if (Input == "prompt font style ")
-    {
-      extract(Input.str(), temp_char.str(), 18);
-      bool flag = true;
-      for (int j = 0; j < NO_OF_STYLES; j++)
-	if (temp_char == calc_font_styles[j])
-	  {
-	    prompt_font.style = j, flag = false;
-	    prompt_font.update();
-	    break;
-	  }
-      if (flag)
-	sprintf(Error.str(), "Error: Font style not defined");
+      if ((temp_char == "color" && (x = &font_t->color) != 0) ||
+	  (temp_char == "background" && (x = &font_t->bagnd) != 0))
+	{
+	  extract(Input.str(), temp_char.str(), i);
+	  for (int j = 0; j < NO_OF_COLORS; j++)
+	    if (temp_char == calc_font_colors[j])
+	      {
+		*x = j, flag = false;
+		font_t->update();
+		break;
+	      }
+	  if (flag)
+	    Error = "Error: Color mismatch";
+	}
+      else if (temp_char == "style")
+	{
+	  extract(Input.str(), temp_char.str(), i);
+	  for (int j = 0; j < NO_OF_STYLES; j++)
+	    if (temp_char == calc_font_styles[j])
+	      {
+		font_t->style = j, flag = false;
+		font_t->update();
+		break;
+	      }
+	  if (flag)
+	    Error = "Error: Color mismatch";
+	}
+      else
+	Error = "Invalid font attribute";
     }
 #endif
 
@@ -578,37 +450,8 @@ Boston, MA 02110-1301  USA\n");
 #ifdef FACTORIZE
   else if (Input == "factorize " || Input == "factorise ")
     {
-      long double x = 0, y = 0;
       unsigned long i = 10;
-      if (calculate(Input.str(), y, i) == SUCCESS)
-        {
-	  y < 0 ? y = -y : 0;
-	  modfl(y, &x);
-	  fprintf(PRINTFAST, "\nFactors of %.0Lf: ", x);
-	  for (long double g = 1; g <= x / 2; g++)
-	    if (!fmodl(x, g))
-	      fprintf(PRINTFAST, "%.0Lf, ", g);
-	  fprintf(PRINTFAST, "%.0Lf", x);
-#ifdef CALC_HISTORY
-	  if (!(record & EXPRESSION_COMMANDS))
-	    h.pop();
-#endif
-        }
-      else
-#ifdef CALC_HISTORY
-        {
-#endif
-	  if (Error != "")
-	    Error += " Error!!";
-	  else
-	    sprintf(Error.str(), "\nUndefined symbols in \'%s\'", Input.str());
-#ifdef CALC_HISTORY
-	  if (!(record & EXPRESSIONS_HAVING_ERROR))
-	    h.pop();
-        }
-#endif
-      num.reset();
-      optr.reset();
+      factorize(i);
     }
 #endif // FACTORIZE
 
@@ -724,13 +567,8 @@ Boston, MA 02110-1301  USA\n");
 
 #ifdef CALC_PROCESS_TIME
 
-      time_taken = ((long double)(clock() - start)) / CLOCKS_PER_SEC;
+      kill(my_pid, SIGUSR1);
 
-      if (calc_time == YES)
-	fprintf(PRINTFAST, "Command Processing Time : %.8Lf seconds\n", time_taken);
-
-      if (calc_time == YES && calc_avg_time == YES)
-	expressions++, total_time += time_taken;
-#endif // CALC_PROCESS_TIME
+#endif
     }
 }

@@ -40,6 +40,8 @@ extern signed char insert(const char *s);
 
 extern signed char calculate(const char *a, long double &n, unsigned long &i, const char ch = '\0', const long double var = 0, bool issum = 0);
 
+extern void factorize(unsigned long &i);
+
 extern void sum(long double lower_limit, long double &upper_limit, long double &rate, const unsigned long &i);
 
 

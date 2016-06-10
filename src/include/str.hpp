@@ -2,6 +2,7 @@
 #define CALC_STR_H
 
 #include <chatr.hpp>
+#include <calc_features.hpp>
 
 /* priority types */
 #define HIGH 10000
