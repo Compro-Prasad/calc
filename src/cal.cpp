@@ -4,6 +4,7 @@
 #include <calc_stacks/num_stack.hpp>
 #include <calc_stacks/history_stack.hpp>
 #include <calc_strings.hpp>
+#include <calc_cmd_action.hpp>
 
 unsigned char angle_type = DEG;
 #ifdef CONST_CMDS
@@ -41,7 +42,7 @@ void factorize(unsigned long &i)
 	  fprintf(PRINTFAST, "%.0Lf, ", g);
       fprintf(PRINTFAST, "%.0Lf", x);
 #ifdef CALC_HISTORY
-      if (!(record & EXPRESSION_COMMANDS))
+      if (!(record & VALID_EXPRESSIONS))
 	h.pop();
 #endif
     }
@@ -52,9 +53,9 @@ void factorize(unsigned long &i)
       if (Error != "")
 	Error += " Error!!";
       else
-	sprintf(Error.str(), "\nUndefined symbols in \'%s\'", Input.str());
+	sprintf(Error.str(), "\nUndefined symbols in '%s'", Input.str());
 #ifdef CALC_HISTORY
-      if (!(record & EXPRESSIONS_HAVING_ERROR))
+      if (!(record & INVALID_EXPRESSIONS))
 	h.pop();
     }
 #endif
@@ -62,14 +63,19 @@ void factorize(unsigned long &i)
   optr.reset();
 }
 
-void sum(long double lower_limit, long double &upper_limit, long double &rate, const unsigned long &i)
+void sum(long double lower_limit,
+	 long double &upper_limit,
+	 long double &rate,
+	 const unsigned long &i)
 {
-  fprintf(PRINTFAST, "Suming expression \"");
+  fprintf(PRINTFAST, "\nSuming expression \"");
   bool flag = 0, f = 1;
   unsigned long m = i;
   long double sum = 0, x = 0;
   Input.print(m);
-  fprintf(PRINTFAST, "\" from i = %Lg to i = %Lg at the rate of %Lg per sum\n", lower_limit, upper_limit, rate);
+  fprintf(PRINTFAST,
+	  "\" from i = %Lg to i = %Lg at the rate of %Lg per sum",
+	  lower_limit, upper_limit, rate);
   if (lower_limit > upper_limit && rate < 0.0)
     {
       swap(lower_limit, upper_limit, long double);
@@ -88,9 +94,10 @@ void sum(long double lower_limit, long double &upper_limit, long double &rate, c
 	  if (Error != "")
 	    Error += " Error!! in expression";
 	  else
-	    sprintf(Error.str(), "Failure to recognise expression in \"%s\"", Input.str());
+	    sprintf(Error.str(), "Failure to recognise expression in \"%s\"",
+		    Input.str());
 #ifdef CALC_HISTORY
-	  if (!(record & EXPRESSIONS_HAVING_ERROR))
+	  if (!(record & INVALID_EXPRESSIONS))
 	    h.pop();
 #endif
 	  break;
@@ -100,7 +107,7 @@ void sum(long double lower_limit, long double &upper_limit, long double &rate, c
   /* For printing the sum and storing in answer list */
   if (f)
     {
-      fprintf(PRINTFAST, "Sum = ");
+      fprintf(PRINTFAST, "\nSum = ");
       if (flag)
 	sum = -sum;
       fprintf(PRINTFAST, precision, sum);
@@ -116,7 +123,10 @@ void sum(long double lower_limit, long double &upper_limit, long double &rate, c
 }
 
 
-signed char calculateit(const char *a, long double &ans, long double x, long double y)
+signed char calculateit(const char *a,
+			long double &ans,
+			const long double &x,
+			const long double y)
 {
   long double z = angle_type == DEG ? (x * PI / 180) : (angle_type == RAD ? x : (x * PI / 200));
   if (!strcmp(a, "+"))
@@ -323,47 +333,49 @@ signed char calculateit(const char *a, long double &ans, long double x, long dou
   return SUCCESS;
 }
 
-signed char insert(const char *s)
+signed char insert(const char *s /* operator to be pushed in operator stack */)
 {
   if (s)
     {
       long double x, y, z;
       char *top_optr = optr.get();
+
       if (check_priority(top_optr, s) == HIGH)
         {
 #ifdef OPTR_DETAILS
 	  if (operator_detail == YES)
 	    fprintf(PRINTFAST, "\nPriority of %6s\tis higher than\t%6s", top_optr, s);
 #endif
+	  /* Pop out other operators untill the priority returns low or if the
+	     operator to be pushed is a ')' and also top_optr is '(' */
 	  while (check_priority(top_optr, s) == HIGH
-		 && (strcmp(s, ")") || strcmp(top_optr, "(")))
+		 && (*s != ')' || *top_optr != '('))
             {
-	      if (!top_optr)
-                {
-		  Error = Operator;
-		  return ERROR;
-                }
+	      /* if the top_optr is binary */
 	      if (isbinary(top_optr))
                 {
+		  /* pop out two numbers from number stack */
 		  if (num.get(y) != SUCCESS || num.get(x) != SUCCESS)
-                    {
-		      Error = Number;
-		      return ERROR;
-                    }
+		    return (Error = Number, ERROR);
+
+		  /* calculate out the result */
 		  if (calculateit(top_optr, z, x, y) != SUCCESS)
 		    return ERROR;
 #ifdef STEPS_CMD
 		  else if (steps == YES)
-		    fprintf(PRINTFAST, "\n-> %.3LG %s %.3LG = %.3LG", x, top_optr, y, z);
+		    fprintf(PRINTFAST, "\n-> %.3LG %s %.3LG = %.3LG",
+			    x, top_optr, y, z);
 #endif
                 }
+
+	      /* if the top_optr is unary */
 	      else if (isunary(top_optr))
                 {
+		  /* pop out a single number */
 		  if (num.get(x) != SUCCESS)
-                    {
-		      Error = Number;
-		      return ERROR;
-                    }
+		    return (Error = Number, ERROR);
+
+		  /* calculate out he result */
 		  if (calculateit(top_optr, z, x) != SUCCESS)
 		    return ERROR;
 #ifdef STEPS_CMD
@@ -371,27 +383,30 @@ signed char insert(const char *s)
 		    fprintf(PRINTFAST, "\n-> %s(%.3LG) = %.3LG", top_optr, x, z);
 #endif
                 }
+
+	      /* popout the top operator from the operator stack */
 	      if (optr.pop() != SUCCESS)
-                {
-		  Error = "!!Operator pop";
-		  return ERROR;
-                }
+		return (Error = "!!Operator pop", ERROR);
+
+	      /* push the newly generated result */
 	      if (num.push(z) != SUCCESS)
-                {
-		  Error = "!!Number push";
-		  return ERROR;
-                }
+		return (Error = "!!Number push", ERROR);
+
+	      /* Check out the next operator from the operator stack */
 	      top_optr = optr.get();
             }
-	  if (strcmp(s, ")"))
-            {
-	      if (optr.push(s) == ERROR)
-		return 5;
-            }
-	  else
+
+	  /* if the operator was a ')' then pop out a single operator */
+	  if (*s == ')')
 	    optr.pop();
+
+	  /* else push the operator in the operator stack */
+	  else if (optr.push(s) == ERROR)
+	    return 5;
         }
-      else if (!top_optr || check_priority(top_optr, s) == LOW)
+
+      /* if the priority is low then it will be pushed in the operator stack */
+      else if (check_priority(top_optr, s) == LOW)
         {
 #ifdef OPTR_DETAILS
 	  if (operator_detail == YES)
@@ -410,8 +425,14 @@ signed char insert(const char *s)
   return ERROR;
 }
 
-signed char calculate(const char *a, long double &n, unsigned long &i, const char ch, const long double var, bool issum)
+signed char calculate(const char *a,
+		      long double &n,
+		      unsigned long &i,
+		      const char ch,
+		      const long double var,
+		      const bool issum)
 {
+  static bool is_presently_executing = false;
   unsigned char check_extract;
 #ifdef ANS_CMD
   unsigned long ans_no;
@@ -422,9 +443,24 @@ signed char calculate(const char *a, long double &n, unsigned long &i, const cha
   bool flag = ch != ' ';
   for (; a[i] != ch;)
     {
+      if (a[i] == '"')
+	{
+	  if (is_presently_executing)
+	    break;
+	  else
+	    {
+	      fprintf(PRINTFAST, "#");
+	      is_presently_executing = true;
+	      Input.advance_ptr(i + 1);
+	      cmd_action();
+	      is_presently_executing = false;
+	      Input.advance_ptr(0);
+	    }
+	}
+	
       flag ? SKIP_SPACE(a, i) : 0;
 
-      /* *********************************Factorial***************** */
+      /* **************************Factorial************************ */
       /* It is a special kind of unary operator which                */
       /* stands after the number whose factorial is to be calculated */
       if (a[i] == '!')
@@ -592,21 +628,5 @@ signed char calculate(const char *a, long double &n, unsigned long &i, const cha
       Error = Number;
       return ERROR;
     }
-#if defined(STEPS_CMD) || defined(OPTR_DETAILS) || defined(NUM_DETAILS)
-  if (
-#ifdef STEPS_CMD
-      steps == YES
-#else
-      0
-#endif
-#ifdef OPTR_DETAILS
-      || operator_detail == YES
-#endif
-#ifdef NUM_DETAILS
-      || num_detail == YES
-#endif
-      )
-    fprintf(PRINTFAST, "\n");
-#endif
   return SUCCESS;
 }

@@ -2,11 +2,8 @@
 #ifdef CALC_HISTORY_STACK_H
 
 #ifdef CALC_HISTORY
-history h;                      /* Object for inserting commands in stack for further retrieval */
-unsigned short record = NORMAL_COMMANDS |
-                        EXPRESSION_COMMANDS |
-                        UNDEFINED_COMMANDS |
-                        EXPRESSIONS_HAVING_ERROR; /* Switch for (not)storing specific types commands */
+history h;   /* Object for inserting commands in stack for further retrieval */
+short record = ALL_; /* Switch for (not )storing specific history types */
 #endif
 
 history::history()

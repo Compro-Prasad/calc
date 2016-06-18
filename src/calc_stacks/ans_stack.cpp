@@ -43,10 +43,10 @@ void link_ans::add_ans(const double a)
 	top = end = temp;
       else
 	end->next = temp, end = temp;
-      fprintf(PRINTFAST, "[ A%ld ]", n);
+      fprintf(PRINTFAST, "  [A%lu]", n);
     }
   else
-    fprintf(PRINTFAST, "<Answer not saved. Please delete some answers to free memory>");
+    Error = "!!Cannot allocate memory!!";
 }
 
 ans link_ans::get_ans_x(unsigned long pos)
@@ -78,15 +78,7 @@ void link_ans::show_ans_x(unsigned long pos)
   else
     t = end;
   if (pos)
-#ifdef CALC_COLORS
-    {
-      error_font.print();
-#endif
-      fprintf(PRINTFAST, "!!Answer not found!!");
-#ifdef CALC_COLORS
-      output_font.print();
-    }
-#endif
+    Error = "!!Answer not found!!";
   else
     {
       char printf_format_string[20] = " = ";

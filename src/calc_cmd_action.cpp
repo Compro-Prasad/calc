@@ -1,5 +1,4 @@
 #include <signal.h>
-//#include <math.h>
 
 #include <calc_cmd_action.hpp>
 #include <str.hpp>
@@ -25,7 +24,9 @@ extern char e[3];              /* String for showing or not showing exponential 
 void cmd_action()
 {
 
-  kill(my_pid, SIGUSR1);
+#ifdef CALC_PROCESS_TIME
+  calc_process_time(TIMER_DO_NORMAL);
+#endif
 
   strings temp_char;
 
@@ -34,7 +35,7 @@ void cmd_action()
 #endif
 
   if (Input == "exit" || Input == "quit")
-    PACKUP_AND_LEAVE;
+    PACKUP_AND_LEAVE("\n");
   else if (Input == "input length ")
     {
       long double x = 0;
@@ -43,7 +44,7 @@ void cmd_action()
         {
 	  strMAX = x + 2;
 #ifdef CALC_HISTORY
-	  if (!(record & NORMAL_COMMANDS))
+	  if (!(record & VALID_COMMANDS))
 	    h.pop();
 #endif
         }
@@ -58,7 +59,7 @@ void cmd_action()
 	  else
 	    Error = "!!Invalid Expression!!";
 #ifdef CALC_HISTORY
-	  if (!(record & EXPRESSIONS_HAVING_ERROR))
+	  if (!(record & INVALID_EXPRESSIONS))
 	    h.pop();
         }
 #endif
@@ -95,6 +96,7 @@ The Free Software Foundation, Inc.\n\t\t\
 51 Franklin Street, Fifth Floor\n\t\t\
 Boston, MA 02110-1301  USA\n");
     }
+
 #ifdef SCREEN_MANIP
   else if (Input == "clear")
     clrscr();
@@ -116,12 +118,12 @@ Boston, MA 02110-1301  USA\n");
   else if (Input == "start recording")
     {
       calc_avg_time = YES;
-      kill(my_pid, SIGUSR2);
+      calc_process_time(TIMER_RESET);
     }
   else if (Input == "stop recording")
     {
       calc_avg_time = NO;
-      kill(my_pid, SIGUSR2);
+      calc_process_time(TIMER_DISPLAY);
     }
 #endif
 
@@ -140,22 +142,19 @@ Boston, MA 02110-1301  USA\n");
 #endif
 
 #ifdef STEPS_CMD
-  /* commands to show/hide steps */
   else if (Input == "show steps")
     steps = YES;
   else if (Input == "hide steps")
     steps = NO;
-  /*******************************/
 #endif
 
 #ifdef ANS_CMD
-  /* commands to manipulate storing of answers */
   else if (Input == "store answers")
     store = YES;
   else if (Input == "dont store answers")
     store = NO;
-  /*********************************************/
 #endif
+
 #ifdef CHANGE_ANGLE
   /* commands for changing angle type */
   else if (Input == "deg")
@@ -171,26 +170,50 @@ Boston, MA 02110-1301  USA\n");
   else if (Input == "allow ")
     {
       extract(Input.str(), temp_char.str(), 6, -1, NUL, 25);
-      if (temp_char == "UNDEFINED COMMANDS")
-	record |= UNDEFINED_COMMANDS;
-      else if (temp_char == "NORMAL COMMANDS")
-	record |= NORMAL_COMMANDS;
-      else if (temp_char == "EXPRESSION COMMANDS")
-	record |= EXPRESSION_COMMANDS;
-      else if (temp_char == "EXPRESSIONS HAVING ERROR")
-	record |= EXPRESSIONS_HAVING_ERROR;
+      if (temp_char == "ALL")
+	record |= ALL_;
+      else if (temp_char == "ALL VALID")
+	record |= ALL_VALID;
+      else if (temp_char == "ALL INVALID")
+	record |= ALL_INVALID;
+      else if (temp_char == "ALL COMMANDS")
+	record |= ALL_COMMANDS;
+      else if (temp_char == "ALL EXPRESSIONS")
+	record |= ALL_EXPRESSIONS;
+      else if (temp_char == "VALID COMMANDS")
+	record |= VALID_COMMANDS;
+      else if (temp_char == "INVALID COMMANDS")
+	record |= INVALID_COMMANDS;
+      else if (temp_char == "VALID EXPRESSIONS")
+	record |= VALID_EXPRESSIONS;
+      else if (temp_char == "INVALID EXPRESSIONS")
+	record |= INVALID_EXPRESSIONS;
+      else
+	Error = "!!Not a valid history type!!";
     }
   else if (Input == "restrict ")
     {
       extract(Input.str(), temp_char.str(), 9, -1, NUL, 30);
-      if (temp_char == "UNDEFINED COMMANDS")
-	record &= ~UNDEFINED_COMMANDS;
-      else if (temp_char == "NORMAL COMMANDS")
-	record &= ~NORMAL_COMMANDS;
-      else if (temp_char == "EXPRESSION COMMANDS")
-	record &= ~EXPRESSION_COMMANDS;
-      else if (temp_char == "EXPRESSIONS HAVING ERROR")
-	record &= ~EXPRESSIONS_HAVING_ERROR;
+      if (temp_char == "ALL")
+	record &= ~ALL_;
+      else if (temp_char == "ALL VALID")
+	record &= ~ALL_VALID;
+      else if (temp_char == "ALL INVALID")
+	record &= ~ALL_INVALID;
+      else if (temp_char == "ALL COMMANDS")
+	record &= ~ALL_COMMANDS;
+      else if (temp_char == "ALL EXPRESSIONS")
+	record &= ~ALL_EXPRESSIONS;
+      else if (temp_char == "VALID COMMANDS")
+	record &= ~VALID_COMMANDS;
+      else if (temp_char == "INVALID COMMANDS")
+	record &= ~INVALID_COMMANDS;
+      else if (temp_char == "VALID EXPRESSIONS")
+	record &= ~VALID_EXPRESSIONS;
+      else if (temp_char == "INVALID EXPRESSIONS")
+	record &= ~INVALID_EXPRESSIONS;
+      else
+	Error = "!!Not a valid history type!!";
     }
 #endif
 
@@ -211,24 +234,32 @@ Boston, MA 02110-1301  USA\n");
       extract(Input.str(), con.name, 9, -1, '=');
       if (isidentifier(con.name) && ismath(con.name) != SUCCESS)
         {
-	  unsigned long i = 0, d;
+	  unsigned long i = 0;
 	  while (Input[i] != '=' && Input[i])
 	    i++;
-	  if (!Input[i] || !Input[i + 1])
-	    Error = "!!Syntax Error!!";
+	  if (calculate(Input.str(), con.value, i) == SUCCESS)
+#ifdef CALC_HISTORY
+	    {
+#endif
+	      cons.insert_const(con);
+#ifdef CALC_HISTORY
+	      if (!(record & VALID_COMMANDS))
+		h.pop();
+	    }
+#endif
 	  else
-            {
-	      i++, con.value = 0;
-	      if (separate_ans(Input.str(), i, d) == SUCCESS)
-		{
-		  con.value = l.get_ans_x(d).num;
-		  cons.insert_const(con);
-		}
-	      else if (atof(Input.str(), i, con.value) == SUCCESS)
-		cons.insert_const(con);
+#ifdef CALC_HISTORY
+	    {
+#endif
+	      if (Error != "")
+		Error += " Error!!";
 	      else
-		Error = "!!Syntax error!!";
-            }
+		Error = "!!Invalid Expression!!";
+#ifdef CALC_HISTORY
+	      if (!(record & INVALID_EXPRESSIONS))
+		h.pop();
+	    }
+#endif
         }
       else
 	sprintf(Error.str(), "!!%s already defined as a mathematical function!!", con.name);
@@ -265,7 +296,7 @@ Boston, MA 02110-1301  USA\n");
   else if (!strcasecmp(Input.str(), "delete answers"))
     {
       if (!l.deallocate())
-	fprintf(PRINTFAST, "!!Answers list empty!!");
+	Error = "!!Answers list empty!!";
     }
   else if (Input == "delete answers leaving ")
     {
@@ -346,7 +377,7 @@ Boston, MA 02110-1301  USA\n");
 	  n %= 1000;
 	  sprintf(precision, "%%.%d%s", n, e);
 #ifdef CALC_HISTORY
-	  if (!(record & NORMAL_COMMANDS))
+	  if (!(record & VALID_COMMANDS))
 	    h.pop();
 #endif
         }
@@ -359,7 +390,7 @@ Boston, MA 02110-1301  USA\n");
 	  else
 	    Error = "!!Invalid Expression!!";
 #ifdef CALC_HISTORY
-	  if (!(record & EXPRESSIONS_HAVING_ERROR))
+	  if (!(record & INVALID_EXPRESSIONS))
 	    h.pop();
         }
 #endif
@@ -439,7 +470,7 @@ Boston, MA 02110-1301  USA\n");
 		break;
 	      }
 	  if (flag)
-	    Error = "Error: Color mismatch";
+	    Error = "Error: Style mismatch";
 	}
       else
 	Error = "Invalid font attribute";
@@ -479,7 +510,7 @@ Boston, MA 02110-1301  USA\n");
 		  bool temp_operator_detail = operator_detail;
 		  operator_detail = NO;
 #endif
-#ifdef ANS_CMD
+#ifdef STEPS_CMD
 		  bool temp_steps = steps;
 		  steps = NO;
 #endif
@@ -487,12 +518,11 @@ Boston, MA 02110-1301  USA\n");
 		  bool temp_num_detail = num_detail;
 		  num_detail = NO;
 #endif
-		  fprintf(PRINTFAST, "\n");
 		  sum(lower_limit, upper_limit, rate, i);
 #ifdef OPTR_DETAILS
 		  operator_detail = temp_operator_detail;
 #endif
-#ifdef ANS_CMD
+#ifdef STEPS_CMD
 		  steps = temp_steps;
 #endif
 #ifdef NUM_DETAILS
@@ -510,7 +540,7 @@ Boston, MA 02110-1301  USA\n");
 	  else
 	    sprintf(Error.str(), "\nUndefined symbols in \'%s\'", Input.str());
 #ifdef CALC_HISTORY
-	  if (!(record & EXPRESSIONS_HAVING_ERROR))
+	  if (!(record & INVALID_EXPRESSIONS))
 	    h.pop();
 	}
 #endif
@@ -533,7 +563,7 @@ Boston, MA 02110-1301  USA\n");
 	    l.add_ans(x);
 #endif // ANS_CMD
 #ifdef CALC_HISTORY
-	  if (!(record & EXPRESSION_COMMANDS))
+	  if (!(record & VALID_EXPRESSIONS))
 	    h.pop();
 #endif
         }
@@ -543,7 +573,7 @@ Boston, MA 02110-1301  USA\n");
 #endif
 	  Error += " Error!!";
 #ifdef CALC_HISTORY
-	  if (!(record & EXPRESSIONS_HAVING_ERROR))
+	  if (!(record & INVALID_EXPRESSIONS))
 	    h.pop();
         }
 #endif
@@ -553,7 +583,7 @@ Boston, MA 02110-1301  USA\n");
 #endif
 	  sprintf(Error.str(), "\nUndefined command \"%s\"", Input.str());
 #ifdef CALC_HISTORY
-	  if (!(record & UNDEFINED_COMMANDS))
+	  if (!(record & INVALID_COMMANDS))
 	    h.pop();
         }
 #endif
@@ -562,13 +592,7 @@ Boston, MA 02110-1301  USA\n");
     }
 
   if (Error == "")
-    {
-      fprintf(PRINTFAST, "\n");
-
 #ifdef CALC_PROCESS_TIME
-
-      kill(my_pid, SIGUSR1);
-
+    calc_process_time(TIMER_DO_NORMAL);
 #endif
-    }
 }

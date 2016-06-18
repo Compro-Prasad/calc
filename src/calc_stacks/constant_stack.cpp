@@ -1,6 +1,8 @@
 #include <calc_stacks/constant_stack.hpp>
 #ifdef CONSTANT_STACK_H
 
+#include <calc_strings.hpp>
+
 #ifdef CONST_CMDS
 const_list cons;                /* Object for storing constants in stack */
 #endif // CONST_CMDS
@@ -19,7 +21,7 @@ constant::constant(const char *c, long double val)
 
 void constant::display()
 {
-  fprintf(PRINTFAST, "%s = ", name);
+  fprintf(PRINTFAST, "\n%s = ", name);
   fprintf(PRINTFAST, precision, value);
 }
 
@@ -36,23 +38,10 @@ const_list::const_list()
 void const_list::disp_const()
 {
   if (top)
-    {
-      for (constnt * t = top; t; t = t->next)
-	{
-	  fprintf(PRINTFAST, "\n");
-	  t->display();
-	}
-    }
+    for (constnt * t = top; t; t = t->next)
+      t->display();
   else
-#ifdef CALC_COLORS
-    {
-      error_font.print();
-#endif
-      fprintf(PRINTFAST, "!!Constant list empty!!");
-#ifdef CALC_COLORS
-      output_font.print();
-    }
-#endif
+    Error = "!!Constant list empty!!";
 }
 
 bool const_list::get_const(const char *a, unsigned long int &i, long double &x)
@@ -74,20 +63,14 @@ bool const_list::get_const(const char *a, unsigned long int &i, long double &x)
   return 0;
 }
 
-bool const_list::insert_const(constant x)
+void const_list::insert_const(constant x)
 {
   if (strcmp(x.name, ""))
     {
       if (!check_const(x.name))
 	{
-#ifdef CALC_COLORS
-	  error_font.print();
-#endif
-	  fprintf(PRINTFAST, "!!Constant already exists!!");
-#ifdef CALC_COLORS
-	  output_font.print();
-#endif
-	  return 1;
+	  Error = "!!Constant already exists!!";
+	  return;
 	}
       constnt *t = new constnt;
       if (t)
@@ -96,20 +79,12 @@ bool const_list::insert_const(constant x)
 	  strncpy(t->name, x.name, 20);
 	  t->name[20] = 0;
 	  t->next = top, top = t;
-	  return 1;
 	}
       else
-#ifdef CALC_COLORS
-	{
-	  error_font.print();
-#endif
-	  fprintf(PRINTFAST, "!!Cannot allocate memory!!");
-#ifdef CALC_COLORS
-	  output_font.print();
-	}
-#endif
+	Error = "!!Cannot allocate memory!!";
     }
-  return 0;
+  else
+    Error = "!!NULL constant name!!";
 }
 
 void const_list::delete_const(const char *x)
@@ -136,24 +111,10 @@ void const_list::delete_const(const char *x)
 		}
 	    }
 	}
-#ifdef CALC_COLORS
-      error_font.print();
-#endif
-      fprintf(PRINTFAST, "!!Constant is not recorded yet!!");
-#ifdef CALC_COLORS
-      output_font.print();
-#endif
+      Error = "!!Invalid Constant!!";
     }
   else
-#ifdef CALC_COLORS
-    {
-      error_font.print();
-#endif
-      fprintf(PRINTFAST, "!!Constant list empty!!");
-#ifdef CALC_COLORS
-      output_font.print();
-    }
-#endif
+    Error = "!!Constant list empty!!";
 }
 
 bool const_list::check_const(const char *x)

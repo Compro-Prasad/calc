@@ -43,14 +43,6 @@ int main(int argc, char *argv[])
 #endif
 
 
-#ifdef CALC_PROCESS_TIME
-  if (signal(SIGUSR1, calc_process_time) == SIG_ERR)
-    fprintf(stderr, "\nUnable to attach signal 'SIGUSR1'\n");
-  if (signal(SIGUSR2, calc_process_time) == SIG_ERR)
-    fprintf(stderr, "\nUnable to attach signal 'SIGUSR2'\n");
-#endif
-
-
 #ifdef SHELL_INPUT
 
 
@@ -60,36 +52,18 @@ int main(int argc, char *argv[])
   /*                           parsing complete                         */
   /* ****************************************************************** */
 
-
-  /* ****************************************************************** */
-  /*                          if an error occured                       */
-  if (Error != "")
-#ifdef CALC_COLORS
-  {
-    error_font.print();
-#endif
-    fprintf(PRINTFAST, "%s\n", Error.str());
-#ifdef CALC_COLORS
-    output_font.print();
-  }
-#endif
-  /*                                print it                            */
-  /* ****************************************************************** */
-
-
   if (argc != 1
 #ifdef DIRECT_INPUT
       && !direct_input
 #endif
       )
-    return 0;
-
+    PACKUP_AND_LEAVE("");
 
 #endif // SHELL_INPUT
 
 
-#ifdef DIRECT_INPUT
 
+#ifdef DIRECT_INPUT
 
 #ifdef SCREEN_MANIP
   unsigned short t;
@@ -130,7 +104,7 @@ int main(int argc, char *argv[])
       /* ************************************************************** */
       /*                  input functioning begins here                 */
 #ifdef CALC_HISTORY
-      /*   reset the positioning of history scroller to a new position  */
+      /*    reset the position of history scroller to a new position    */
       /*  */                      h.reset();                        /*  */
 #endif
 #ifdef CALC_COLORS
@@ -158,9 +132,9 @@ int main(int argc, char *argv[])
       if (Error != "")
 #ifdef CALC_COLORS
 	{
-	  error_font.print();
+	  error_font.print(PRINTFAST);
 #endif
-	  fprintf(PRINTFAST, "%s\n", Error.str());
+	  fprintf(PRINTFAST, "%s", Error.str());
 #ifdef CALC_COLORS
 	  output_font.print();
 	}
@@ -169,10 +143,11 @@ int main(int argc, char *argv[])
       /*                                                                */
       /*                   input fuctioning over(reloop)                */
       /* ************************************************************** */
+      fprintf(PRINTFAST, "\n");
 
     }
 #endif // DIRECT_INPUT
 
 
-  PACKUP_AND_LEAVE;
+  PACKUP_AND_LEAVE("");
 }

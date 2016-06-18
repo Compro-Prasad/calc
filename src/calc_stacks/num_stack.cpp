@@ -12,7 +12,7 @@ numbers_stack::numbers_stack()
 #if defined(SPEED_UP)
   rate = 16;
 #elif defined(ACCELERATE_UP)
-  accelerator = 1;
+  accelerate = 1;
 #endif
   start = new long double[size];
   current = 0;
@@ -81,7 +81,7 @@ signed char numbers_stack::decrease_size()
 #if defined(SPEED_UP)
       size -= rate;
 #elif defined(ACCELERATE_UP)
-      size /= (--accelerator);
+      size /= (--accelerate);
 #endif
       if (current)
 	{
@@ -102,14 +102,14 @@ signed char numbers_stack::increase_size()
 #if defined(SPEED_UP)
   long double *temp = new long double[rate + size];
 #elif defined(ACCELERATE_UP)
-  long double *temp = new long double[(accelerator + 1) * size];
+  long double *temp = new long double[(accelerate + 1) * size];
 #endif
   if (temp)
     {
 #if defined(SPEED_UP)
       size += rate;
 #elif defined(ACCELERATE_UP)
-      size *= (++accelerator);
+      size *= (++accelerate);
 #endif
       if (current)
 	{

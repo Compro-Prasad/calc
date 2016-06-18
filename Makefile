@@ -1,7 +1,7 @@
 CC = g++
 CXX = $(CC)
 
-CFLAGS = -O4 -floop-nest-optimize -Wall -ansi -pedantic
+CFLAGS = -O3 -Ofast -Wall -ansi -pedantic
 CXXFLAGS = $(CFLAGS)
 ALL_CFLAGS = $(CFLAGS) -c -o
 ALL_CXXFLAGS = $(CXXFLAGS) -c -o

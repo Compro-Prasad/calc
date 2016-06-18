@@ -11,7 +11,7 @@ class operators_stack
 #if defined(SPEED_UP)
   long unsigned rate;
 #elif defined(ACCELERATE_UP)
-  long unsigned accelerator;
+  long unsigned accelerate;
 #endif
 public:
   operators_stack();

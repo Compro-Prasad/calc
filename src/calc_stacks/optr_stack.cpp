@@ -13,7 +13,7 @@ operators_stack::operators_stack()
 #if defined(SPEED_UP)
   rate = 16;
 #elif defined(ACCELERATE_UP)
-  accelerator = 1;
+  accelerate = 1;
 #endif
   start = new char[size][7];
   current = 0;
@@ -97,7 +97,7 @@ signed char operators_stack::decrease_size()
 #if defined(SPEED_UP)
       size -= rate;
 #elif defined(ACCELERATE_UP)
-      size /= (--accelerator);
+      size /= (--accelerate);
 #endif
       if (current)
 	{
@@ -125,7 +125,7 @@ signed char operators_stack::increase_size()
 #if defined(SPEED_UP)
       size += rate;
 #elif defined(ACCELERATE_UP)
-      size *= (++accelerator);
+      size *= (++accelerate);
 #endif
       if (current)
 	{

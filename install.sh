@@ -1,86 +1,134 @@
 #!/bin/bash
 
-function replace_()
+function comment_
+{
+    if [ -n "$1" ]; then
+	sed "/$1/s/^/\/\//" src/include/calc_features.hpp > calc_features.temp
+	rm src/include/calc_features.hpp
+	mv calc_features.temp src/include/calc_features.hpp
+    fi
+}
+
+function uncomment_
+{
+    if [ -n "$1" ]; then
+	sed "/$1/s/^\/\///" src/include/calc_features.hpp > calc_features.temp
+	rm src/include/calc_features.hpp
+	mv calc_features.temp src/include/calc_features.hpp
+    fi
+}
+
+function replace_
 {
     read input
     if [ "$input" = "n" ]; then
 	if [ -z "$2" ]; then
-	    sed "s/$1/\/\/$1/g" src/include/calc_features.hpp > calc_features.temp
+	    comment_ "$1"
 	else
-	    sed "s/$2/$1/g" src/include/calc_features.hpp > calc_features.temp
+	    sed -e "s/$2/$1/" src/include/calc_features.hpp > calc_features.temp
+	    rm src/include/calc_features.hpp
+	    mv calc_features.temp src/include/calc_features.hpp
 	fi
-	rm src/include/calc_features.hpp
-	mv calc_features.temp src/include/calc_features.hpp
     elif [ "$input" = "y" ]; then
 	if [ -z "$2" ]; then
-	    sed "s/\/\/$1/$1/g" src/include/calc_features.hpp > calc_features.temp
+	    uncomment_ "$1"
 	else
 	    sed "s/$1/$2/g" src/include/calc_features.hpp > calc_features.temp
+	    rm src/include/calc_features.hpp
+	    mv calc_features.temp src/include/calc_features.hpp
 	fi
-	rm src/include/calc_features.hpp
-	mv calc_features.temp src/include/calc_features.hpp
     fi
 }
 
 echo -n 'Do you want a custom install[recommended](y/n)? '
 read input
 if [ "$input" = "y" ]; then
-    echo "Stable features[e(nable all)/o(ne by one)]:"
+    echo "Input method:"
+    echo "1) SHELL_INPUT"
+    echo "2) DIRECT_INPUT"
+    echo "3) Both of the above"
+    echo -n "Choose an option: "
+    read input
+    if [ "$input" = "1" ]; then
+	sed "/define DIRECT_INPUT/s/^/\/\//" src/include/calc_features.hpp > calc_features.temp
+	sed "/define SHELL_INPUT/s/^\/\///" src/include/calc_features.hpp > calc_features.temp
+    elif [ "$input" = "2" ];then
+	sed "/define SHELL_INPUT/s/^/\/\//" src/include/calc_features.hpp > calc_features.temp
+	sed "/define DIRECT_INPUT/s/^\/\///" src/include/calc_features.hpp > calc_features.temp
+    else
+	sed "/define SHELL_INPUT/s/^\/\///" src/include/calc_features.hpp > calc_features.temp
+	sed "/define DIRECT_INPUT/s/^\/\///" src/include/calc_features.hpp > ccalc_features.temp
+    fi
+    if [ -e calc_features.temp ]; then
+	rm src/include/calc_features.hpp
+	mv calc_features.temp src/include/calc_features.hpp
+    fi
+
+    echo -n "Stable features[e(nable all)/c(hoose manually)]: "
     read input
     if [ "$input" = "o" ]; then
-	echo -en "\tDo you want optr/num stack details(helpful for programmers)? "
-	replace_ "#define OPTR_DETAILS"
-	replace_ "#define NUM_DETAILS"
+	echo -en "\tDo you want operator stack details(helpful for programmers)? "
+	replace_ "define OPTR_DETAILS"
+
+	echo -en "\tDo you want number stack details(helpful for programmers)? "
+	replace_ "define NUM_DETAILS"
 
 	echo -en "\tDo you want the suming feature(for everyone)? "
-	replace_ "#define SUM"
+	replace_ "define SUM"
 
+	
 	echo -en "\tDo you want factorizing feature(for everyone)? "
-	replace_ "#define FACTORIZE"
+	replace_ "define FACTORIZE"
 
 	echo -en "\tDo you want calculation steps(not flexible)? "
-	replace_ "#define STEPS_CMD"
+	replace_ "define STEPS_CMD"
 
 	echo -en "\tDo you want the ability to change angle type? "
-	replace_ "#define CHANGE_ANGLE"
+	replace_ "define CHANGE_ANGLE"
 
 	echo -en "\tDo you need direct input help commands? "
-	replace_ "#define HELP_CMD"
+	replace_ "define HELP_CMD"
 
 	echo -en "\tDo you ever want a very lengthy and memory consuming calculation? "
-	replace_ "#define SPEED_UP" "#define ACCELERATE_UP"
-
-	echo -en "\tDo you want shell input features? "
-	replace_ "#define SHELL_INPUT"
-
-	echo -en "\tDo you want application direct input? "
-	replace_ "#define DIRECT_INPUT"
+	replace_ "define SPEED_UP" "define ACCELERATE_UP"
 
 	echo -en "\tDo you want to record calculation time? "
-	replace_ "#define CALC_PROCESS_TIME"
+	replace_ "define CALC_PROCESS_TIME"
 
 	echo -en "\tDo you want prompt feature? "
-	replace_ "#define PROMPT"
+	replace_ "define PROMPT"
 
 	echo -en "\tDo you need defining constants? "
-	replace_ "#define CONST_CMDS"
+	replace_ "define CONST_CMDS"
 
 	echo -en "\tDo you want answers to be recorded? "
-	replace_ "#define ANS_CMD"
+	replace_ "define ANS_CMD"
 
 	echo -en "\tDo you want to access bash from within your calculator? "
-	replace_ "#define SHELL_CMD"
+	replace_ "define SHELL_CMD"
 
 	echo -en "\tDo you want the ability to change precision? "
-	replace_ "#define CHANGE_PRECISION"
+	replace_ "define CHANGE_PRECISION"
     elif [ "$input" = "e" ]; then
 	sed "s/\/\/#define/#define/g" src/include/calc_features.hpp > calc_features.temp
 	rm src/include/calc_features.hpp
 	mv calc_features.temp src/include/calc_features.hpp
     fi
+
+    echo "Unstable features"
+    echo "Under Development/not Cross Platform but usable on standard platforms"
+    echo -n "[e(nable) all/d(isable all)/c(hoose manually)]: "
+    read input
+    if [ "$input" = "e" ]; then
+    fi
 fi
 
-	
+
+
+if [ -e "calc" ]; then
+   make cleanall
+fi
+
 echo Compiling...
 make
 if [ $? -eq 0 ]; then

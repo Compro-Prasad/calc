@@ -7,28 +7,28 @@
 
 #include <calc_term_csi.hpp>
 
-#define moveup       fprintf(stderr, CSICUA)
-#define movedown     fprintf(stderr, CSICUB)
-#define movefd       fprintf(stderr, CSICUC)
-#define movebd       fprintf(stderr, CSICUD)
-#define movexy(x, y) fprintf(stderr, FCSICUP, y, x)
-#define moveyx(y, x) fprintf(stderr, FCSICUP, y, x)
+#define moveup       fprintf(PRINTFAST, CSICUA)
+#define movedown     fprintf(PRINTFAST, CSICUB)
+#define movefd       fprintf(PRINTFAST, CSICUC)
+#define movebd       fprintf(PRINTFAST, CSICUD)
+#define movexy(x, y) fprintf(PRINTFAST, FCSICUP, y, x)
+#define moveyx(y, x) fprintf(PRINTFAST, FCSICUP, y, x)
 #define move(x, y)   movexy(x, y)
 
-#define clear_full     fprintf(stderr, FCSIED, FULL)
-#define clear_afterCU  fprintf(stderr, FCSIED, AFTER)
-#define clear_beforeCU fprintf(stderr, FCSIED, BEFORE)
-#define clear          fprintf(stderr, FCSIED CSICUP, FULL)
+#define clear_full     fprintf(PRINTFAST, FCSIED, FULL)
+#define clear_afterCU  fprintf(PRINTFAST, FCSIED, AFTER)
+#define clear_beforeCU fprintf(PRINTFAST, FCSIED, BEFORE)
+#define clear          fprintf(PRINTFAST, FCSIED CSICUP, FULL)
 
-#define clear_full_line     fprintf(stderr, FCSIEL, FULL)
-#define clear_afterCU_line  fprintf(stderr, FCSIEL, AFTER)
-#define clear_beforeCU_line fprintf(stderr, FCSIEL, BEFORE)
+#define clear_full_line     fprintf(PRINTFAST, FCSIEL, FULL)
+#define clear_afterCU_line  fprintf(PRINTFAST, FCSIEL, AFTER)
+#define clear_beforeCU_line fprintf(PRINTFAST, FCSIEL, BEFORE)
 
-#define CUsave    fprintf(stderr, CSISCP)
-#define CUrestore fprintf(stderr, CSIRCP)
+#define CUsave    fprintf(PRINTFAST, CSISCP)
+#define CUrestore fprintf(PRINTFAST, CSIRCP)
 
-#define scroll_up   fprintf(stderr, CSISU)
-#define scroll_down fprintf(stderr, CSISD)
+#define scroll_up   fprintf(PRINTFAST, CSISU)
+#define scroll_down fprintf(PRINTFAST, CSISD)
 
 #define DEC_CUR_POS (!(cur_col >> 1) && cur_line > 1 ? --cur_line : 0,	\
 		     cur_col = cur_col >> 1 ? cur_col - 1 : max_cols)

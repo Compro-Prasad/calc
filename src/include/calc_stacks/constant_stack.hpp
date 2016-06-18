@@ -42,7 +42,7 @@ class const_list
 public:
   const_list();
   bool check_const(const char *x);
-  bool insert_const(const constant x);
+  void insert_const(const constant x);
   void delete_const(const char *x);
   void disp_const();
   bool get_const(const char *a, unsigned long &i, long double &x);

@@ -19,7 +19,7 @@ unsigned short cur_line, cur_col;   /* Current position of cursor while taking
 
 void current_pos(unsigned short &x, unsigned short &y)
 {
-  fwrite(CSIDSR, 1, 5, stderr);
+  fwrite(CSIDSR, 1, 5, PRINTFAST);
   char c[20];
   if (fread(c, 1, 2, stdin) == 2)
     {
@@ -34,7 +34,7 @@ void current_pos(unsigned short &x, unsigned short &y)
 void clrscr()
 {
   for (unsigned short i = 0; i < max_lines; i++)
-    fprintf(stderr, "\n");
+    fprintf(PRINTFAST, "\n");
   move(1, 1);
 }
 

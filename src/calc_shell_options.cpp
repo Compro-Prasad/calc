@@ -41,11 +41,13 @@ void parse_options(int argc, char *argv[])
 	  max_ret_value = -1;
 	  while (*(++c))
 	    {
-	      kill(my_pid, SIGUSR1);
+	      calc_process_time(TIMER_DO_NORMAL);
 	      if ((ret_value = option_action(c, argv + i + 1)) < 0)
 		break;
-	      kill(my_pid, SIGUSR1);
+	      calc_process_time(TIMER_DO_NORMAL);
+
 	      max_ret_value < ret_value ? max_ret_value = ret_value : 0;
+
 	      if (*c == '-' || !*c)
 		break;
 	      else if (*c == 'N')
@@ -56,7 +58,7 @@ void parse_options(int argc, char *argv[])
 	      if (Error == "")
 		Error = "Error in option ";
 	      else
-		Error += "Error in option ";
+		Error += "\nError in option ";
 	      Error += argv[i];
 	      return;
 	    }
@@ -76,8 +78,22 @@ void parse_options(int argc, char *argv[])
 	  output_font.print();
 #endif
 	  cmd_action();
+	  if (Error != "")
+#ifdef CALC_COLORS
+	    {
+	      error_font.print(PRINTFAST);
+#endif
+	      fprintf(PRINTFAST, "%s", Error.str());
+#ifdef CALC_COLORS
+	      output_font.print();
+	    }
+#endif
+	  fprintf(PRINTFAST, "\n");
 	}
+      Error = "";
     }
+  if (calc_time == true)
+    fprintf(PRINTFAST, "\n");
 }
 
 signed char option_action(const char *action, char **action_args)
@@ -114,29 +130,36 @@ signed char option_action(const char *action, char **action_args)
   else if (CHECK_OPTION_AMONG('w', "welcome"))
     welcome_msg = YES - negate;
 #endif
+
 #ifdef ANS_CMD
   else if (CHECK_OPTION_AMONG('a', "store-answers"))
     store = YES - negate;
 #endif
+
 #ifdef OPTR_DETAILS
   else if (CHECK_OPTION_AMONG('o', "show-optr-details"))
     operator_detail = YES - negate;
 #endif
+
 #ifdef NUM_DETAILS
   else if (CHECK_OPTION_AMONG('n', "show-num-details"))
     num_detail = YES - negate;
 #endif
+
 #ifdef STEPS_CMD
   else if (CHECK_OPTION_AMONG('s', "show-steps"))
     steps = YES - negate;
 #endif
+
 #ifdef CALC_PROCESS_TIME
   else if (CHECK_OPTION_AMONG('t', "show-processing-time"))
     calc_time = YES - negate;
   else if (CHECK_OPTION_AMONG('r', "start-recording"))
     {
-      calc_avg_time = YES - negate;
-      kill(my_pid, SIGUSR2);
+      if ((calc_avg_time = YES - negate) != 0)
+	calc_process_time(TIMER_DISPLAY);
+      else
+	calc_process_time(TIMER_RESET);
       fprintf(PRINTFAST, "\n");
     }
 #endif
@@ -145,34 +168,46 @@ signed char option_action(const char *action, char **action_args)
 	   CHECK_OPTION_AMONG('q', "exit"))
     direct_input = 0 - negate;
 #endif
-  else if (negate)
-    {
+
 #ifdef CALC_HISTORY
-      if (CHECK_OPTION_AMONG('H', "ignore-history"))
-	{
-	  if (!strcmp(*action_args, "undef_cmd"))
-	    record &= ~UNDEFINED_COMMANDS;
-	  else if (!strcmp(*action_args, "normal_cmd"))
-	    record &= ~NORMAL_COMMANDS;
-	  else if (!strcmp(*action_args, "expr"))
-	    record &= ~EXPRESSION_COMMANDS;
-	  else if (!strcmp(*action_args, "error_expr"))
-	    record &= ~EXPRESSIONS_HAVING_ERROR;
-	  else
-	    return -1;
-	  ++ret_value;
-	}
+  else if (CHECK_OPTION_AMONG('H', "ignore-history"))
+    {
+      long x;
+      if (!strcasecmp(*action_args, "ALL"))
+	x = ALL_;
+      else if (!strcasecmp(*action_args, "ALL VALID"))
+	x = ALL_VALID;
+      else if (!strcasecmp(*action_args, "ALL INVALID"))
+	x = ALL_INVALID;
+      else if (!strcasecmp(*action_args, "ALL COMMANDS"))
+	x = ALL_COMMANDS;
+      else if (!strcasecmp(*action_args, "ALL EXPRESSIONS"))
+	x = ALL_EXPRESSIONS;
+      else if (!strcasecmp(*action_args, "VALID COMMANDS"))
+	x = VALID_COMMANDS;
+      else if (!strcasecmp(*action_args, "INVALID COMMANDS"))
+	x = INVALID_COMMANDS;
+      else if (!strcasecmp(*action_args, "VALID EXPRESSIONS"))
+	x = VALID_EXPRESSIONS;
+      else if (!strcasecmp(*action_args, "INVALID EXPRESSIONS"))
+	x = INVALID_EXPRESSIONS;
       else
-#endif
-	return -1;
+	{
+	  Error = "!!Not a valid history type!!";
+	  return -1;
+	}
+      record = negate ? record & ~x : record | x;
+      ++ret_value;
     }
+#endif
+
   else if (!negate)
     {
       if (CHECK_OPTION_AMONG('h', "help"))
 	{
 	  fprintf(PRINTFAST,
 		  "USAGE:\n\t"
-		  "calc [<expression>]\n\t"
+		  "calc [-short_options] [--long_option] [<expression>]\n\t"
 #ifdef DIRECT_INPUT
 		  "calc [-q]           Quits after reading all shell arguments\n\t"
 		  "calc [-[N]w]        Show welcome message\n\t"
@@ -207,6 +242,7 @@ signed char option_action(const char *action, char **action_args)
 		  "[-N] represents negation of the specific action\n"
 		  "Other options and long options can be consulted from manpage\n");
 	}
+
 #ifdef DIRECT_INPUT
       else if (*action_args && CHECK_OPTION_AMONG('i', "input-length"))
 	{
@@ -216,7 +252,7 @@ signed char option_action(const char *action, char **action_args)
 	    {
 	      if (x < 25)
 		{
-		  Error = "Minimum length is 25\n";
+		  Error = "Minimum length is 25";
 		  return -1;
 		}
 	      strMAX = x + 2;
@@ -226,6 +262,7 @@ signed char option_action(const char *action, char **action_args)
 	  ++ret_value;
 	}
 #endif
+
       else if (*action_args && CHECK_OPTION_AMONG('f', "file"))
 	{
 	  Input = *action_args;
@@ -245,19 +282,24 @@ signed char option_action(const char *action, char **action_args)
 		  output_font.print();
 #endif
 		  cmd_action();
+		  if (Error != "")
+#ifdef CALC_COLORS
+		    {
+		      error_font.print(PRINTFAST);
+#endif
+		      fprintf(PRINTFAST, "\n%s", Error.str());
+#ifdef CALC_COLORS
+		      output_font.print();
+		    }
+#endif
 		  fprintf(PRINTFAST, "\n");
 		}
 	    }
 	  else
-#ifdef CALC_COLORS
 	    {
-	      error_font.print();
-#endif
-	      fprintf(stderr, "\"%s\" file could not be read\n", Input.str());
-#ifdef CALC_COLORS
-	      output_font.print();
+	      sprintf(Error.str(), "'%s' file could not be read\n", Input.str());
+	      return -1;
 	    }
-#endif
 	  ++ret_value;
 	}
       else if (*action_args && CHECK_OPTION_AMONG('A', "angle-type"))
@@ -272,26 +314,12 @@ signed char option_action(const char *action, char **action_args)
 	    return -1;
 	  ++ret_value;
 	}
+
 #ifdef SCREEN_MANIP
       else if (CHECK_OPTION_AMONG('C', "clear"))
 	clrscr();
 #endif
-#ifdef CALC_HISTORY
-      else if (CHECK_OPTION_AMONG('H', "store-history"))
-	{
-	  if (!strcmp(*action_args, "undef_cmd"))
-	    record |= UNDEFINED_COMMANDS;
-	  else if (!strcmp(*action_args, "normal_cmd"))
-	    record |= NORMAL_COMMANDS;
-	  else if (!strcmp(*action_args, "expr"))
-	    record |= EXPRESSION_COMMANDS;
-	  else if (!strcmp(*action_args, "error_expr"))
-	    record |= EXPRESSIONS_HAVING_ERROR;
-	  else
-	    return -1;
-	  ++ret_value;
-	}
-#endif
+
 #ifdef CONST_CMDS
       else if (*action_args && CHECK_OPTION_AMONG('c', "constant"))
 	{
@@ -318,6 +346,7 @@ signed char option_action(const char *action, char **action_args)
 	  ++ret_value;
 	}
 #endif
+
 #ifdef PROMPT
       else if (*action_args && CHECK_OPTION_AMONG('p', "prompt"))
 	{
@@ -326,26 +355,19 @@ signed char option_action(const char *action, char **action_args)
 	  ++ret_value;
 	}
 #endif
+
 #ifdef FACTORIZE
       else if (*action_args && CHECK_OPTION_AMONG('F', "factorize"))
 	{
-	  long double x = 0, y = 0;
 	  unsigned long i = 0;
-	  if (calculate(*action_args, y, i) == SUCCESS)
-	    {
-	      y < 0 ? y = -y : 0;
-	      modfl(y, &x);
-	      fprintf(PRINTFAST, "Factors of %.0Lf: ", x);
-	      for (long double g = 1; g <= x / 2; g++)
-		if (!fmodl(x, g))
-		  fprintf(PRINTFAST, "%.0Lf, ", g);
-	      fprintf(PRINTFAST, "%.0Lf\n", x);
-	    }
-	  else
+	  factorize(i);
+	  if (Error != "")
 	    return -1;
+	  fprintf(PRINTFAST, "\n");
 	  ++ret_value;
 	}
 #endif
+
 #ifdef SUM
       else if (*action_args && *(action_args + 1) && *(action_args + 2) &&
 	       *(action_args + 3) && CHECK_OPTION_AMONG('S', "sum"))
@@ -356,7 +378,7 @@ signed char option_action(const char *action, char **action_args)
 	  bool temp_operator_detail = operator_detail;
 	  operator_detail = NO;
 #endif
-#ifdef ANS_CMD
+#ifdef STEPS_CMD
 	  bool temp_steps = steps;
 	  steps = NO;
 #endif
@@ -379,10 +401,7 @@ signed char option_action(const char *action, char **action_args)
 		      Input = *action_args;
 		      sum(lower_limit, upper_limit, rate, i);
 		      if (Error != "")
-			{
-			  ret_value = -1;
-			  Error += "\n";
-			}
+			ret_value = -1;
 		      fprintf(PRINTFAST, "\n");
 		    }
 		  else
@@ -393,10 +412,11 @@ signed char option_action(const char *action, char **action_args)
 	    }
 	  else
 	    ret_value = -1;
+
 #ifdef OPTR_DETAILS
 	  operator_detail = temp_operator_detail;
 #endif
-#ifdef ANS_CMD
+#ifdef STEPS_CMD
 	  steps = temp_steps;
 #endif
 #ifdef NUM_DETAILS
@@ -404,6 +424,7 @@ signed char option_action(const char *action, char **action_args)
 #endif
 	}
 #endif
+
 #ifdef CHANGE_PRECISION
       else if (*action_args && CHECK_OPTION_AMONG('P', "precision"))
 	{

@@ -19,9 +19,9 @@ calc_font::calc_font(char c, char b, char s)
   format[STYLE_INDEX]      = '0' + (this->style = s);
 }
 
-void calc_font::print()
+void calc_font::print(FILE *file)
 {
-  fprintf(stderr, "%s", this->format);
+  fprintf(file, "%s", this->format);
 }
 
 void calc_font::update()
@@ -29,6 +29,5 @@ void calc_font::update()
   this->format[STYLE_INDEX]      = style + '0';
   this->format[TEXT_COLOR_INDEX] = color + '0';
   this->format[BACK_COLOR_INDEX] = bagnd + '0';
-  this->print();
 }
 #endif // CALC_COLORS

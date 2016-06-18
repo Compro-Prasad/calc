@@ -29,24 +29,12 @@ RECORD OF FEATURES ADDED
        |                     |           |  POINTER 'top_optr' TO REDUCE      |
        |                     |           |  CALLS TO link_oprators::get()     |
        |---------------------+-----------+------------------------------------|
-       |  07 March     2016  |  10:30am  |  SOURCE FILES REORGANISING STARTED |
-       |                     |-----------+------------------------------------|
-       |                     |  07:15pm  |  SOURCE FILES SUCCESSFULLY         |
-       |                     |           |  REORGANISED                       |
+       |  07 March     2016  |  10:30am  |  src/ FILES HEAVILY REORGANIZED    |
        |---------------------+-----------+------------------------------------|
        |  13 March     2016  |  12:15pm  |  ADDED AN INSTALL SECTION IN       |
        |                     |           |  Makefile                          |
-       |                     |-----------+------------------------------------|
-       |                     |  03:15pm  |  REMOVED A VERY DANGEROUS AND      |
-       |                     |           |  DISSATISFYING BUG WHICH ALWAYS    |
-       |                     |           |  SHOWED "operator scarcity error". |
-       |                     |-----------+------------------------------------|
-       |                     |  04:45pm  |  REMOVED AN INPUT BUG              |
        |---------------------+-----------+------------------------------------|
-       |  21 March     2016  |  11:45pm  |  REMOVED BUG FROM sum COMMAND      |
-       |                     |           |  SHOWING ADDRESS LOCATIONS AS HEX  |
-       |                     |-----------+------------------------------------|
-       |                     |  11:50pm  |  PREVENTION OF NULL INPUT          |
+       |  21 March     2016  |  11:50pm  |  PREVENTION OF NULL INPUT          |
        |---------------------+-----------+------------------------------------|
        |  24 April     2016  |  12:10pm  |  ADDED SUPPORT FOR CHANGING INPUT  |
        |                     |           |  LENGTH                            |
@@ -59,7 +47,8 @@ RECORD OF FEATURES ADDED
        |  28 May       2016  |  07:50pm  |  ADDED SUPPORT FOR TERMINAL SCREEN |
        |                     |           |  MANIPULATION                      |
        |---------------------+-----------+------------------------------------|
-       |  04 June      2016  |  01:10am  |  ADDED SUPPORT FOR SHELL OPTIONS   |
+       |  04 June      2016  |  01:10am  |  ADDED SUPPORT FOR MORE NUMBER OF  |
+       |                     |           |  SHELL OPTIONS                     |
        +----------------------------------------------------------------------+
 
 
@@ -89,16 +78,16 @@ ABOUT
 	idea of Open Source softwares. And I also didn't know much of
 	programming techniques. So I stopped working on it and started shifting
 	onto other smaller projects.
-	But then I visualised what all problems were faced while longer
-	calulations. I figured out that when normal users faced bigger
+	But then I visualized what all problems were faced while longer
+	calculations. I figured out that when normal users faced bigger
 	calculations they had to remember the previous answers before
 	proceeding forwards and they also had to sacrifice the amount of
-	precision recieved in their previous answer. So I started writing code
-	for storing answers in the memory so they could be retreived afterward
+	precision received in their previous answer. So I started writing code
+	for storing answers in the memory so they could be retrieved afterward
 	thus relieving stress off the user's head. But till then I had learned
 	about stacks, postfix and infix notations thus the user could also
-	enjoy writing larger expressions upto 5000 characters. Then the
+	enjoy writing larger expressions up to 5000 characters. Then the
 	operator support also widened to a great extent supporting bitwise
 	operations also.
-	Now it has abilties for normal file operations, color changing, and
+	Now it has abilities for normal file operations, color changing, and
 	history support.

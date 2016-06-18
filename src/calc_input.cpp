@@ -74,10 +74,11 @@ void calc_input()
 	fflush(stdin);
       /* single character as input */
       ch = getchar();
-      //fprintf(stderr, "%d", ch);
+
 #ifdef CALC_HISTORY
       if (!i)  h.cmd_modify(Input);
 #endif
+
       /* processing of character according to condition */
       if (ch == ESC)
         {

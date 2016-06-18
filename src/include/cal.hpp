@@ -28,21 +28,32 @@
 
 #ifdef STEPS_CMD
 extern bool steps;             /* Whether or not to show steps */
-#endif // STEPS_CMD
+#endif
 
 extern unsigned char angle_type;
 
-extern long double factorial(long double x);	// factorial is undefined for x<0
+extern long double factorial(long double x);  // factorial is undefined for x<0
 
-extern signed char calculateit(const char *a, long double &ans, long double x, long double y = 0);
+extern signed char calculateit(const char *a, // operator
+			       long double &ans, // Result to be stored into
+			       const long double &x, // Argument 1
+			       const long double y = 0 /* Argument 2 */);
 
 extern signed char insert(const char *s);
 
-extern signed char calculate(const char *a, long double &n, unsigned long &i, const char ch = '\0', const long double var = 0, bool issum = 0);
+extern signed char calculate(const char *a, // The input string to be worked on
+			     long double &n, // End Result
+			     unsigned long &i, // Position in string
+			     const char ch = '\0', // Stopping character
+			     const long double var = 0, // for variable in expr
+			     const bool issum = 0 /* for variable */);
 
 extern void factorize(unsigned long &i);
 
-extern void sum(long double lower_limit, long double &upper_limit, long double &rate, const unsigned long &i);
+extern void sum(long double lower_limit,
+		long double &upper_limit,
+		long double &rate,
+		const unsigned long &i);
 
 
 #endif // CALC_CAL_H

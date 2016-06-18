@@ -65,7 +65,7 @@ public:
   char bagnd;
   char style;
   calc_font(char, char, char);
-  void print();
+  void print(FILE *file = PRINTFAST);
   void update();
 };
 

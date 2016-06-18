@@ -59,6 +59,9 @@ public:
   char * str();
 
   void print(unsigned long &start, unsigned long end = strMAX);
+
+  void advance_ptr(unsigned long pos);
+
 };
 
 extern strings Error;                  /* String for storing errors generated after each command */

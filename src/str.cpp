@@ -364,5 +364,7 @@ long check_priority(const char *s1, const char *s2)
 		  return HIGH;	// s1 >= s2
 	      }
     }
+  else if (!s1 && s2)
+    return LOW;
   return ERROR;
 }
