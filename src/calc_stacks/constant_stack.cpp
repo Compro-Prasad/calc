@@ -7,6 +7,8 @@
 const_list cons;                /* Object for storing constants in stack */
 #endif // CONST_CMDS
 
+extern char precision[15];
+
 constant::constant()
 {
   name[0] = 0, value = 0.0;

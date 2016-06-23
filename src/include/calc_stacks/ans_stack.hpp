@@ -8,15 +8,8 @@
 #include <calc_colors.hpp>
 
 /* constant strings used repeatedly in the program */
-#define Not_Calc "!!Ans%ld not yet calculated and is 0!!"
-#undef Empty
-#define Empty "!!Answers list empty!!"
-#define Invalid "!!Position invalid!!"
 
-extern bool store;
-extern char precision[15];
-extern calc_font error_font;
-extern calc_font output_font;
+#define Empty "!!Answers list empty!!"
 
 /* structure for storing answers */
 struct answer
@@ -60,10 +53,8 @@ public:
   ~link_ans();
 };
 
-#ifdef ANS_CMD
 extern bool store;              /* Whether or not to store answers */
 extern link_ans l;                     /* Object for storing answers in stack */
-#endif // ANS_CMD
 
 #endif // ANS_H
 #endif // ANS_CMD

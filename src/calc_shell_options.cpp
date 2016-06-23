@@ -41,10 +41,14 @@ void parse_options(int argc, char *argv[])
 	  max_ret_value = -1;
 	  while (*(++c))
 	    {
+#ifdef CALC_PROCESS_TIME
 	      calc_process_time(TIMER_DO_NORMAL);
+#endif
 	      if ((ret_value = option_action(c, argv + i + 1)) < 0)
 		break;
+#ifdef CALC_PROCESS_TIME
 	      calc_process_time(TIMER_DO_NORMAL);
+#endif
 
 	      max_ret_value < ret_value ? max_ret_value = ret_value : 0;
 
@@ -92,8 +96,10 @@ void parse_options(int argc, char *argv[])
 	}
       Error = "";
     }
+#ifdef CALC_PROCESS_TIME
   if (calc_time == true)
     fprintf(PRINTFAST, "\n");
+#endif
 }
 
 signed char option_action(const char *action, char **action_args)
@@ -115,6 +121,7 @@ signed char option_action(const char *action, char **action_args)
 
   if (CHECK_OPTION_AMONG('e', "show-exp"))
     {
+      extern char precision[15];
       if (*(action - 1) == 'N')
 	{
 	  strcpy(precision, "%.5Lf");
@@ -434,6 +441,7 @@ signed char option_action(const char *action, char **action_args)
 	    {
 	      unsigned short n = x;
 	      n %= 1000;
+	      extern char precision[15];
 	      sprintf(precision, "%%.%d%s", n, e);
 	    }
 	  else

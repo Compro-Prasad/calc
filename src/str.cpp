@@ -1,4 +1,5 @@
 #include <math.h>
+#include <str.hpp>
 #include <calc_stacks/constant_stack.hpp>
 
 #ifdef CONST_CMDS
@@ -262,7 +263,9 @@ unsigned char extract_math(const char *a, unsigned long &i, long double &x, char
     }
   else if (ismathchar(a[i]))
     {
+#ifdef CONST_CMDS
       long unsigned j = i;
+#endif
       while (k < 8 && ismathchar(a[i]) &&
 	     (!ismath(b) || (!strcasecmp(b, "c") && a[i] == 'o')
 	      || (!strcasecmp(b, "cos") && (a[i] == 'e' || a[i] == 'h'))

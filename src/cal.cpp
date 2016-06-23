@@ -110,6 +110,7 @@ void sum(long double lower_limit,
       fprintf(PRINTFAST, "\nSum = ");
       if (flag)
 	sum = -sum;
+      extern char precision[15];
       fprintf(PRINTFAST, precision, sum);
 #ifdef ANS_CMD
       if (store == 1)

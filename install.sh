@@ -3,7 +3,7 @@
 function comment_
 {
     if [ -n "$1" ]; then
-	sed "/$1/s/^/\/\//" src/include/calc_features.hpp > calc_features.temp
+	sed "/^[^\/]*$1/s/^/\/\//" src/include/calc_features.hpp > calc_features.temp
 	rm src/include/calc_features.hpp
 	mv calc_features.temp src/include/calc_features.hpp
     fi
@@ -12,7 +12,7 @@ function comment_
 function uncomment_
 {
     if [ -n "$1" ]; then
-	sed "/$1/s/^\/\///" src/include/calc_features.hpp > calc_features.temp
+	sed "/$1/s/^\/\/[\/]*//" src/include/calc_features.hpp > calc_features.temp
 	rm src/include/calc_features.hpp
 	mv calc_features.temp src/include/calc_features.hpp
     fi
@@ -25,7 +25,7 @@ function replace_
 	if [ -z "$2" ]; then
 	    comment_ "$1"
 	else
-	    sed -e "s/$2/$1/" src/include/calc_features.hpp > calc_features.temp
+	    sed -e "s/$2/$1/g" src/include/calc_features.hpp > calc_features.temp
 	    rm src/include/calc_features.hpp
 	    mv calc_features.temp src/include/calc_features.hpp
 	fi
@@ -42,7 +42,7 @@ function replace_
 
 echo -n 'Do you want a custom install[recommended](y/n)? '
 read input
-if [ "$input" = "y" ]; then
+if [ "$input" = "y" -o -z "$input" ]; then
     echo "Input method:"
     echo "1) SHELL_INPUT"
     echo "2) DIRECT_INPUT"
@@ -50,23 +50,23 @@ if [ "$input" = "y" ]; then
     echo -n "Choose an option: "
     read input
     if [ "$input" = "1" ]; then
-	sed "/define DIRECT_INPUT/s/^/\/\//" src/include/calc_features.hpp > calc_features.temp
-	sed "/define SHELL_INPUT/s/^\/\///" src/include/calc_features.hpp > calc_features.temp
+	comment_ "define DIRECT_INPUT"
+	uncomment_ "define SHELL_INPUT"
     elif [ "$input" = "2" ];then
-	sed "/define SHELL_INPUT/s/^/\/\//" src/include/calc_features.hpp > calc_features.temp
-	sed "/define DIRECT_INPUT/s/^\/\///" src/include/calc_features.hpp > calc_features.temp
+	comment_ "define SHELL_INPUT"
+	uncomment_ "define DIRECT_INPUT"
     else
-	sed "/define SHELL_INPUT/s/^\/\///" src/include/calc_features.hpp > calc_features.temp
-	sed "/define DIRECT_INPUT/s/^\/\///" src/include/calc_features.hpp > ccalc_features.temp
+	uncomment_ "define SHELL_INPUT"
+	uncomment_ "define DIRECT_INPUT"
     fi
     if [ -e calc_features.temp ]; then
 	rm src/include/calc_features.hpp
 	mv calc_features.temp src/include/calc_features.hpp
     fi
 
-    echo -n "Stable features[e(nable all)/c(hoose manually)]: "
+    echo -n "Stable features[e(nable all)/d(isable all)/c(hoose manually)]: "
     read input
-    if [ "$input" = "o" ]; then
+    if [ "$input" = "c" ]; then
 	echo -en "\tDo you want operator stack details(helpful for programmers)? "
 	replace_ "define OPTR_DETAILS"
 
@@ -75,7 +75,6 @@ if [ "$input" = "y" ]; then
 
 	echo -en "\tDo you want the suming feature(for everyone)? "
 	replace_ "define SUM"
-
 	
 	echo -en "\tDo you want factorizing feature(for everyone)? "
 	replace_ "define FACTORIZE"
@@ -104,13 +103,16 @@ if [ "$input" = "y" ]; then
 	echo -en "\tDo you want answers to be recorded? "
 	replace_ "define ANS_CMD"
 
-	echo -en "\tDo you want to access bash from within your calculator? "
+	echo -en "\tDo you want to access shell from within your calculator? "
 	replace_ "define SHELL_CMD"
 
 	echo -en "\tDo you want the ability to change precision? "
 	replace_ "define CHANGE_PRECISION"
-    elif [ "$input" = "e" ]; then
-	sed "s/\/\/#define/#define/g" src/include/calc_features.hpp > calc_features.temp
+    elif [ "$input" = "d" ]; then
+	comment_ "define CALC_STABLE"
+    else
+	uncomment_ "define CALC_STABLE"
+	sed "/#ifdef CALC_STABLE/,/#endif \/\/ CALC_STABLE/s/^\/\///" src/include/calc_features.hpp > calc_features.temp
 	rm src/include/calc_features.hpp
 	mv calc_features.temp src/include/calc_features.hpp
     fi
@@ -120,14 +122,21 @@ if [ "$input" = "y" ]; then
     echo -n "[e(nable) all/d(isable all)/c(hoose manually)]: "
     read input
     if [ "$input" = "e" ]; then
+	uncomment_ "define CALC_UNSTABLE"
+	sed "/#ifdef CALC_STABLE/,/#endif \/\/ CALC_UNSTABLE/s/^\/\///" src/include/calc_features.hpp > calc_features.temp
+	rm src/include/calc_features.hpp
+	mv calc_features.temp src/include/calc_features.hpp
+    elif [ "$input" = "d" ]; then
+	comment_ "define CALC_UNSTABLE"
+    else
+	echo -en "Do you want colors? "
+	replace_ "define CALC_COLORS"
+	echo -en "Do you want screen manipulation? "
+	replace_ "define SCREEN_MANIP"
     fi
 fi
 
-
-
-if [ -e "calc" ]; then
-   make cleanall
-fi
+make cleanall
 
 echo Compiling...
 make
@@ -178,7 +187,7 @@ if [ $? -eq 0 ]; then
 			fi
 		    fi;;
 		"n" | "N" | "no" | "No" )
-		    exit;;
+		    exit 0;;
 	    esac
 	fi
     else

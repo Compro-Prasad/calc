@@ -4,6 +4,8 @@
 bool store = true;              /* Whether or not to store answers */
 link_ans l;                     /* Object for storing answers in stack */
 
+extern char precision[15];
+
 void answer::display()
 {
   fprintf(PRINTFAST, " = ");
@@ -57,7 +59,7 @@ ans link_ans::get_ans_x(unsigned long pos)
   for (; t && --pos; t = t->next);
   if (pos)
     {
-      fprintf(PRINTFAST, Not_Calc, pos);
+      fprintf(PRINTFAST, "!!Ans%ld not yet calculated and is 0!!", pos);
       ans k;
       return k;
     }
@@ -108,7 +110,7 @@ void link_ans::del_ans_x(unsigned long pos)
       ans *t = top;
       for (;t->next && --pos; t = t->next);
       if (pos)
-	fprintf(PRINTFAST, Invalid);
+	fprintf(PRINTFAST, "!!Position invalid!!");
       else
 	{
 	  ans *z = t->next;

@@ -47,11 +47,9 @@ void cmd_action()
 	  if (!(record & VALID_COMMANDS))
 	    h.pop();
 #endif
-        }
+	}
       else
-#ifdef CALC_HISTORY
         {
-#endif
 	  if (Error != "")
 	    Error += " Error!!";
 	  else if (x < 25)
@@ -61,8 +59,8 @@ void cmd_action()
 #ifdef CALC_HISTORY
 	  if (!(record & INVALID_EXPRESSIONS))
 	    h.pop();
-        }
 #endif
+	}
     }
   /* commands for dealing with exponentials */
   else if (Input == "show e")
@@ -215,6 +213,8 @@ Boston, MA 02110-1301  USA\n");
       else
 	Error = "!!Not a valid history type!!";
     }
+  else if (!strcasecmp(Input.str(), "history"))
+    h.display();
 #endif
 
 #ifdef CONST_CMDS
@@ -248,9 +248,7 @@ Boston, MA 02110-1301  USA\n");
 	    }
 #endif
 	  else
-#ifdef CALC_HISTORY
 	    {
-#endif
 	      if (Error != "")
 		Error += " Error!!";
 	      else
@@ -258,8 +256,8 @@ Boston, MA 02110-1301  USA\n");
 #ifdef CALC_HISTORY
 	      if (!(record & INVALID_EXPRESSIONS))
 		h.pop();
-	    }
 #endif
+	    }
         }
       else
 	sprintf(Error.str(), "!!%s already defined as a mathematical function!!", con.name);
@@ -335,11 +333,6 @@ Boston, MA 02110-1301  USA\n");
   /*************************************/
 #endif // ANS_CMD
 
-#ifdef CALC_HISTORY
-  else if (!strcasecmp(Input.str(), "history"))
-    h.display();
-#endif
-
 #ifdef SHELL_CMD
   /* commands to deal with shell */
   else if (Input == "shell ")
@@ -382,9 +375,7 @@ Boston, MA 02110-1301  USA\n");
 #endif
         }
       else
-#ifdef CALC_HISTORY
         {
-#endif
 	  if (Error != "")
 	    Error += " Error!!";
 	  else
@@ -392,8 +383,8 @@ Boston, MA 02110-1301  USA\n");
 #ifdef CALC_HISTORY
 	  if (!(record & INVALID_EXPRESSIONS))
 	    h.pop();
-        }
 #endif
+	}
     }
 #endif // CHANGE_PRECISION
 
@@ -561,22 +552,20 @@ Boston, MA 02110-1301  USA\n");
 #ifdef ANS_CMD
 	  if (store == YES)
 	    l.add_ans(x);
-#endif // ANS_CMD
+#endif
 #ifdef CALC_HISTORY
 	  if (!(record & VALID_EXPRESSIONS))
 	    h.pop();
 #endif
         }
       else if (check_calculate == ERROR)
-#ifdef CALC_HISTORY
         {
-#endif
 	  Error += " Error!!";
 #ifdef CALC_HISTORY
 	  if (!(record & INVALID_EXPRESSIONS))
 	    h.pop();
-        }
 #endif
+	}
       else if (check_calculate == FAILURE)
 #ifdef CALC_HISTORY
         {
@@ -591,8 +580,8 @@ Boston, MA 02110-1301  USA\n");
       optr.reset();
     }
 
-  if (Error == "")
 #ifdef CALC_PROCESS_TIME
+  if (Error == "")
     calc_process_time(TIMER_DO_NORMAL);
 #endif
 }

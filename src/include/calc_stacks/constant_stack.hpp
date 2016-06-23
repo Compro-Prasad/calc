@@ -12,8 +12,6 @@
   program and memory size to make the program run faster
 */
 
-extern char precision[15];
-
 #ifdef CALC_COLORS
 extern calc_font input_font;
 extern calc_font error_font;

@@ -24,8 +24,8 @@ strings Error;
 
 unsigned long strMAX = 1000;
 
-char precision[15] = "%.5Lg";  /* String for storing precision */
-char e[3] = "Lg";              /* String for showing or not showing exponential */
+char precision[15] = "%.5Lg";/* String for storing precision */
+char e[3] = "Lg";            /* String for showing or not showing exponential */
 
 #ifdef DIRECT_INPUT
 #ifdef SHELL_INPUT
