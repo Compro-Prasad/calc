@@ -12,13 +12,6 @@
   program and memory size to make the program run faster
 */
 
-#ifdef CALC_COLORS
-extern calc_font input_font;
-extern calc_font error_font;
-extern calc_font output_font;
-extern calc_font prompt_font;
-#endif // CALC_COLORS
-
 struct constant
 {
   char name[21];

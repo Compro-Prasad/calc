@@ -4,8 +4,6 @@
 #ifndef CALC_COLORS_H
 #define CALC_COLORS_H
 
-#include <stdio.h>
-
 /* COLORS */
 #define BLACK   0
 #define RED     1
@@ -69,7 +67,7 @@ public:
   void update();
 };
 
-extern calc_font input_font, prompt_font, output_font;
+extern calc_font input_font, prompt_font, output_font, error_font;
 
 #endif // CALC_COLORS_H
 #endif // CALC_COLORS

@@ -33,7 +33,8 @@ void current_pos(unsigned short &x, unsigned short &y)
 
 void clrscr()
 {
-  for (unsigned short i = 0; i < max_lines; i++)
+  fprintf(PRINTFAST, "\n\r");
+  for (unsigned short i = 1; i < max_lines; i++)
     fprintf(PRINTFAST, "\n");
   move(1, 1);
 }
@@ -86,7 +87,7 @@ void change_screen_values(int sig)
       input_font.print();
       for (i = 0; i < cur_pos; i++)
 	fprintf(PRINTFAST, "%c", Input[i]);
-      /* *************************************** */
+      /* **************************************** */
 
 
       /* Printing left out Input characters(if any)

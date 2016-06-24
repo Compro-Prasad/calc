@@ -1,22 +1,18 @@
 #include <signal.h>
 
-#include <calc_cmd_action.hpp>
-#include <str.hpp>
-#include <calc_features.hpp>
-#include <calc_stacks/num_stack.hpp>
-#include <calc_colors.hpp>
 #include <cal.hpp>
 #include <calc_help.hpp>
-#include <calc_process_time.hpp>
-#include <calc_stacks/optr_stack.hpp>
-#include <calc_stacks/constant_stack.hpp>
-#include <calc_stacks/history_stack.hpp>
-#include <calc_screen_manip.hpp>
 #include <calc_input.hpp>
-
-#ifdef PROMPT
-extern char prompt[500];       /* String for storing prompt */
-#endif
+#include <calc_colors.hpp>
+#include <calc_features.hpp>
+#include <calc_cmd_action.hpp>
+#include <calc_process_time.hpp>
+#include <calc_screen_manip.hpp>
+#include <calc_stacks/ans_stack.hpp>
+#include <calc_stacks/num_stack.hpp>
+#include <calc_stacks/optr_stack.hpp>
+#include <calc_stacks/history_stack.hpp>
+#include <calc_stacks/constant_stack.hpp>
 
 extern char precision[15];     /* String for storing precision */
 extern char e[3];              /* String for showing or not showing exponential */
@@ -25,7 +21,7 @@ void cmd_action()
 {
 
 #ifdef CALC_PROCESS_TIME
-  calc_process_time(TIMER_DO_NORMAL);
+  calc_process_time(TIMER_START);
 #endif
 
   strings temp_char;
@@ -235,8 +231,7 @@ Boston, MA 02110-1301  USA\n");
       if (isidentifier(con.name) && ismath(con.name) != SUCCESS)
         {
 	  unsigned long i = 0;
-	  while (Input[i] != '=' && Input[i])
-	    i++;
+	  while (Input[i] && Input[i++] != '=');
 	  if (calculate(Input.str(), con.value, i) == SUCCESS)
 #ifdef CALC_HISTORY
 	    {
@@ -582,6 +577,6 @@ Boston, MA 02110-1301  USA\n");
 
 #ifdef CALC_PROCESS_TIME
   if (Error == "")
-    calc_process_time(TIMER_DO_NORMAL);
+    calc_process_time(TIMER_STOP);
 #endif
 }

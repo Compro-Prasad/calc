@@ -116,36 +116,12 @@ Or in cases where you just don't wan't to go and type at the calculator prompt
 itself.
 .TP
 .BR \-i " " NUM ", " \-\^\-input-length " " NUM ", " input " " length " " NUM
-This option always requires a numerical argument that can be calculated. Here
+Here
 .B NUM
-can be any valid expression where
-.B NUM
-actually represents the end integral result which will further be passed to
-.I strMAX
-for limiting the input from exceeding
-.B NUM
-characters.
-.IP
-The default value of
-.I strMAX
-is 1000 i.e. you can enter only 998 characters at the calc prompt. And, the
-minimum value of
-.B NUM
-is 25. If
-.B NUM
-is lesser than 25 then an error is reported to the screen.
-.IP
-.I strMAX
-is a source code variable which is actually set to
-.B NUM \+ 2
-where one is for
-.BI NULL
-character while the other one is usually unused and kept for safety purposes.
-This has affect only on objects of
-.I class strings
-and during
+can be any valid expression whose end integral result will be used to limit
+the total number of characters in
 .I direct input
-only.
+\&. You can use this in memory intensive environments.
 .TP
 .BR \-A ", " \-\^\-angle-type ", " deg ", " rad ", " grad
 The angle type can be changed to
@@ -237,8 +213,7 @@ through the shell option.
 .IP
 Let us break the valid case into small parts. The first argument
 .B calc
-is the program's name. The econd
-argument
+is the program's name. The second argument
 .B \-S
 starts the summing operation. The third argument
 .B 3 \- 3

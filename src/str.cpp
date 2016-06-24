@@ -52,7 +52,7 @@ void strcpy(char *s1, const char *s2)
 
 void strncpy(char *s1, const char *s2, unsigned int l)
 {
-  register unsigned int i = 1;
+  register unsigned int i = 0;
   for (; i < l && *s2; i++, *(s1++) = *(s2++));
   if (i < l)
     *s1 = 0;

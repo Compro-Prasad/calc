@@ -1,21 +1,20 @@
-#include <cal.hpp>
 #include <math.h>
-#include <calc_stacks/optr_stack.hpp>
-#include <calc_stacks/num_stack.hpp>
-#include <calc_stacks/history_stack.hpp>
+#include <cal.hpp>
 #include <calc_strings.hpp>
 #include <calc_cmd_action.hpp>
+#include <calc_stacks/ans_stack.hpp>
+#include <calc_stacks/num_stack.hpp>
+#include <calc_stacks/optr_stack.hpp>
+#include <calc_stacks/history_stack.hpp>
+#include <calc_stacks/constant_stack.hpp>
 
 unsigned char angle_type = DEG;
+
 #ifdef CONST_CMDS
 extern const_list cons;
 #endif
 
 extern strings Input;
-
-#ifdef ANS_CMD
-extern link_ans l;
-#endif
 
 #ifdef STEPS_CMD
 bool steps = false;             /* Whether or not to show steps */

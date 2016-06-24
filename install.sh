@@ -4,7 +4,7 @@ function comment_
 {
     if [ -n "$1" ]; then
 	sed "/^[^\/]*$1/s/^/\/\//" src/include/calc_features.hpp > calc_features.temp
-	rm src/include/calc_features.hpp
+	rm -f src/include/calc_features.hpp
 	mv calc_features.temp src/include/calc_features.hpp
     fi
 }
@@ -13,7 +13,7 @@ function uncomment_
 {
     if [ -n "$1" ]; then
 	sed "/$1/s/^\/\/[\/]*//" src/include/calc_features.hpp > calc_features.temp
-	rm src/include/calc_features.hpp
+	rm -f src/include/calc_features.hpp
 	mv calc_features.temp src/include/calc_features.hpp
     fi
 }
@@ -26,7 +26,7 @@ function replace_
 	    comment_ "$1"
 	else
 	    sed -e "s/$2/$1/g" src/include/calc_features.hpp > calc_features.temp
-	    rm src/include/calc_features.hpp
+	    rm -f src/include/calc_features.hpp
 	    mv calc_features.temp src/include/calc_features.hpp
 	fi
     elif [ "$input" = "y" ]; then
@@ -34,7 +34,7 @@ function replace_
 	    uncomment_ "$1"
 	else
 	    sed "s/$1/$2/g" src/include/calc_features.hpp > calc_features.temp
-	    rm src/include/calc_features.hpp
+	    rm -f src/include/calc_features.hpp
 	    mv calc_features.temp src/include/calc_features.hpp
 	fi
     fi
@@ -60,7 +60,7 @@ if [ "$input" = "y" -o -z "$input" ]; then
 	uncomment_ "define DIRECT_INPUT"
     fi
     if [ -e calc_features.temp ]; then
-	rm src/include/calc_features.hpp
+	rm -f src/include/calc_features.hpp
 	mv calc_features.temp src/include/calc_features.hpp
     fi
 
@@ -113,18 +113,18 @@ if [ "$input" = "y" -o -z "$input" ]; then
     else
 	uncomment_ "define CALC_STABLE"
 	sed "/#ifdef CALC_STABLE/,/#endif \/\/ CALC_STABLE/s/^\/\///" src/include/calc_features.hpp > calc_features.temp
-	rm src/include/calc_features.hpp
+	rm -f src/include/calc_features.hpp
 	mv calc_features.temp src/include/calc_features.hpp
     fi
 
     echo "Unstable features"
-    echo "Under Development/not Cross Platform but usable on standard platforms"
+    echo "Under Development/not Cross Platform -f but usable on standard platforms"
     echo -n "[e(nable) all/d(isable all)/c(hoose manually)]: "
     read input
     if [ "$input" = "e" ]; then
 	uncomment_ "define CALC_UNSTABLE"
-	sed "/#ifdef CALC_STABLE/,/#endif \/\/ CALC_UNSTABLE/s/^\/\///" src/include/calc_features.hpp > calc_features.temp
-	rm src/include/calc_features.hpp
+	sed "/#ifdef CALC_STABLE/,/#endif \/\/ CALC_UNSTABLE/s/^\/\/[\/]*//" src/include/calc_features.hpp > calc_features.temp
+	rm -f src/include/calc_features.hpp
 	mv calc_features.temp src/include/calc_features.hpp
     elif [ "$input" = "d" ]; then
 	comment_ "define CALC_UNSTABLE"
@@ -151,7 +151,7 @@ if [ $? -eq 0 ]; then
 	    echo -n "Do you want to launch the application? "
 	    read input
 	    case $input in
-		"y" | "Y" | "yes" | "Yes" )
+		"" | "y" | "Y" | "yes" | "Yes" | "YES" )
 		    calc
 		    if [ $? -eq 0 ]; then
 			echo "You can now remove the calc project tree"
@@ -183,10 +183,10 @@ if [ $? -eq 0 ]; then
 			    cd $install_dir
 			    ./calc
 			    echo "Config file changed"
-			    echo "Restart terminal to reload config file"
+			    echo "Restart shell to reload config file"
 			fi
 		    fi;;
-		"n" | "N" | "no" | "No" )
+		"n" | "N" | "no" | "No" | "NO" )
 		    exit 0;;
 	    esac
 	fi

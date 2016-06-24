@@ -3,10 +3,6 @@
 #ifndef CALC_CAL_H
 #define CALC_CAL_H
 
-#include <calc_stacks/ans_stack.hpp>
-#include <calc_strings.hpp>
-#include <calc_stacks/constant_stack.hpp>
-
 #define Operator "!!Operator scarcity"
 #define Number "!!Number scarcity"
 #define PI 3.14159265358979323846264338327950288419716939937510

@@ -14,8 +14,8 @@ using namespace std;
 #include <calc_strings.hpp>
 #include <cal.hpp>
 #include <calc_input.hpp>
-#include <calc_stacks/num_stack.hpp>
 #include <calc_stacks/ans_stack.hpp>
+#include <calc_stacks/num_stack.hpp>
 #include <calc_stacks/optr_stack.hpp>
 #include <calc_stacks/history_stack.hpp>
 #include <calc_stacks/constant_stack.hpp>
@@ -42,12 +42,12 @@ void parse_options(int argc, char *argv[])
 	  while (*(++c))
 	    {
 #ifdef CALC_PROCESS_TIME
-	      calc_process_time(TIMER_DO_NORMAL);
+	      calc_process_time(TIMER_START);
 #endif
 	      if ((ret_value = option_action(c, argv + i + 1)) < 0)
 		break;
 #ifdef CALC_PROCESS_TIME
-	      calc_process_time(TIMER_DO_NORMAL);
+	      calc_process_time(TIMER_STOP);
 #endif
 
 	      max_ret_value < ret_value ? max_ret_value = ret_value : 0;
