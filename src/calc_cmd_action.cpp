@@ -17,6 +17,10 @@
 extern char precision[15];     /* String for storing precision */
 extern char e[3];              /* String for showing or not showing exponential */
 
+#ifdef SHELL_CMD
+char Shell[100] = "bash";
+#endif
+
 void cmd_action()
 {
 
@@ -329,7 +333,8 @@ Boston, MA 02110-1301  USA\n");
 #endif // ANS_CMD
 
 #ifdef SHELL_CMD
-  /* commands to deal with shell */
+  else if (Input == "shell=")
+    extract(Input.str(), Shell, 6, -1, 0, 200);
   else if (Input == "shell ")
     {
       extract(Input.str(), temp_char.str(), 6);
@@ -340,10 +345,9 @@ Boston, MA 02110-1301  USA\n");
     {
       fprintf(PRINTFAST, "\nConnecting to shell...\n");
       change_input_flags(1);
-      fprintf(PRINTFAST, "Return value %d", system("bash"));
+      fprintf(PRINTFAST, "Return value %d", system(Shell));
       change_input_flags(0);
     }
-  /*******************************/
 #endif // SHELL_CMD
 
 #ifdef PROMPT

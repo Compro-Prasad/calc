@@ -98,6 +98,7 @@ void help(strings c)
 		    "\n-> sum <lo_lt> <up_lt> <rate> <expr> - sums up expression having i as variable"
 #endif
 #ifdef SHELL_CMD
+		    "\n-> shell=<shell_name>         - change shell"
 		    "\n-> shell <command> <args>     - command is executed from shell"
 		    "\n-> shell                      - opens up a shell"
 #endif

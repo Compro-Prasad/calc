@@ -1,5 +1,18 @@
 #!/bin/bash
 
+Strip=yes
+AutoLaunch=no
+CompileOnly=no
+
+while [ -n "$1" ]; do
+    case $1 in
+	no-strip) Strip=no;;
+	auto-launch) AutoLaunch=yes;;
+	compile-only) CompileOnly=yes;;
+    esac
+    shift
+done
+
 function comment_
 {
     if [ -n "$1" ]; then
@@ -118,7 +131,7 @@ if [ "$input" = "y" -o -z "$input" ]; then
     fi
 
     echo "Unstable features"
-    echo "Under Development/not Cross Platform -f but usable on standard platforms"
+    echo "Under Development/not Cross Platform but usable on standard platforms"
     echo -n "[e(nable) all/d(isable all)/c(hoose manually)]: "
     read input
     if [ "$input" = "e" ]; then
@@ -142,14 +155,22 @@ echo Compiling...
 make
 if [ $? -eq 0 ]; then
     echo Compilation Finished
-    if [[ $(id | grep sudo > /dev/null;echo $?) -eq 0 || "$USER" = "root" ]]; then
+    if [[ "$CompileOnly" = "no" && $(id | grep sudo > /dev/null;echo $?) -eq 0 || "$USER" = "root" ]]; then
+	if [ "$Strip" == "yes" ]; then
+	    strip calc
+	fi
 	sudo make install
 	if [ $? -eq 0 ]; then
 	    echo "Installation Finished"
 	    make cleanall
 	    echo "Cleaned up residual files"
-	    echo -n "Do you want to launch the application? "
-	    read input
+	    if [ "$AutoLaunch" = "no" ]; then
+		echo -n "Do you want to launch the application? "
+		read input
+	    else
+		input=y
+	    fi
+
 	    case $input in
 		"" | "y" | "Y" | "yes" | "Yes" | "YES" )
 		    calc
