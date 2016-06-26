@@ -15,7 +15,9 @@ class operators_stack
 #endif
 public:
   operators_stack();
+  operators_stack(const operators_stack &);
   ~operators_stack();
+  void operator=(const operators_stack &);
   char *get();
   signed char push(const char *x);
   signed char pop();

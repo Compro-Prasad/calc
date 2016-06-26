@@ -18,6 +18,37 @@ numbers_stack::numbers_stack()
   current = 0;
 }
 
+numbers_stack::numbers_stack(const numbers_stack &t)
+{
+  this->size = t.size;
+#if defined(SPEED_UP)
+  this->rate = t.rate;
+#elif defined(ACCELERATE_UP)
+  this->accelerate = t.accelerate;
+#endif
+  this->start = new long double[this->size];
+  this->current = t.current ? this->start + (t.current - t.start) : 0;
+  for (long double *temp1 = this->start, *temp2 = t.start;
+       temp2 < t.current; ++temp1, ++temp2)
+    *temp1 = *temp2;
+}
+
+void numbers_stack::operator=(const numbers_stack &t)
+{
+  if (this->start)
+    delete this->start;
+  this->start = new long double[this->size = t.size];
+#if defined(SPEED_UP)
+  this->rate = t.rate;
+#elif defined(ACCELERATE_UP)
+  this->accelerate = t.accelerate;
+#endif
+  this->current = t.current ? this->start + (t.current - t.start) : 0;
+  for (long double *temp1 = this->start, *temp2 = t.start;
+       temp2 < t.current; ++temp1, ++temp2)
+    *temp1 = *temp2;
+}
+
 numbers_stack::~numbers_stack()
 {
   this->reset();

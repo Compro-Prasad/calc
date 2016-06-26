@@ -129,6 +129,7 @@ signed char calculateit(const char *a,
 			const long double y)
 {
   long double z = angle_type == DEG ? (x * PI / 180) : (angle_type == RAD ? x : (x * PI / 200));
+  /* Basic arithmatic operators */
   if (!strcmp(a, "+"))
     ans = x + y;
   else if (!strcmp(a, "-"))
@@ -145,6 +146,7 @@ signed char calculateit(const char *a,
 	  return ERROR;
         }
     }
+  /* Factorials */
   else if (!strcmp(a, "!"))
     {
       if (x >= 0 && !(x - floorl(x)))
@@ -175,6 +177,7 @@ signed char calculateit(const char *a,
 	  return ERROR;
         }
     }
+  /* Computer related operations */
   else if (!strcmp(a, ">>"))
     ans = (unsigned long)x >> (unsigned long)y;
   else if (!strcmp(a, "<<"))
@@ -187,6 +190,7 @@ signed char calculateit(const char *a,
     ans = (unsigned long)x & (unsigned long)y;
   else if (!strcmp(a, "%"))
     ans = fmodl(x, y);
+  /* Other mathematical functions */
   else if (!strcmp(a, "log"))
     {
       if (y > 0 && x >= 0)
@@ -325,6 +329,18 @@ signed char calculateit(const char *a,
       angle_type == GRAD ? (atanl(1 / x) * 200 / PI) : (atanl(1 / x));
   else if (!strcmp(a, "^"))
     ans = powl(x, y);
+  /* Relational operators */
+  else if (!strcmp(a, ">"))  ans = x >  y;
+  else if (!strcmp(a, "<"))  ans = x <  y;
+  else if (!strcmp(a, ">=")) ans = x >= y;
+  else if (!strcmp(a, "<=")) ans = x <= y;
+  else if (!strcmp(a, "==")) ans = x == y;
+  /* Logical operators */
+  else if ((x == 1 || !x) && (y == 1 || !y))
+    {
+      if (!strcmp(a, "||")) ans = x || y;
+      if (!strcmp(a, "&&")) ans = x && y;
+    }
   else
     {
       Error = "!!Calculateit";
@@ -375,7 +391,7 @@ signed char insert(const char *s /* operator to be pushed in operator stack */)
 		  if (num.get(x) != SUCCESS)
 		    return (Error = Number, ERROR);
 
-		  /* calculate out he result */
+		  /* calculate out the result */
 		  if (calculateit(top_optr, z, x) != SUCCESS)
 		    return ERROR;
 #ifdef STEPS_CMD
@@ -432,7 +448,6 @@ signed char calculate(const char *a,
 		      const long double var,
 		      const bool issum)
 {
-  static bool is_presently_executing = false;
   unsigned char check_extract;
 #ifdef ANS_CMD
   unsigned long ans_no;
@@ -443,21 +458,6 @@ signed char calculate(const char *a,
   bool flag = ch != ' ';
   for (; a[i] != ch;)
     {
-      if (a[i] == '"')
-	{
-	  if (is_presently_executing)
-	    break;
-	  else
-	    {
-	      fprintf(PRINTFAST, "#");
-	      is_presently_executing = true;
-	      Input.advance_ptr(i + 1);
-	      cmd_action();
-	      is_presently_executing = false;
-	      Input.advance_ptr(0);
-	    }
-	}
-	
       flag ? SKIP_SPACE(a, i) : 0;
 
       /* **************************Factorial************************ */

@@ -8,15 +8,15 @@ extern const_list cons;
 
 unsigned int strlen(const char *s)
 {
-  register int l = 0;
-  for (; s[l]; l++);
-  return l;
+  register const char *c = s;
+  for (; *c; ++c);
+  return (c - s);
 }
 
 signed char strcmp(const char *s1, const char *s2)
 {
   while ((*s1 || *s2) && *s1 == *s2)
-    *s1 ? s1++ : 0, *s2 ? s2++ : 0;
+    *s1 ? ++s1 : 0, *s2 ? ++s2 : 0;
   return (*s1 - *s2);
 }
 
@@ -24,7 +24,7 @@ signed char strncmp(const char *s1, const char *s2, unsigned int l)
 {
   for (register unsigned int i = 1;
        i < l && (*s1 || *s2) && *s1 == *s2;
-       i++, *s1 ? s1++ : 0, s2 ? s2++ : 0);
+       ++i, *s1 ? ++s1 : 0, s2 ? ++s2 : 0);
   return (*s1 - *s2);
 }
 
@@ -39,7 +39,7 @@ signed char strncasecmp(const char *s1, const char *s2, unsigned int l)
 {
   register unsigned int i = 1;
   for (; i < l && (*s1 || *s2) && tolower(*s1) == tolower(*s2);
-       i++, *s1 ? s1++ : 0, s2 ? s2++ : 0);
+       ++i, *s1 ? ++s1 : 0, s2 ? ++s2 : 0);
   return (tolower(*s1) - tolower(*s2));
 }
 
@@ -53,7 +53,7 @@ void strcpy(char *s1, const char *s2)
 void strncpy(char *s1, const char *s2, unsigned int l)
 {
   register unsigned int i = 0;
-  for (; i < l && *s2; i++, *(s1++) = *(s2++));
+  for (; i < l && *s2; ++i, *(s1++) = *(s2++));
   if (i < l)
     *s1 = 0;
 }
@@ -87,19 +87,33 @@ bool isbinary(const char *s)
 {
   if (s)
     {
-      if (!strcmp(s, "/") ||
-	  !strcmp(s, "*") ||
-	  !strcmp(s, "-") ||
-	  !strcmp(s, "+") ||
-	  !strcmp(s, "^") ||
-	  !strcmp(s, "C") ||
-	  !strcmp(s, "P") ||
-	  !strcmp(s, "%") ||
-	  !strcasecmp(s, "log") ||
-	  !strcmp(s, "|") ||
-	  !strcmp(s, "&") ||
-	  !strcmp(s, ">>") ||
-	  !strcmp(s, "<<"))
+      if (!*(s + 1))
+	switch (*s)
+	  {
+	  case '>':
+	  case '<':
+	  case '/':
+	  case '*':
+	  case '-':
+	  case '+':
+	  case '^':
+	  case 'C':
+	  case 'P':
+	  case '%':
+	  case '|':
+	  case '&':
+	    return SUCCESS;
+	  }
+      else if (!*(s + 2))
+	{
+	  if ((*s == '>' && (*(s + 1) == '=' || *(s + 1) == '>')) ||
+	      (*s == '<' && (*(s + 1) == '=' || *(s + 1) == '<')) ||
+	      (*s == '=' && *(s + 1) == '=') ||
+	      (*s == '|' && *(s + 1) == '|') ||
+	      (*s == '&' && *(s + 1) == '&'))
+	    return SUCCESS;
+	}
+      else if (!strcmp(s, "log"))
 	return SUCCESS;
     }
   return FAILURE;
@@ -109,28 +123,28 @@ bool isunary(const char *s)
 {
   if (s)
     {
-      if (!strcasecmp(s, "ln") ||
+      if (!strcmp(s, "ln") ||
 	  !strcmp(s, "~") ||
 	  !strcmp(s, "!") ||
-	  !strcasecmp(s, "abs") ||
-	  !strcasecmp(s, "ceil") ||
-	  !strcasecmp(s, "floor") ||
-	  !strcasecmp(s, "sin") ||
-	  !strcasecmp(s, "cos") ||
-	  !strcasecmp(s, "tan") ||
-	  !strcasecmp(s, "cot") ||
-	  !strcasecmp(s, "cosec") ||
-	  !strcasecmp(s, "sec") ||
-	  !strcasecmp(s, "asin") ||
-	  !strcasecmp(s, "acos") ||
-	  !strcasecmp(s, "atan") ||
-	  !strcasecmp(s, "acot") ||
-	  !strcasecmp(s, "asec") ||
-	  !strcasecmp(s, "acosec") ||
-	  !strcasecmp(s, "sinh") ||
-	  !strcasecmp(s, "cosh") ||
-	  !strcasecmp(s, "tanh") ||
-	  !strcasecmp(s, "logten"))
+	  !strcmp(s, "abs") ||
+	  !strcmp(s, "ceil") ||
+	  !strcmp(s, "floor") ||
+	  !strcmp(s, "sin") ||
+	  !strcmp(s, "cos") ||
+	  !strcmp(s, "tan") ||
+	  !strcmp(s, "cot") ||
+	  !strcmp(s, "cosec") ||
+	  !strcmp(s, "sec") ||
+	  !strcmp(s, "asin") ||
+	  !strcmp(s, "acos") ||
+	  !strcmp(s, "atan") ||
+	  !strcmp(s, "acot") ||
+	  !strcmp(s, "asec") ||
+	  !strcmp(s, "acosec") ||
+	  !strcmp(s, "sinh") ||
+	  !strcmp(s, "cosh") ||
+	  !strcmp(s, "tanh") ||
+	  !strcmp(s, "logten"))
 	return SUCCESS;
     }
   return FAILURE;
@@ -155,53 +169,29 @@ bool isidentifier(const char *s)
 
 signed char atof(const char *a, unsigned long &i, long double &x, data_type d)
 {
-  bool f = 0, s = 0;
-  unsigned long p = i;
-  signed char j = -1;
-  if (a[i] == '-')
+  bool s = 0;
+  register const char *c = a + i;
+  if (*c == '-')
     {
       if (d == REAL || d == INT)
 	s = 1;
       else
 	return ERROR;
-      i++;
+      ++c;
     }
-  if (a[i] == '.')
+  while (isdigit(*c))
+    x = x * 10 + *(c++) - 48;
+  if (*c == '.')
     {
-      if (d == REAL || d == UNSIGNED_REAL)
-	f = 1;
-      else
+      if (d != REAL && d != UNSIGNED_REAL)
 	return ERROR;
-      i++;
-    }
-  for (; a[i]; i++)
-    {
-      if (isdigit(a[i]))
-        {
-	  if (f == 1 && (d == REAL || d == UNSIGNED_REAL))
-	    x = x + pow(10, j--) * (a[i] - 48);
-	  else
-            {
-	      x = x * 10 + a[i] - 48;
-	      if (a[i + 1] == '.')
-                {
-		  if (f)
-		    return ERROR;
-		  if (d == REAL || d == UNSIGNED_REAL)
-		    f = 1;
-		  else
-		    return ERROR;
-		  i++;
-                }
-            }
-        }
-      else if (p == i)
-	return ERROR;
-      else
-	break;
+      register signed long j = 0;
+      while (*(++c) > 47 && *c < 58) // isdigit
+	x = x + pow(10, --j) * (*c - 48);
     }
   if (s == 1)
     x = -x;
+  i = c - a;
   return SUCCESS;
 }
 
@@ -357,9 +347,9 @@ long check_priority(const char *s1, const char *s2)
 	return LOW;
       char a[][7] = { "+", "-", "*", "/", "^", "p", "c", "log", "%", "|", "&", ">>", "<<" };
       for (int i = 0; i < 13; i++)
-	if (!strcasecmp(s1, a[i]))
+	if (!strcmp(s1, a[i]))
 	  for (int j = 0; j < 13; j++)
-	    if (!strcasecmp(s2, a[j]))
+	    if (!strcmp(s2, a[j]))
 	      {
 		if (i < j)	// 2+3*5
 		  return LOW;	// s1 < s2

@@ -26,13 +26,13 @@ void calc_process_time(char sig)
 	expressions++, total_time += time_taken;
 
       if (calc_time == true)
-	fprintf(PRINTFAST, "\nCommand Processing Time : %.8Lf seconds",
+	fprintf(PRINTFAST, "\nCommand Processing Time : %.6Lf seconds",
 		time_taken);
     }
   else if (sig == TIMER_RESET)
     total_time = expressions = 0.0;
   else if (sig == TIMER_DISPLAY && expressions)
-    fprintf(PRINTFAST, "\nAverage time = %.8Lf", (total_time / expressions));
+    fprintf(PRINTFAST, "\nAverage time = %.7Lf", (total_time / expressions));
 }
 
 #endif

@@ -19,6 +19,37 @@ operators_stack::operators_stack()
   current = 0;
 }
 
+operators_stack::operators_stack(const operators_stack &t)
+{
+  this->size = t.size;
+#if defined(SPEED_UP)
+  this->rate = t.rate;
+#elif defined(ACCELERATE_UP)
+  this->accelerate = t.accelerate;
+#endif
+  this->start = new char[this->size][7];
+  this->current = t.current ? this->start + (t.current - t.start) : 0;
+  for (char (*temp1)[7] = this->start, (*temp2)[7] = t.start;
+       temp2 < t.current; ++temp1, ++temp2)
+    strcpy(*temp1, *temp2);
+}
+
+void operators_stack::operator=(const operators_stack &t)
+{
+  if (this->start)
+    delete this->start;
+  this->start = new char[this->size = t.size][7];
+#if defined(SPEED_UP)
+  this->rate = t.rate;
+#elif defined(ACCELERATE_UP)
+  this->accelerate = t.accelerate;
+#endif
+  this->current = t.current ? this->start + (t.current - t.start) : 0;
+  for (char (*temp1)[7] = this->start, (*temp2)[7] = t.start;
+       temp2 < t.current; ++temp1, ++temp2)
+    strcpy(*temp1, *temp2);
+}
+
 operators_stack::~operators_stack()
 {
   this->reset();

@@ -217,22 +217,3 @@ void strings::print(unsigned long &start, unsigned long end)
        )
     fprintf(PRINTFAST, "%c", *ch);
 }
-
-void strings::advance_ptr(unsigned long pos)
-{
-  static char *x;
-  if (pos)
-    {
-      if (pos < length)
-	{
-	  x = c;
-	  c += pos;
-	  length -= pos;
-	}
-    }
-  else
-    {
-      length += c - x;
-      c = x;
-    }
-}

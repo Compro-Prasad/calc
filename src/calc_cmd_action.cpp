@@ -18,7 +18,7 @@ extern char precision[15];     /* String for storing precision */
 extern char e[3];              /* String for showing or not showing exponential */
 
 #ifdef SHELL_CMD
-char Shell[100] = "bash";
+char Shell[200] = "bash";
 #endif
 
 void cmd_action()

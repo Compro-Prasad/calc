@@ -15,7 +15,9 @@ class numbers_stack
 #endif
 public:
   numbers_stack();
+  numbers_stack(const numbers_stack &);
   ~numbers_stack();
+  void operator=(const numbers_stack &);
   signed char increase_size();
   signed char decrease_size();
   signed char get(long double &y);

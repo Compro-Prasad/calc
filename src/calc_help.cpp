@@ -21,7 +21,7 @@ void help(strings c)
 #endif
       if (c == "answers")
 	fprintf(PRINTFAST,
-		"\n-> start/stop storing answers  - starts/stops the storing of answers"
+		"\n-> (dont) store answers  - starts/stops the storing of answers"
 		"\n-> answers                     - shows all answers"
 		"\n-> delete answers              - deletes all answers"
 		"\n-> delete answers leaving NUM  - deletes all answers leaving NUM of them"
