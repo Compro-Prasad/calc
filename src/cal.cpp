@@ -129,14 +129,15 @@ signed char calculateit(const char *a,
 			const long double y)
 {
   long double z = angle_type == DEG ? (x * PI / 180) : (angle_type == RAD ? x : (x * PI / 200));
+
   /* Basic arithmatic operators */
-  if (!strcmp(a, "+"))
+  if (*a == '+')
     ans = x + y;
-  else if (!strcmp(a, "-"))
+  else if (*a == '-')
     ans = x - y;
-  else if (!strcmp(a, "*"))
+  else if (*a == '*')
     ans = x * y;
-  else if (!strcmp(a, "/"))
+  else if (*a == '/')
     {
       if (y)
 	ans = x / y;
@@ -146,18 +147,11 @@ signed char calculateit(const char *a,
 	  return ERROR;
         }
     }
+  else if (*a == '^')
+    ans = powl(x, y);
+
   /* Factorials */
-  else if (!strcmp(a, "!"))
-    {
-      if (x >= 0 && !(x - floorl(x)))
-	ans = factorial(x);
-      else
-        {
-	  Error = "!!Factorial";
-	  return ERROR;
-        }
-    }
-  else if (!strcmp(a, "p"))
+  else if (*a == 'C')
     {
       if (x >= 0 && y >= 0 && x >= y && !(x - floorl(x)) && !(y - floorl(y)))
 	ans = factorial(x) / factorial(x - y);
@@ -167,7 +161,7 @@ signed char calculateit(const char *a,
 	  return ERROR;
         }
     }
-  else if (!strcmp(a, "c"))
+  else if (*a == 'C')
     {
       if (x >= 0 && y >= 0 && x >= y && !(x - floorl(x)) && !(y - floorl(y)))
 	ans = factorial(x) / (factorial(y) * factorial(x - y));
@@ -177,19 +171,33 @@ signed char calculateit(const char *a,
 	  return ERROR;
         }
     }
+
   /* Computer related operations */
-  else if (!strcmp(a, ">>"))
-    ans = (unsigned long)x >> (unsigned long)y;
-  else if (!strcmp(a, "<<"))
-    ans = (unsigned long)x << (unsigned long)y;
-  else if (!strcmp(a, "~"))
+  else if (*a == '~')
     ans = ~(unsigned long)x;
-  else if (!strcmp(a, "|"))
+  else if (*a == '|' && !*a)
     ans = (unsigned long)x | (unsigned long)y;
-  else if (!strcmp(a, "&"))
+  else if (*a == '&' && !*a)
     ans = (unsigned long)x & (unsigned long)y;
-  else if (!strcmp(a, "%"))
+  else if (*a == '%')
     ans = fmodl(x, y);
+  else if (*(a + 1) == *a && *a == '>')
+    ans = (unsigned long)x >> (unsigned long)y;
+  else if (*(a + 1) == *a && *a == '<')
+    ans = (unsigned long)x << (unsigned long)y;
+
+  /* Relational operators */
+  else if (*a == '>')  ans = x >  y;
+  else if (*a == '<')  ans = x <  y;
+  else if (*(a + 1) == '=')
+    switch (*a)
+      {
+      case '>': ans = x >= y; break; // >=
+      case '<': ans = x <= y; break; // <=
+      case '=': ans = x == y; break; // ==
+      default : goto Operator_Invalid;
+      }
+
   /* Other mathematical functions */
   else if (!strcmp(a, "log"))
     {
@@ -327,24 +335,24 @@ signed char calculateit(const char *a,
   else if (!strcmp(a, "acot"))
     ans = angle_type == DEG ? (atanl(1 / x) * 180 / PI) :
       angle_type == GRAD ? (atanl(1 / x) * 200 / PI) : (atanl(1 / x));
-  else if (!strcmp(a, "^"))
-    ans = powl(x, y);
-  /* Relational operators */
-  else if (!strcmp(a, ">"))  ans = x >  y;
-  else if (!strcmp(a, "<"))  ans = x <  y;
-  else if (!strcmp(a, ">=")) ans = x >= y;
-  else if (!strcmp(a, "<=")) ans = x <= y;
-  else if (!strcmp(a, "==")) ans = x == y;
+
   /* Logical operators */
   else if ((x == 1 || !x) && (y == 1 || !y))
     {
-      if (!strcmp(a, "||")) ans = x || y;
-      if (!strcmp(a, "&&")) ans = x && y;
+      if (*a == '!')        ans = !x;
+      if (*a == *(a + 1))
+	switch (*a)
+	  {
+	  case '|': ans = x || y; break; // ||
+	  case '&': ans = x && y; break; // &&
+	  default : goto Operator_Invalid;
+	  }
     }
+
   else
     {
-      Error = "!!Calculateit";
-      return FAILURE;
+    Operator_Invalid:
+      return Error = "!!Invalid Operator", FAILURE;
     }
   return SUCCESS;
 }
@@ -463,13 +471,15 @@ signed char calculate(const char *a,
       /* **************************Factorial************************ */
       /* It is a special kind of unary operator which                */
       /* stands after the number whose factorial is to be calculated */
-      if (a[i] == '!')
+      if (a[i] == '!' && isalnum(a[i - 1]))
         {
-	  num.get(x);
-	  if (calculateit("!", y, x) != SUCCESS)
-	    return ERROR;
-	  num.push(y);
-	  i++;
+	  if (num.get(x) == ERROR)
+	    return Error = "Number scarcity", ERROR;
+	  if (x >= 0 && !(x - floorl(x)))
+	    num.push(factorial(x));
+	  else
+	    return Error = "!!Factorial", ERROR;
+	  ++i;
 	  flag ? SKIP_SPACE(a, i) : 0;
 	  continue;
         }

@@ -66,6 +66,15 @@ void strcat(char *s1, const char *s2)
   *s = 0;
 }
 
+void strcat(char *s1, const char c)
+{
+  if (c)
+    {
+      char *s = strlen(s1) + s1;
+      *s++ = c, *s = 0;
+    }
+}
+
 void strncat(char *s1, const char *s2, unsigned int l)
 {
   register unsigned int i = strlen(s1);
@@ -78,7 +87,8 @@ void strncat(char *s1, const char *s2, unsigned int l)
 bool ismathchar(const char ch)
 {
   if (isalpha(ch) || ch == '/' || ch == '*' || ch == '-' || ch == '+' || ch == '^' || ch == '%'
-      || ch == '_' || ch == '!' || ch == '&' || ch == '|' || ch == '<' || ch == '>' || ch == '~')
+      || ch == '_' || ch == '!' || ch == '&' || ch == '|' || ch == '<' || ch == '>' || ch == '~'
+      || ch == '=')
     return SUCCESS;
   return FAILURE;
 }
@@ -123,9 +133,8 @@ bool isunary(const char *s)
 {
   if (s)
     {
-      if (!strcmp(s, "ln") ||
-	  !strcmp(s, "~") ||
-	  !strcmp(s, "!") ||
+      if (*s == '~' || *s == '!' ||
+	  !strcmp(s, "ln") ||
 	  !strcmp(s, "abs") ||
 	  !strcmp(s, "ceil") ||
 	  !strcmp(s, "floor") ||
@@ -257,11 +266,14 @@ unsigned char extract_math(const char *a, unsigned long &i, long double &x, char
       long unsigned j = i;
 #endif
       while (k < 8 && ismathchar(a[i]) &&
-	     (!ismath(b) || (!strcasecmp(b, "c") && a[i] == 'o')
-	      || (!strcasecmp(b, "cos") && (a[i] == 'e' || a[i] == 'h'))
-	      || (!strcasecmp(b, "sin") && a[i] == 'h')
-	      || (!strcasecmp(b, "tan") && a[i] == 'h')
-	      || (!strcasecmp(b, "log") && a[i] == 't')))
+	     (!ismath(b)
+	      || (*b == '&' && a[i] == '&')
+	      || (*b == '|' && a[i] == '|')
+	      || (*b == 'c' && a[i] == 'o')
+	      || (!strcmp(b, "cos") && (a[i] == 'e' || a[i] == 'h'))
+	      || (!strcmp(b, "sin") && a[i] == 'h')
+	      || (!strcmp(b, "tan") && a[i] == 'h')
+	      || (!strcmp(b, "log") && a[i] == 't')))
 	b[k++] = a[i++], b[k] = 0;
       if (ismath(b))
 	return GOT_MATH_FUNC;
@@ -274,6 +286,55 @@ unsigned char extract_math(const char *a, unsigned long &i, long double &x, char
 #endif
     }
   return FAILURE;
+}
+
+int priority_group(const char *s)
+{
+  /*
+      const char operators[][5][4] = {
+      { "&&", "||" },
+      { ">", "<", ">=", "<=", "==" },
+      { "+", "-" },
+      { "*", "/", "%", "^" },
+      { "P", "C", "log" },
+      { "&", "|" },
+      { ">>", "<<" }
+      };
+  */
+  if (*s == *(s + 1))
+    switch (*s)
+      {
+      case '&':
+      case '|': return 1;
+      case '>':
+      case '<': return 7;
+      default : return 0;
+      }
+  else if (*(s + 1) == '=')
+    switch (*s)
+      {
+      case '>':
+      case '<':
+      case '=': return 2;
+      default : return 0;
+      }
+  else
+    switch (*s)
+      {
+      case '>':
+      case '<': return 2;
+      case '+':
+      case '-': return 3;
+      case '*':
+      case '/':
+      case '%':
+      case '^': return 4;
+      case 'P':
+      case 'C': return 5;
+      case '&':
+      case '|': return 6;
+      default : return strcmp(s, "log") ? 0 : 5;
+      }
 }
 
 long check_priority(const char *s1, const char *s2)
@@ -328,9 +389,9 @@ long check_priority(const char *s1, const char *s2)
   */
   if (s1 && s2)
     {
-      if (!strcmp(s2, ")"))	// highest priority
+      if (*s2 == ')')	// highest priority
 	return HIGH;
-      if (!strcmp(s1, "("))	// lowest priority
+      if (*s1 == '(')	// lowest priority
 	return LOW;
       if (isbinary(s1) && isunary(s2))	// 2+sin3; where s1=+ && s2=sin
 	return LOW;			// s1 < s2
@@ -345,17 +406,12 @@ long check_priority(const char *s1, const char *s2)
         }
       if (isunary(s1) && isunary(s2))
 	return LOW;
-      char a[][7] = { "+", "-", "*", "/", "^", "p", "c", "log", "%", "|", "&", ">>", "<<" };
-      for (int i = 0; i < 13; i++)
-	if (!strcmp(s1, a[i]))
-	  for (int j = 0; j < 13; j++)
-	    if (!strcmp(s2, a[j]))
-	      {
-		if (i < j)	// 2+3*5
-		  return LOW;	// s1 < s2
-		else	// 2*3+5 or 2*3*5
-		  return HIGH;	// s1 >= s2
-	      }
+
+      unsigned char p1 = priority_group(s1), p2 = priority_group(s2);
+      if (p1 && p2)
+	return p1 < p2 ? LOW : HIGH;
+      else
+	return ERROR;
     }
   else if (!s1 && s2)
     return LOW;

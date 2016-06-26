@@ -9,11 +9,11 @@ void help(strings c)
 #ifdef CONST_CMDS
     if (c == "constants")
       fprintf(PRINTFAST,
-	      "\n-> constant <name>=<value>  - for creating a custom constant"
-	      "\n-> constants                - shows all constants"
-	      "\n-> remove constant <name>   - removes constant"
-	      "\n-> remove constants         - removes all constants"
-	      "\n-> load constant pi         - loads pi as a constant");
+	      "\n-> constant <name>=<value> - for creating a custom constant"
+	      "\n-> constants               - shows all constants"
+	      "\n-> remove constant <name>  - removes constant"
+	      "\n-> remove constants        - removes all constants"
+	      "\n-> load constant pi        - loads pi as a constant");
 #endif
 #ifdef ANS_CMD
 #if defined(CONST_CMDS)
@@ -21,11 +21,11 @@ void help(strings c)
 #endif
       if (c == "answers")
 	fprintf(PRINTFAST,
-		"\n-> (dont) store answers  - starts/stops the storing of answers"
-		"\n-> answers                     - shows all answers"
-		"\n-> delete answers              - deletes all answers"
-		"\n-> delete answers leaving NUM  - deletes all answers leaving NUM of them"
-		"\n-> show/delete A31             - shows/deletes answer number 31");
+		"\n-> (dont) store answers       - starts/stops the storing of answers"
+		"\n-> answers                    - shows all answers"
+		"\n-> delete answers             - deletes all answers"
+		"\n-> delete answers leaving NUM - deletes all answers leaving NUM of them"
+		"\n-> show/delete A31            - shows/deletes answer number 31");
 #endif
 #ifdef CALC_COLORS
 #if defined(CONST_CMDS) || defined(ANS_CMD)
