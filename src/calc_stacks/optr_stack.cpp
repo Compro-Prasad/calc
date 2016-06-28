@@ -2,7 +2,6 @@
 #include <str.hpp>
 #include <calc_stacks/optr_stack.hpp>
 
-operators_stack optr;
 #ifdef OPTR_DETAILS
 bool operator_detail;
 #endif

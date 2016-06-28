@@ -27,7 +27,6 @@ public:
   bool check_brac();
 };
 
-extern operators_stack optr;
 #ifdef OPTR_DETAILS
 extern bool operator_detail;
 #endif
