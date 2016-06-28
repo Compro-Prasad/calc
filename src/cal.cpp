@@ -58,8 +58,6 @@ void factorize(unsigned long &i)
 	h.pop();
     }
 #endif
-  num.reset();
-  optr.reset();
 }
 
 void sum(long double lower_limit,
@@ -117,9 +115,6 @@ void sum(long double lower_limit,
 #endif
     }
   /***************************************************/
-
-  num.reset();
-  optr.reset();
 }
 
 
@@ -357,7 +352,9 @@ signed char calculateit(const char *a,
   return SUCCESS;
 }
 
-signed char insert(const char *s /* operator to be pushed in operator stack */)
+signed char insert(const char *s /* operator to be pushed in operator stack */,
+		   operators_stack &optr,
+		   numbers_stack &num)
 {
   if (s)
     {
@@ -460,6 +457,8 @@ signed char calculate(const char *a,
 #ifdef ANS_CMD
   unsigned long ans_no;
 #endif
+  operators_stack optr;
+  numbers_stack num;
   long double x, y;
   char c[10];
   unsigned long first = i;
@@ -477,12 +476,13 @@ signed char calculate(const char *a,
 	  while (a[i] == '+' || a[i] == '-')
 	    if (a[i++] == '-')
 	      t = t * (-1);
-	  if (insert(t < 0 ? "-" : "+") == ERROR)
+	  if (insert(t < 0 ? "-" : "+", optr, num) == ERROR)
 	    return ERROR;
 	  flag ? SKIP_SPACE(a, i) : 0;
+	  continue;
         }
 
-      /* i represents the value during suming an expresseion */
+      /* i represents the value during suming an expression */
       if (a[i] == 'i' && issum)
         {
 	  i++;
@@ -551,7 +551,7 @@ signed char calculate(const char *a,
 	    {
 	      /* We just have to insert the '*' operator when the above
 		 condition is satisfied*/
-	      if (insert("*") == ERROR)
+	      if (insert("*", optr, num) == ERROR)
 		return ERROR;
 	    }
 	  /* *************************************************************** */
@@ -575,7 +575,7 @@ signed char calculate(const char *a,
 #endif
       else if (check_extract == GOT_MATH_FUNC)
         {
-	  if (insert(c) == ERROR)
+	  if (insert(c, optr, num) == ERROR)
 	    return ERROR;
 	  else
             {
@@ -603,7 +603,7 @@ signed char calculate(const char *a,
 		  Error = "!!Bracket";
 		  return ERROR;
                 }
-	      if (insert(c) == ERROR)
+	      if (insert(c, optr, num) == ERROR)
 		return ERROR;
 	      flag ? SKIP_SPACE(a, i) : 0;
 #ifdef CONST_CMDS
@@ -617,13 +617,13 @@ signed char calculate(const char *a,
 		       (a[i] != 'P' && tolower(a[i]) != 'l'
 			&& a[i] != 'C'))) || a[i] == '('
 		  || isdigit(a[i]))
-		if (insert("*") == ERROR)
+		if (insert("*", optr, num) == ERROR)
 		  return ERROR;
             }
         }
     }							// loop ends
   while (optr.get())
-    if (insert(")") == ERROR)
+    if (insert(")", optr, num) == ERROR)
       return ERROR;
   if (num.get(n) != SUCCESS)
     return FAILURE;

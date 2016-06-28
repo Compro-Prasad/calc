@@ -534,8 +534,6 @@ Boston, MA 02110-1301  USA\n");
 	    h.pop();
 	}
 #endif
-      num.reset();
-      optr.reset();
     }
 #endif // SUM
 
@@ -575,8 +573,6 @@ Boston, MA 02110-1301  USA\n");
 	    h.pop();
         }
 #endif
-      num.reset();
-      optr.reset();
     }
 
 #ifdef CALC_PROCESS_TIME
