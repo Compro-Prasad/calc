@@ -64,7 +64,16 @@ void parse_options(int argc, char *argv[])
 	      else
 		Error += "\nError in option ";
 	      Error += argv[i];
-	      return;
+#ifdef CALC_COLORS
+	      error_font.print(PRINTFAST);
+#endif
+	      fprintf(PRINTFAST, "%s", Error.str());
+#ifdef CALC_COLORS
+	      output_font.print();
+#endif
+	      fprintf(PRINTFAST, "\n");
+	      Error = "";
+	      continue;
 	    }
 	  else if (!*c)
 	    ++max_ret_value;
@@ -409,7 +418,6 @@ signed char option_action(const char *action, char **action_args)
 		      sum(lower_limit, upper_limit, rate, i);
 		      if (Error != "")
 			ret_value = -1;
-		      fprintf(PRINTFAST, "\n");
 		    }
 		  else
 		    ret_value = -1;
