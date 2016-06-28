@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
     fprintf(PRINTFAST,
 	    "This is free software with ABSOLUTELY NO WARRANTY.\n"
 	    "For details type `warranty'.\n"
-	    "Type help and press return to know more.\n");
+	    "Type help and press return to know more.");
   /* ******************************************************************* */
 
 
@@ -138,8 +138,6 @@ int main(int argc, char *argv[])
       /*                                                                */
       /*                   input fuctioning over(reloop)                */
       /* ************************************************************** */
-      fprintf(PRINTFAST, "\n");
-
     }
 #endif // DIRECT_INPUT
 

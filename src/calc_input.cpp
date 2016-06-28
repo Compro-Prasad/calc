@@ -46,7 +46,7 @@ void print_prompt()
 #ifdef CALC_COLORS
   prompt_font.print();
 #endif
-  fprintf(PRINTFAST, "%s", prompt);
+  fprintf(PRINTFAST, "\n%s", prompt);
 #ifdef CALC_COLORS
   output_font.print();
 #endif

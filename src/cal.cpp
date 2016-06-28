@@ -65,14 +65,13 @@ void sum(long double lower_limit,
 	 long double &rate,
 	 const unsigned long &i)
 {
-  fprintf(PRINTFAST, "\nSuming expression \"");
   bool flag = 0, f = 1;
   unsigned long m = i;
   long double sum = 0, x = 0;
-  Input.print(m);
   fprintf(PRINTFAST,
-	  "\" from i = %Lg to i = %Lg at the rate of %Lg per sum",
-	  lower_limit, upper_limit, rate);
+	  "\nSuming expression \"%s\""
+	  " from i = %Lg to i = %Lg at the rate of %Lg per sum",
+	  Input.str(), lower_limit, upper_limit, rate);
   if (lower_limit > upper_limit && rate < 0.0)
     {
       swap(lower_limit, upper_limit, long double);
