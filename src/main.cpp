@@ -12,13 +12,8 @@ using namespace std;
 #include <calc_input.hpp>
 #include <calc_colors.hpp>
 #include <calc_screen_manip.hpp>
-#include <calc_process_time.hpp>
 
-#include <calc_stacks/optr_stack.hpp>
-#include <calc_stacks/num_stack.hpp>
 #include <calc_stacks/history_stack.hpp>
-#include <calc_stacks/constant_stack.hpp>
-#include <calc_stacks/ans_stack.hpp>
 
 strings Error;
 
