@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <calc_stacks/num_stack.hpp>
 
-numbers_stack num;
 #ifdef NUM_DETAILS
 bool num_detail;
 #endif
@@ -83,7 +82,7 @@ signed char numbers_stack::push(const long double y)
     *((current = start + 1) - 1) = y;
 #ifdef NUM_DETAILS
   if (num_detail)
-    fprintf(PRINTFAST, "\nPushing\t%.15Lg\tto   location\t%lx@%d", y, (unsigned long)current - 1, num_detail);
+    fprintf(PRINTFAST, "\nPushing\t%.15Lg\tto   location\t%lx", y, (unsigned long)current - 1);
 #endif
   return SUCCESS;
 }

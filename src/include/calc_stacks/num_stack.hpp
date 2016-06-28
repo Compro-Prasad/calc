@@ -25,7 +25,6 @@ public:
   void reset();
 };
 
-extern numbers_stack num;
 #ifdef NUM_DETAILS
 extern bool num_detail;
 #endif
