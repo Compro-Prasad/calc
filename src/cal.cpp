@@ -468,23 +468,6 @@ signed char calculate(const char *a,
     {
       flag ? SKIP_SPACE(a, i) : 0;
 
-      /* **************************Factorial************************ */
-      /* It is a special kind of unary operator which                */
-      /* stands after the number whose factorial is to be calculated */
-      if (a[i] == '!' && isalnum(a[i - 1]))
-        {
-	  if (num.get(x) == ERROR)
-	    return Error = "Number scarcity", ERROR;
-	  if (x >= 0 && !(x - floorl(x)))
-	    num.push(factorial(x));
-	  else
-	    return Error = "!!Factorial", ERROR;
-	  ++i;
-	  flag ? SKIP_SPACE(a, i) : 0;
-	  continue;
-        }
-      /* *********************************************************** */
-
       if (a[i] == '+' || a[i] == '-')
         {
 	  // condition to tackle continuous random + and/or -
@@ -508,8 +491,24 @@ signed char calculate(const char *a,
 	    break;
         }
 
-      x = 0.0;
+      /* **************************Factorial************************ */
+      /* It is a special kind of unary operator which                */
+      /* stands after the number whose factorial is to be calculated */
+      if (i && a[i] == '!' && isalnum(a[i - 1]))
+        {
+	  if (num.get(x) == ERROR)
+	    return Error = "Number scarcity", ERROR;
+	  if (x >= 0 && !(x - floorl(x)))
+	    num.push(factorial(x));
+	  else
+	    return Error = "!!Factorial", ERROR;
+	  ++i;
+	  flag ? SKIP_SPACE(a, i) : 0;
+	  continue;
+        }
+      /* *********************************************************** */
 
+      x = 0.0;
 
       /* extract a part of the expression */
       check_extract = extract_math(a, i, x, c);
