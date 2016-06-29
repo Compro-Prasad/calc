@@ -15,7 +15,7 @@
 #define GOT_MATH_FUNC 4
 
 #define SKIP_SPACE(s, i) s[i] == ' ' ? ++i : i
-
+/*
 #define isupper(c) ((c) > 64 && (c) < 91  ? 1 : 0)
 #define islower(c) ((c) > 96 && (c) < 123 ? 1 : 0)
 #define isdigit(c) ((c) > 47 && (c) < 58  ? 1 : 0)
@@ -23,7 +23,7 @@
 #define isalnum(c) (isalpha(c) || isdigit(c))
 #define tolower(c) (isupper(c) ? (c) + 32 : c)
 #define toupper(c) (islower(c) ? (c) - 32 : c)
-
+*/
 enum data_type
   {
     REAL,
@@ -33,7 +33,7 @@ enum data_type
   };
 
 extern unsigned long strMAX;
-
+/*
 extern unsigned int strlen(const char *s);
 extern signed char strcmp(const char *s1, const char *s2);
 extern signed char strncmp(const char *s1, const char *s2, unsigned int l);
@@ -43,7 +43,7 @@ extern void strcpy(char *s1, const char *s2);
 extern void strncpy(char *s1, const char *s2, unsigned int l);
 extern void strcat(char *s1, const char *s2);
 extern void strncat(char *s1, const char *s2, unsigned int l);
-
+*/
 extern bool ismathchar(const char ch);
 extern bool isbinary(const char *s);
 extern bool isunary(const char *s);

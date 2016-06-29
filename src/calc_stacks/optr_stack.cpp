@@ -1,5 +1,6 @@
 #include <stdio.h>
-#include <str.hpp>
+#include <string.h>
+
 #include <calc_stacks/optr_stack.hpp>
 
 #ifdef OPTR_DETAILS

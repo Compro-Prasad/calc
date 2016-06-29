@@ -1,8 +1,9 @@
-#include <calc_strings.hpp>
 #include <assert.h>
-#include <chatr.hpp>
+#include <string.h>
 #include <malloc.h>
-#include <calc_screen_manip.hpp>
+
+#include <calc_strings.hpp>
+#include <chatr.hpp>
 
 strings::strings()
 {
@@ -202,18 +203,7 @@ char * strings::str()
 void strings::print(unsigned long &start, unsigned long end)
 {
   end == strMAX ? end = length : 0;
-#ifdef SCREEN_MANIP
-  register int t1 = cur_col, t2 = cur_line;
-#endif
   for (register char *ch = c + start;
-#ifdef SCREEN_MANIP
-       (t1 < max_cols || t2 < max_lines) &&
-#endif
-	 *ch && start < end; ++ch, ++start
-#ifdef SCREEN_MANIP
-	 , t1 = t1 == max_cols ? 1 : t1 + 1,
-	 !(t1 >> 1) && t2 < max_lines ? ++t2 : 0
-#endif
-       )
-    fprintf(PRINTFAST, "%c", *ch);
+	 *ch && start < end; ++ch, ++start)
+    fprintf(PRINTFAST, "%s", c);
 }

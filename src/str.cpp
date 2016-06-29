@@ -1,11 +1,14 @@
 #include <math.h>
+#include <string.h>
+#include <ctype.h>
+
 #include <str.hpp>
 #include <calc_stacks/constant_stack.hpp>
 
 #ifdef CONST_CMDS
 extern const_list cons;
 #endif
-
+/*
 unsigned int strlen(const char *s)
 {
   register const char *c = s;
@@ -82,7 +85,7 @@ void strncat(char *s1, const char *s2, unsigned int l)
     s1[i++] = *(s2++);
   if (i < l)
     s1[i] = 0;
-}
+    }*/
 
 bool ismathchar(const char ch)
 {

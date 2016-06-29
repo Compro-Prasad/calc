@@ -6,6 +6,5 @@
 #define VT  '\v'  // vertical tab
 #define BS  '\b'  // back space
 #define NUL '\0'  // null
-#define ESC '\033'  // escape
 #define DEL 127   // del char on keyboard
 #endif  // CHAR_H

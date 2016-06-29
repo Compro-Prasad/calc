@@ -49,6 +49,11 @@ RECORD OF FEATURES ADDED
        |---------------------+-----------+------------------------------------|
        |  04 June      2016  |  01:10am  |  ADDED SUPPORT FOR MORE NUMBER OF  |
        |                     |           |  SHELL OPTIONS                     |
+       |---------------------+-----------+------------------------------------|
+       |  29 June      2016  |  11:30pm  |  READDED SUPPORT FOR string.h AND  |
+       |                     |           |  ctype.h DUE TO MAKING INPUT MORE  |
+       |                     |           |  PORTABLE AND STABLE USING GNU     |
+       |                     |           |  READLINE                          |
        +----------------------------------------------------------------------+
 
 

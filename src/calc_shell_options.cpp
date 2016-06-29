@@ -6,6 +6,7 @@
 using namespace std;
 
 #include <math.h>
+#include <string.h>
 #include <signal.h>
 
 #include <calc_screen_manip.hpp>
@@ -13,7 +14,6 @@ using namespace std;
 #include <calc_cmd_action.hpp>
 #include <calc_strings.hpp>
 #include <cal.hpp>
-#include <calc_input.hpp>
 #include <calc_stacks/ans_stack.hpp>
 #include <calc_stacks/num_stack.hpp>
 #include <calc_stacks/optr_stack.hpp>
@@ -22,6 +22,9 @@ using namespace std;
 
 #define CHECK_OPTION_AMONG(short, long)					\
   ((!ret_value && *action == short) || (ret_value && !strcmp(action, long)))
+
+extern strings Input;
+extern char prompt[500];
 
 #ifdef DIRECT_INPUT
 extern bool direct_input;
@@ -82,11 +85,10 @@ void parse_options(int argc, char *argv[])
       else
 	{
 	  Input = c;
-	  print_prompt("\n");
 #ifdef CALC_COLORS
 	  input_font.print();
 #endif
-	  fprintf(PRINTFAST, "%s", Input.str());
+	  fprintf(PRINTFAST, "\n%s%s", prompt, Input.str());
 #ifdef CALC_COLORS
 	  output_font.print();
 #endif
@@ -289,11 +291,10 @@ signed char option_action(const char *action, char **action_args)
 	      while (!f.eof())
 		{
 		  f.getline(Input.str(), 4000, '\n');
-		  print_prompt("\n");
 #ifdef CALC_COLORS
 		  input_font.print();
 #endif
-		  fprintf(PRINTFAST, "%s", Input.str());
+		  fprintf(PRINTFAST, "\n%s%s", prompt, Input.str());
 #ifdef CALC_COLORS
 		  output_font.print();
 #endif

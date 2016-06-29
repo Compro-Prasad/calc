@@ -1,8 +1,8 @@
 #include <signal.h>
+#include <string.h>
 
 #include <cal.hpp>
 #include <calc_help.hpp>
-#include <calc_input.hpp>
 #include <calc_colors.hpp>
 #include <calc_features.hpp>
 #include <calc_cmd_action.hpp>
@@ -14,11 +14,17 @@
 #include <calc_stacks/history_stack.hpp>
 #include <calc_stacks/constant_stack.hpp>
 
+extern strings Input;
+
 extern char precision[15];     /* String for storing precision */
 extern char e[3];              /* String for showing or not showing exponential */
 
 #ifdef SHELL_CMD
 char Shell[200] = "bash";
+#endif
+
+#ifdef PROMPT
+extern char prompt[500];
 #endif
 
 void cmd_action()
@@ -344,9 +350,9 @@ Boston, MA 02110-1301  USA\n");
   else if (!strcasecmp(Input.str(), "shell"))
     {
       fprintf(PRINTFAST, "\nConnecting to shell...\n");
-      change_input_flags(1);
+      //change_input_flags(1);
       fprintf(PRINTFAST, "Return value %d", system(Shell));
-      change_input_flags(0);
+      //change_input_flags(0);
     }
 #endif // SHELL_CMD
 

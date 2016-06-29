@@ -35,14 +35,7 @@
 #define INC_CUR_POS (cur_col = cur_col == max_cols ? 1 : cur_col + 1,	\
 		     !(cur_col >> 1) && cur_line < max_lines ? ++cur_line : 0)
 
-
-extern void current_pos(unsigned short &x, unsigned short &y);
 extern void clrscr();
-extern void get_screen_size(int);
-extern void change_screen_values(int);
-
-extern unsigned short max_lines, max_cols;
-extern unsigned short cur_line, cur_col;
 
 #endif
 

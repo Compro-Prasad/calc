@@ -28,15 +28,6 @@ extern bool steps;             /* Whether or not to show steps */
 
 extern unsigned char angle_type;
 
-extern long double factorial(long double x);  // factorial is undefined for x<0
-
-extern signed char calculateit(const char *a, // operator
-			       long double &ans, // Result to be stored into
-			       const long double &x, // Argument 1
-			       const long double y = 0 /* Argument 2 */);
-
-extern signed char insert(const char *s);
-
 extern signed char calculate(const char *a, // The input string to be worked on
 			     long double &n, // End Result
 			     unsigned long &i, // Position in string

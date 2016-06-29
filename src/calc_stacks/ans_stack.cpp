@@ -1,6 +1,9 @@
 #include <calc_stacks/ans_stack.hpp>
 
 #ifdef ANS_CMD
+
+#include <string.h>
+
 bool store = true;              /* Whether or not to store answers */
 link_ans l;                     /* Object for storing answers in stack */
 

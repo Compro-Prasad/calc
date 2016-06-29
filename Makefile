@@ -19,6 +19,8 @@ OBJECTS = $(addprefix $(OBJDIR), $(subst .cpp,.o,$(notdir $(SOURCES))))
 
 INCLUDE = -I$(SRCDIR)include/
 
+LIBS = -lreadline
+
 PREFIX=/usr/local/
 INSTALL_PREFIX=$(PREFIX)
 
@@ -30,7 +32,7 @@ MANPAGE=doc/man/man1/$(TARGET).1
 all: $(TARGET) doc
 
 $(TARGET): $(OBJECTS)
-	$(CXX) -o $(TARGET) $^
+	$(CXX) -o $(TARGET) $^ $(LIBS)
 
 $(OBJDIR)%.o: $(SRCDIR)%.cpp
 	@if [ ! -d "$(OBJDIR)" ]; then mkdir $(OBJDIR); fi

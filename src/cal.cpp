@@ -1,4 +1,7 @@
 #include <math.h>
+#include <string.h>
+#include <ctype.h>
+
 #include <cal.hpp>
 #include <calc_strings.hpp>
 #include <calc_cmd_action.hpp>
@@ -20,7 +23,7 @@ extern strings Input;
 bool steps = false;             /* Whether or not to show steps */
 #endif // STEPS_CMD
 
-long double factorial(long double x)
+static long double factorial(long double x)
 {
   long double t = 1;
   for (long double i = 1; i <= x; i++)
@@ -117,10 +120,10 @@ void sum(long double lower_limit,
 }
 
 
-signed char calculateit(const char *a,
+static signed char calculateit(const char *a,
 			long double &ans,
 			const long double &x,
-			const long double y)
+			const long double y = 0)
 {
   long double z = angle_type == DEG ? (x * PI / 180) : (angle_type == RAD ? x : (x * PI / 200));
 
@@ -351,7 +354,7 @@ signed char calculateit(const char *a,
   return SUCCESS;
 }
 
-signed char insert(const char *s /* operator to be pushed in operator stack */,
+static signed char insert(const char *s /* operator to be pushed in operator stack */,
 		   operators_stack &optr,
 		   numbers_stack &num)
 {

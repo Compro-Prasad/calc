@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include <calc_colors.hpp>
 #include <calc_term_csi.hpp>
 
@@ -14,7 +16,6 @@ calc_font prompt_font = calc_font( YELLOW, DEFAULT, REGULAR );
 
 calc_font::calc_font(char c, char b, char s)
 {
-  extern void strcpy(char *, const char *);
   strcpy(format, CSI"00;01;31;41m");
   format[TEXT_COLOR_INDEX] = '0' + (this->color = c);
   format[BACK_COLOR_INDEX] = '0' + (this->bagnd = b);
@@ -31,6 +32,11 @@ void calc_font::update()
   this->format[STYLE_INDEX]      = style + '0';
   this->format[TEXT_COLOR_INDEX] = color + '0';
   this->format[BACK_COLOR_INDEX] = bagnd + '0';
+}
+
+const char *const calc_font::str()
+{
+  return this->format;
 }
 
 #endif // CALC_COLORS

@@ -53,7 +53,6 @@
 #include <stdlib.h>
 #define PACKUP_AND_LEAVE(s) do {		\
     fprintf(PRINTFAST, "%s", s);		\
-    change_input_flags(1);			\
     exit(0);					\
   } while (0)
 
