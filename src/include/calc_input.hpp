@@ -5,7 +5,7 @@ class strings;
 
 extern void change_input_flags(int);
 extern void calc_input();
-extern void print_prompt();
+extern void print_prompt(const char *const s = "");
 
 #ifdef PROMPT
 extern char prompt[500];       /* String for storing prompt */

@@ -82,7 +82,7 @@ void parse_options(int argc, char *argv[])
       else
 	{
 	  Input = c;
-	  print_prompt();
+	  print_prompt("\n");
 #ifdef CALC_COLORS
 	  input_font.print();
 #endif
@@ -289,7 +289,7 @@ signed char option_action(const char *action, char **action_args)
 	      while (!f.eof())
 		{
 		  f.getline(Input.str(), 4000, '\n');
-		  print_prompt();
+		  print_prompt("\n");
 #ifdef CALC_COLORS
 		  input_font.print();
 #endif

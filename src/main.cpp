@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
 #ifdef SCREEN_MANIP
       current_pos(t, cur_prompt_line);
 #endif
-      print_prompt();
+      print_prompt("\n");
 
       Input = "";
       Error = "";

@@ -39,18 +39,16 @@ void change_input_flags(int yn)
 }
 /* ******************************* */
 
-void print_prompt()
+void print_prompt(const char *const s)
 {
 #ifdef PROMPT
-  /* show prompt */
 #ifdef CALC_COLORS
   prompt_font.print();
 #endif
-  fprintf(PRINTFAST, "\n%s", prompt);
+  fprintf(PRINTFAST, "%s%s", s, prompt);
 #ifdef CALC_COLORS
   output_font.print();
 #endif
-  /***************/
 #endif // PROMPT
 }
 
