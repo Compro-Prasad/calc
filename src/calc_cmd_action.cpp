@@ -350,9 +350,7 @@ Boston, MA 02110-1301  USA\n");
   else if (!strcasecmp(Input.str(), "shell"))
     {
       fprintf(PRINTFAST, "\nConnecting to shell...\n");
-      //change_input_flags(1);
       fprintf(PRINTFAST, "Return value %d", system(Shell));
-      //change_input_flags(0);
     }
 #endif // SHELL_CMD
 
@@ -360,7 +358,9 @@ Boston, MA 02110-1301  USA\n");
   else if (Input == "prompt=")
     {
       extract(Input.str(), temp_char.str(), 7, -1, NUL, 500);
-      strncpy(prompt, temp_char.str(), 500);
+      strcpy(prompt, prompt_font.str());
+      strncat(prompt, temp_char.str(), 480);
+      strcat(prompt, input_font.str());
     }
 #endif // PROMPT
 
