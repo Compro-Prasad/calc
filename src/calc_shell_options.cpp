@@ -9,15 +9,16 @@ using namespace std;
 #include <string.h>
 #include <signal.h>
 
-#include <calc_screen_manip.hpp>
-#include <calc_process_time.hpp>
-#include <calc_cmd_action.hpp>
-#include <calc_strings.hpp>
 #include <cal.hpp>
+#include <calc_history.hpp>
+#include <calc_strings.hpp>
+#include <calc_cmd_action.hpp>
+#include <calc_process_time.hpp>
+#include <calc_screen_manip.hpp>
+
 #include <calc_stacks/ans_stack.hpp>
 #include <calc_stacks/num_stack.hpp>
 #include <calc_stacks/optr_stack.hpp>
-#include <calc_stacks/history_stack.hpp>
 #include <calc_stacks/constant_stack.hpp>
 
 #define CHECK_OPTION_AMONG(short, long)					\

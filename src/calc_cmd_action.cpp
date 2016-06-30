@@ -1,17 +1,19 @@
 #include <signal.h>
 #include <string.h>
+#include <readline/history.h>
 
 #include <cal.hpp>
 #include <calc_help.hpp>
 #include <calc_colors.hpp>
+#include <calc_history.hpp>
 #include <calc_features.hpp>
 #include <calc_cmd_action.hpp>
 #include <calc_process_time.hpp>
 #include <calc_screen_manip.hpp>
+
 #include <calc_stacks/ans_stack.hpp>
 #include <calc_stacks/num_stack.hpp>
 #include <calc_stacks/optr_stack.hpp>
-#include <calc_stacks/history_stack.hpp>
 #include <calc_stacks/constant_stack.hpp>
 
 extern strings Input;
@@ -50,8 +52,8 @@ void cmd_action()
         {
 	  strMAX = x + 2;
 #ifdef CALC_HISTORY
-	  if (!(record & VALID_COMMANDS))
-	    h.pop();
+	  if (record & VALID_COMMANDS)
+	    add_history(Input.str());
 #endif
 	}
       else
@@ -63,8 +65,8 @@ void cmd_action()
 	  else
 	    Error = "!!Invalid Expression!!";
 #ifdef CALC_HISTORY
-	  if (!(record & INVALID_EXPRESSIONS))
-	    h.pop();
+	  if (record & INVALID_EXPRESSIONS)
+	    add_history(Input.str());
 #endif
 	}
     }
@@ -160,15 +162,13 @@ Boston, MA 02110-1301  USA\n");
 #endif
 
 #ifdef CHANGE_ANGLE
-  /* commands for changing angle type */
   else if (Input == "deg")
     angle_type = DEG;
   else if (Input == "rad")
     angle_type = RAD;
   else if (Input == "grad")
     angle_type = GRAD;
-  /************************************/
-#endif // CHANGE_ANGLE
+#endif
 
 #ifdef CALC_HISTORY
   else if (Input == "allow ")
@@ -219,8 +219,6 @@ Boston, MA 02110-1301  USA\n");
       else
 	Error = "!!Not a valid history type!!";
     }
-  else if (!strcasecmp(Input.str(), "history"))
-    h.display();
 #endif
 
 #ifdef CONST_CMDS
@@ -248,8 +246,8 @@ Boston, MA 02110-1301  USA\n");
 #endif
 	      cons.insert_const(con);
 #ifdef CALC_HISTORY
-	      if (!(record & VALID_COMMANDS))
-		h.pop();
+	      if (record & VALID_COMMANDS)
+		add_history(Input.str());
 	    }
 #endif
 	  else
@@ -259,8 +257,8 @@ Boston, MA 02110-1301  USA\n");
 	      else
 		Error = "!!Invalid Expression!!";
 #ifdef CALC_HISTORY
-	      if (!(record & INVALID_EXPRESSIONS))
-		h.pop();
+	      if (record & INVALID_EXPRESSIONS)
+		add_history(Input.str());
 #endif
 	    }
         }
@@ -375,8 +373,8 @@ Boston, MA 02110-1301  USA\n");
 	  n %= 1000;
 	  sprintf(precision, "%%.%d%s", n, e);
 #ifdef CALC_HISTORY
-	  if (!(record & VALID_COMMANDS))
-	    h.pop();
+	  if (record & VALID_COMMANDS)
+	    add_history(Input.str());
 #endif
         }
       else
@@ -386,8 +384,8 @@ Boston, MA 02110-1301  USA\n");
 	  else
 	    Error = "!!Invalid Expression!!";
 #ifdef CALC_HISTORY
-	  if (!(record & INVALID_EXPRESSIONS))
-	    h.pop();
+	  if (record & INVALID_EXPRESSIONS)
+	    add_history(Input.str());
 #endif
 	}
     }
@@ -480,7 +478,7 @@ Boston, MA 02110-1301  USA\n");
       unsigned long i = 10;
       factorize(i);
     }
-#endif // FACTORIZE
+#endif
 
 
 #ifdef SUM
@@ -536,8 +534,8 @@ Boston, MA 02110-1301  USA\n");
 	  else
 	    sprintf(Error.str(), "\nUndefined symbols in \'%s\'", Input.str());
 #ifdef CALC_HISTORY
-	  if (!(record & INVALID_EXPRESSIONS))
-	    h.pop();
+	  if (record & INVALID_EXPRESSIONS)
+	    add_history(Input.str());
 	}
 #endif
     }
@@ -557,16 +555,16 @@ Boston, MA 02110-1301  USA\n");
 	    l.add_ans(x);
 #endif
 #ifdef CALC_HISTORY
-	  if (!(record & VALID_EXPRESSIONS))
-	    h.pop();
+	  if (record & VALID_EXPRESSIONS)
+	    add_history(Input.str());
 #endif
         }
       else if (check_calculate == ERROR)
         {
 	  Error += " Error!!";
 #ifdef CALC_HISTORY
-	  if (!(record & INVALID_EXPRESSIONS))
-	    h.pop();
+	  if (record & INVALID_EXPRESSIONS)
+	    add_history(Input.str());
 #endif
 	}
       else if (check_calculate == FAILURE)
@@ -575,8 +573,8 @@ Boston, MA 02110-1301  USA\n");
 #endif
 	  sprintf(Error.str(), "\nUndefined command \"%s\"", Input.str());
 #ifdef CALC_HISTORY
-	  if (!(record & INVALID_COMMANDS))
-	    h.pop();
+	  if (record & INVALID_COMMANDS)
+	    add_history(Input.str());
         }
 #endif
     }

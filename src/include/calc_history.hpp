@@ -19,28 +19,8 @@
 
 #define ALL_                  15
 
-struct command
-{
-  strings c;
-  command *next;
-  command *prev;
-};
-
-class history
-{
-  command *top, *current;
-public:
-  history();
-  ~history();
-  void reset();
-  void push(strings cmd);
-  void cmd_modify(const strings &cmd);
-  command* get_prev_cmd();
-  command* get_next_cmd();
-  void pop();
-  void display();
-};
-extern history h; /* Object for inserting commands in stack for further retrieval */
 extern short record; /* Switch for (not)storing specific types commands */
+
 #endif // CALC_HISTORY_STACK_H
+
 #endif // CALC_HISTORY

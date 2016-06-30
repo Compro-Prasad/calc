@@ -9,14 +9,17 @@
 using namespace std;
 #endif
 
-#include <calc_cmd_action.hpp>
-#include <calc_shell_options.hpp>
 #include <calc_colors.hpp>
+#include <calc_history.hpp>
+#include <calc_cmd_action.hpp>
 #include <calc_screen_manip.hpp>
-
-#include <calc_stacks/history_stack.hpp>
+#include <calc_shell_options.hpp>
 
 strings Error, Input;
+
+#ifdef CALC_HISTORY
+short record = ALL_; /* Switch for (not )storing specific history types */
+#endif
 
 unsigned long strMAX = 1000;
 
@@ -41,8 +44,17 @@ int main(int argc, char *argv[])
 #endif
 
 #ifdef PROMPT
-  sprintf(prompt, "%s%s%s", prompt_font.str(), ">> ", input_font.str());
+  sprintf(prompt,
+	  "%s"
+#ifdef CALC_COLORS
+	  "%s%s", prompt_font.str()
 #endif
+	  , ">> "
+#ifdef CALC_COLORS
+	  , input_font.str()
+#endif
+	  );
+#endif // PROMPT
 
 
 #ifdef SHELL_INPUT
@@ -67,12 +79,6 @@ int main(int argc, char *argv[])
 
 #ifdef DIRECT_INPUT
 
-  /* ****************************************************************** */
-  /* Changing input flags to prevent printing while typing and every    */
-  /*      character is returned without pressing the return key         */
-  /*                    *change_input_flags(0);*                      */
-  /* ****************************************************************** */
-
 
   /* ******************************************************************* */
   /*                             Welcome message                         */
@@ -89,38 +95,25 @@ int main(int argc, char *argv[])
 
       fprintf(PRINTFAST, "\n");
 
-      Input = "";
       Error = "";
 
-
       /* ************************************************************** */
-      /*                  input functioning begins here                 */
-#ifdef CALC_HISTORY
-      /*    reset the position of history scroller to a new position    */
-      /*  */                      h.reset();                        /*  */
-#endif
-#ifdef CALC_COLORS
-      /*              change to input font characteristics              */
-      /*  */                 input_font.print();                    /*  */
-#endif
-      /*                      start taking in input                     */
-      /*  */                Input = readline(prompt);               /*  */
-#ifdef CALC_COLORS
-      /*            reset font characteristics to output mode           */
-      /*  */                 output_font.print();                   /*  */
-#endif
-      /*                           Input over                           */
+      /*                           take input                           */
+      /* */            do { Input = readline(prompt); }              /* */
+      /*                     check length of Input                      */
+      /* */                  while (!Input.len());                   /* */
+      /*                     loop if Input is empty                     */
       /* ************************************************************** */
 
+#ifdef CALC_COLORS
+      output_font.print();
+#endif
 
       /* ************************************************************** */
       /*                   bring the input in action                    */
       /*  */                     cmd_action();                      /*  */
       /* ************************************************************** */
 
-
-      /* ************************************************************** */
-      /*                     if an error occured                        */
       if (Error != "")
 #ifdef CALC_COLORS
 	{
@@ -131,10 +124,6 @@ int main(int argc, char *argv[])
 	  output_font.print();
 	}
 #endif
-      /*                         then print it                          */
-      /*                                                                */
-      /*                   input fuctioning over(reloop)                */
-      /* ************************************************************** */
     }
 #endif // DIRECT_INPUT
 

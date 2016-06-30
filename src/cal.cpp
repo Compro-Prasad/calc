@@ -1,14 +1,16 @@
 #include <math.h>
 #include <string.h>
 #include <ctype.h>
+#include <readline/history.h>
 
 #include <cal.hpp>
+#include <calc_history.hpp>
 #include <calc_strings.hpp>
 #include <calc_cmd_action.hpp>
+
 #include <calc_stacks/ans_stack.hpp>
 #include <calc_stacks/num_stack.hpp>
 #include <calc_stacks/optr_stack.hpp>
-#include <calc_stacks/history_stack.hpp>
 #include <calc_stacks/constant_stack.hpp>
 
 unsigned char angle_type = DEG;
@@ -44,8 +46,8 @@ void factorize(unsigned long &i)
 	  fprintf(PRINTFAST, "%.0Lf, ", g);
       fprintf(PRINTFAST, "%.0Lf", x);
 #ifdef CALC_HISTORY
-      if (!(record & VALID_EXPRESSIONS))
-	h.pop();
+      if (record & VALID_EXPRESSIONS)
+	add_history(Input.str());
 #endif
     }
   else
@@ -57,8 +59,8 @@ void factorize(unsigned long &i)
       else
 	sprintf(Error.str(), "\nUndefined symbols in '%s'", Input.str());
 #ifdef CALC_HISTORY
-      if (!(record & INVALID_EXPRESSIONS))
-	h.pop();
+      if (record & INVALID_EXPRESSIONS)
+	add_history(Input.str());
     }
 #endif
 }
@@ -96,8 +98,8 @@ void sum(long double lower_limit,
 	    sprintf(Error.str(), "Failure to recognise expression in \"%s\"",
 		    Input.str());
 #ifdef CALC_HISTORY
-	  if (!(record & INVALID_EXPRESSIONS))
-	    h.pop();
+	  if (record & INVALID_EXPRESSIONS)
+	    add_history(Input.str());
 #endif
 	  break;
 	}
