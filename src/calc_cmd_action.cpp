@@ -356,9 +356,13 @@ Boston, MA 02110-1301  USA\n");
   else if (Input == "prompt=")
     {
       extract(Input.str(), temp_char.str(), 7, -1, NUL, 500);
+#ifdef CALC_COLORS
       strcpy(prompt, prompt_font.str());
-      strncat(prompt, temp_char.str(), 480);
+      strncat(prompt, temp_char.str(), 460);
       strcat(prompt, input_font.str());
+#else
+      strncpy(prompt, temp_char.str(), 500);
+#endif
     }
 #endif // PROMPT
 
