@@ -95,32 +95,20 @@ void link_ans::show_ans_x(unsigned long pos)
 void link_ans::del_ans_x(unsigned long pos)
 {
   if (!top)
-    {
-      Error = Empty;
-      return;
-    }
-  if (pos == 1)
-    {
-      ans *z = top;
-      delete z;
-      top = top->next, n--;
-      if (!n)
-	end = 0;
-    }
+    Error = Empty;
   else
     {
-      --pos;
-      ans *t = top;
-      for (;t->next && --pos; t = t->next);
-      if (pos)
-	fprintf(PRINTFAST, "!!Position invalid!!");
-      else
+      ans **t = &this->top;
+      while (*t != NULL && --pos)
+	t = &(*t)->next;
+      if (*t != NULL && pos == 0)
 	{
-	  ans *z = t->next;
-	  t->next = t->next->next;
-	  delete z;
-	  n--;
+	  ans *ans_to_delete = *t;
+	  *t = (*t)->next;
+	  delete ans_to_delete;
 	}
+      else
+	Error = "!!Position Invalid!!";
     }
 }
 
