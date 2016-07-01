@@ -31,6 +31,7 @@
 # define ANS_CMD
 # define SHELL_CMD
 # define CHANGE_PRECISION
+# define CALC_HISTORY
 #endif // CALC_STABLE
 
 # define ACCELERATE_UP
@@ -38,7 +39,6 @@
 #ifdef CALC_UNSTABLE
 # ifdef DIRECT_INPUT
 #  define SCREEN_MANIP
-#  define CALC_HISTORY
 # endif
 # if defined(SCREEN_MANIP) || defined(SHELL_INPUT)
 #  define CALC_COLORS
