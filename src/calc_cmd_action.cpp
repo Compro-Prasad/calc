@@ -530,9 +530,7 @@ Boston, MA 02110-1301  USA\n");
 	    }
 	}
       if (check != SUCCESS)
-#ifdef CALC_HISTORY
 	{
-#endif
 	  if (Error != "")
 	    Error += " Error!!";
 	  else
@@ -540,8 +538,8 @@ Boston, MA 02110-1301  USA\n");
 #ifdef CALC_HISTORY
 	  if (record & INVALID_EXPRESSIONS)
 	    add_history(Input.str());
-	}
 #endif
+	}
     }
 #endif // SUM
 
@@ -583,8 +581,14 @@ Boston, MA 02110-1301  USA\n");
 #endif
     }
 
-#ifdef CALC_PROCESS_TIME
   if (Error == "")
-    calc_process_time(TIMER_STOP);
+    {
+#ifdef CALC_HISTORY
+      if (record & VALID_COMMANDS)
+	add_history(Input.str());
 #endif
+#ifdef CALC_PROCESS_TIME
+      calc_process_time(TIMER_STOP);
+#endif
+    }
 }
