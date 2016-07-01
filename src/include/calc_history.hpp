@@ -5,8 +5,6 @@
 #ifndef CALC_HISTORY_STACK_H
 #define CALC_HISTORY_STACK_H
 
-#include <calc_strings.hpp>
-
 #define VALID_COMMANDS         1
 #define VALID_EXPRESSIONS      2
 #define INVALID_EXPRESSIONS    4

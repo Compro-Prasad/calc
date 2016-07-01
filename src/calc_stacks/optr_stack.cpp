@@ -37,7 +37,7 @@ operators_stack::operators_stack(const operators_stack &t)
 void operators_stack::operator=(const operators_stack &t)
 {
   if (this->start)
-    delete this->start;
+    delete [] this->start;
   this->start = new char[this->size = t.size][7];
 #if defined(SPEED_UP)
   this->rate = t.rate;
@@ -53,7 +53,7 @@ void operators_stack::operator=(const operators_stack &t)
 operators_stack::~operators_stack()
 {
   this->reset();
-  delete start;
+  delete [] this->start;
 }
 
 char* operators_stack::get()
@@ -137,7 +137,7 @@ signed char operators_stack::decrease_size()
 	    strcpy(*(y++), *(x++));
 	  current = y - 1;
 	}
-      delete [] start;
+      delete [] this->start;
       start = temp;
       return SUCCESS;
     }
@@ -165,7 +165,7 @@ signed char operators_stack::increase_size()
 	    strcpy(*(y++), *(x++));
 	  current = y - 1;
 	}
-      delete [] start;
+      delete [] this->start;
       start = temp;
       return SUCCESS;
     }

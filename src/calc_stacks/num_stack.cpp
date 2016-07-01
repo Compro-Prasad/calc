@@ -1,4 +1,5 @@
 #include <stdio.h>
+
 #include <calc_stacks/num_stack.hpp>
 
 #ifdef NUM_DETAILS
@@ -35,7 +36,7 @@ numbers_stack::numbers_stack(const numbers_stack &t)
 void numbers_stack::operator=(const numbers_stack &t)
 {
   if (this->start)
-    delete this->start;
+    delete [] this->start;
   this->start = new long double[this->size = t.size];
 #if defined(SPEED_UP)
   this->rate = t.rate;
@@ -51,7 +52,7 @@ void numbers_stack::operator=(const numbers_stack &t)
 numbers_stack::~numbers_stack()
 {
   this->reset();
-  delete [] start;
+  delete [] this->start;
 }
 
 signed char numbers_stack::get(long double &y)
@@ -120,7 +121,7 @@ signed char numbers_stack::decrease_size()
 	    *(y++) = *(x++);
 	  current = y - 1;
 	}
-      delete [] start;
+      delete [] this->start;
       start = temp;
       return SUCCESS;
     }
@@ -148,7 +149,7 @@ signed char numbers_stack::increase_size()
 	    *(y++) = *(x++);
 	  current = y - 1;
 	}
-      delete [] start;
+      delete [] this->start;
       start = temp;
       return SUCCESS;
     }
