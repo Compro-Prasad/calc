@@ -41,7 +41,10 @@ void strings::operator=(const strings x)
 void strings::operator=(const char *x)
 {
   if (x == NULL)
-    PACKUP_AND_LEAVE("\n");
+    {
+      fprintf(PRINTFAST, "exit");
+      PACKUP_AND_LEAVE("\n");
+    }
   strncpy(c, x, strMAX);
   length = strlen(c);
 }
