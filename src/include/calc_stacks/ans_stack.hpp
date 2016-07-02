@@ -43,13 +43,13 @@ class link_ans
   unsigned long n;                   // stores the count of answers in the list
 public:
   link_ans();
-  unsigned long has_ans();                 // are there answers in the list?
-  void add_ans(double);              // adds an answer to the list
-  ans get_ans_x(unsigned long pos);  // returns an answer which is at position x
-  void show_ans_x(unsigned long pos);// prints answer on the screen present at position x
+  unsigned long has_ans(); // are there answers in the list?
+  void add_ans(double); // adds an answer to the list
+  long double get_ans_x(unsigned long pos); // value of answer at x
+  void show_ans_x(unsigned long pos); // prints answer at position x
   void del_ans_x(unsigned long pos); // deletes answer from position x
-  void show_all_ans();               // prints all answers on the screen
-  bool deallocate();                 // frees up the memory by emptying the list
+  void show_all_ans(); // prints all answers on the screen
+  bool deallocate(); // frees up the memory by emptying the list
   ~link_ans();
 };
 

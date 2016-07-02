@@ -569,12 +569,19 @@ signed char calculate(const char *a,
 	      Error = "!!Answer";
 	      return ERROR;
             }
-	  // pushing the answer after extracting it from answer list
-	  if (num.push(l.get_ans_x(ans_no).num) == ERROR)
-            {
-	      Error = "!!Number linker";
-	      return ERROR;
-            }
+	  // extracting from answer list
+	  x = l.get_ans_x(ans_no);
+	  if (x != 0.0|| Error == "")
+	    {
+	      // pushing answer to stack
+	      if (num.push(x) == ERROR)
+		{
+		  Error = "!!Number linker";
+		  return ERROR;
+		}
+	    }
+	  else
+	    return ERROR;
         }
 #endif
       else if (check_extract == GOT_MATH_FUNC)

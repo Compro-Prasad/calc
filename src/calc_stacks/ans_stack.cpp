@@ -42,7 +42,7 @@ void link_ans::add_ans(const double a)
     {
       temp->num = a;
       temp->next = 0;
-      n++;
+      ++n;
 
       if (top == 0)
 	top = end = temp;
@@ -54,62 +54,55 @@ void link_ans::add_ans(const double a)
     Error = "!!Cannot allocate memory!!";
 }
 
-ans link_ans::get_ans_x(unsigned long pos)
+long double link_ans::get_ans_x(unsigned long pos)
 {
   if (!pos && end)
-    return *end;
-  ans * t = top;
-  for (; t && --pos; t = t->next);
-  if (pos)
+    return end->num;
+  if (pos <= n)
     {
-      fprintf(PRINTFAST, "!!Ans%ld not yet calculated and is 0!!", pos);
-      ans k;
-      return k;
+      ans * t = top;
+      for (; t && --pos; t = t->next);
+      if (t)
+	return t->num;
     }
-  else
-    return *t;
+  Error = "!!Unable to predict a future answer!!";
+  return 0;
 }
 
 void link_ans::show_ans_x(unsigned long pos)
 {
   if (!top)
-    {
-      Error = Empty;
-      return;
-    }
-  ans *t;
-  if (pos)
-    for (t = top; t && --pos; t = t->next);
-  else
-    t = end;
-  if (pos)
-    Error = "!!Answer not found!!";
-  else
+    Error = Empty;
+  else if (pos <= n)
     {
       char printf_format_string[20] = " = ";
       strcat(printf_format_string, precision);
-      fprintf(PRINTFAST, printf_format_string, t->num);
+      fprintf(PRINTFAST, printf_format_string, get_ans_x(pos));
     }
+  else
+    Error = "!!Unable to show a future answer!!";
 }
 
 void link_ans::del_ans_x(unsigned long pos)
 {
   if (!top)
     Error = Empty;
-  else
+  else if (pos <= n)
     {
+      pos = pos ? pos : n;
       ans **t = &this->top;
       while (*t != NULL && --pos)
 	t = &(*t)->next;
-      if (*t != NULL && pos == 0)
+      if (*t != NULL)
 	{
 	  ans *ans_to_delete = *t;
 	  *t = (*t)->next;
+	  --n;
 	  delete ans_to_delete;
 	}
-      else
-	Error = "!!Position Invalid!!";
     }
+  else
+    Error = "!!Unable to delete a future answer!!";;
 }
 
 void link_ans::show_all_ans()
