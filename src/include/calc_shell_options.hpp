@@ -8,5 +8,10 @@
 extern void parse_options(int, char **);
 extern signed char option_action(const char *action, char **action_arg);
 
+#ifdef DIRECT_INPUT
+extern bool direct_input;
 #endif
-#endif
+
+#endif // CALC_OPTIONS_H
+
+#endif // SHELL_INPUT

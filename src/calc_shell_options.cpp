@@ -12,6 +12,7 @@ using namespace std;
 #include <cal.hpp>
 #include <calc_history.hpp>
 #include <calc_strings.hpp>
+#include <input_bindings.hpp>
 #include <calc_cmd_action.hpp>
 #include <calc_process_time.hpp>
 #include <calc_screen_manip.hpp>
@@ -24,11 +25,9 @@ using namespace std;
 #define CHECK_OPTION_AMONG(short, long)					\
   ((!ret_value && *action == short) || (ret_value && !strcmp(action, long)))
 
-extern strings Input;
-extern char prompt[500];
+bool direct_input;
 
 #ifdef DIRECT_INPUT
-extern bool direct_input;
 extern bool welcome_msg;
 #endif
 

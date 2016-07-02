@@ -45,7 +45,5 @@ public:
 extern const_list cons;                /* Object for storing constants in stack */
 #endif // CONST_CMDS
 
-#include <str.hpp>
-
 #endif
 #endif // CONSTANT_STACK_H

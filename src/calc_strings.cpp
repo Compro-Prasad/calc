@@ -3,7 +3,6 @@
 #include <malloc.h>
 
 #include <calc_strings.hpp>
-#include <chatr.hpp>
 
 strings::strings()
 {
@@ -57,7 +56,7 @@ void strings::operator=(char **x)
 
 char strings::operator[] (const unsigned long i)
 {
-  return (i < length ? c[i] : NUL);
+  return (i < length ? c[i] : '\0');
 }
 
 bool strings::operator==(const char *x)

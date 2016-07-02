@@ -17,7 +17,7 @@
 
 #define ALL_                  15
 
-extern short record; /* Switch for (not)storing specific types commands */
+extern short record; /* Switch for (not )storing specific types commands */
 
 #endif // CALC_HISTORY_STACK_H
 

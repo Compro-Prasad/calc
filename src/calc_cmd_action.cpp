@@ -7,6 +7,7 @@
 #include <calc_colors.hpp>
 #include <calc_history.hpp>
 #include <calc_features.hpp>
+#include <input_bindings.hpp>
 #include <calc_cmd_action.hpp>
 #include <calc_process_time.hpp>
 #include <calc_screen_manip.hpp>
@@ -16,17 +17,11 @@
 #include <calc_stacks/optr_stack.hpp>
 #include <calc_stacks/constant_stack.hpp>
 
-extern strings Input;
-
 extern char precision[15];     /* String for storing precision */
 extern char e[3];              /* String for showing or not showing exponential */
 
 #ifdef SHELL_CMD
 char Shell[200] = "bash";
-#endif
-
-#ifdef PROMPT
-extern char prompt[500];
 #endif
 
 void cmd_action()
@@ -42,7 +37,7 @@ void cmd_action()
   ans k;
 #endif
 
-  if (Input == "exit" || Input == "quit")
+  if (!strcasecmp(Input.str(), "exit") || !strcasecmp(Input.str(), "quit"))
     PACKUP_AND_LEAVE("\n");
   else if (Input == "input length ")
     {
@@ -71,12 +66,12 @@ void cmd_action()
 	}
     }
   /* commands for dealing with exponentials */
-  else if (Input == "show e")
+  else if (!strcasecmp(Input.str(), "show e"))
     {
       strcpy(precision, "%.5Lg");
       strcpy(e, "Lg");
     }
-  else if (Input == "hide e")
+  else if (!strcasecmp(Input.str(), "hide e"))
     {
       strcpy(precision, "%.5Lf");
       strcpy(e, "Lf");
@@ -104,29 +99,29 @@ Boston, MA 02110-1301  USA\n");
     }
 
 #ifdef SCREEN_MANIP
-  else if (Input == "clear")
+  else if (!strcasecmp(Input.str(), "clear"))
     clrscr();
 #endif
 
 #ifdef HELP_CMD
-  else if (!strncasecmp(Input.str(), "help ", 5) || Input == "help")
+  else if (!strcasecmp(Input.str(), "help") || Input == "help ")
     {
-      extract(Input.str(), temp_char.str(), 5, -1, NUL, 30);
+      extract(Input.str(), temp_char.str(), 5, -1, '\0', 30);
       help(temp_char);
     }
 #endif
 
 #ifdef CALC_PROCESS_TIME
-  else if (Input == "show processing time")
+  else if (!strcasecmp(Input.str(), "show processing time"))
     calc_time = YES;
-  else if (Input == "hide processing time")
+  else if (!strcasecmp(Input.str(), "hide processing time"))
     calc_time = NO;
-  else if (Input == "start recording")
+  else if (!strcasecmp(Input.str(), "start recording"))
     {
       calc_avg_time = YES;
       calc_process_time(TIMER_RESET);
     }
-  else if (Input == "stop recording")
+  else if (!strcasecmp(Input.str(), "stop recording"))
     {
       calc_avg_time = NO;
       calc_process_time(TIMER_DISPLAY);
@@ -134,46 +129,46 @@ Boston, MA 02110-1301  USA\n");
 #endif
 
 #ifdef OPTR_DETAILS
-  else if (Input == "show operator details")
+  else if (!strcasecmp(Input.str(), "show operator details"))
     operator_detail = YES;
-  else if (Input == "hide operator details")
+  else if (!strcasecmp(Input.str(), "hide operator details"))
     operator_detail = NO;
 #endif
 
 #ifdef NUM_DETAILS
-  else if (Input == "show number details")
+  else if (!strcasecmp(Input.str(), "show number details"))
     num_detail = YES;
-  else if (Input == "hide number details")
+  else if (!strcasecmp(Input.str(), "hide number details"))
     num_detail = NO;
 #endif
 
 #ifdef STEPS_CMD
-  else if (Input == "show steps")
+  else if (!strcasecmp(Input.str(), "show steps"))
     steps = YES;
-  else if (Input == "hide steps")
+  else if (!strcasecmp(Input.str(), "hide steps"))
     steps = NO;
 #endif
 
 #ifdef ANS_CMD
-  else if (Input == "store answers")
+  else if (!strcasecmp(Input.str(), "store answers"))
     store = YES;
-  else if (Input == "dont store answers")
+  else if (!strcasecmp(Input.str(), "dont store answers"))
     store = NO;
 #endif
 
 #ifdef CHANGE_ANGLE
-  else if (Input == "deg")
+  else if (!strcasecmp(Input.str(), "deg"))
     angle_type = DEG;
-  else if (Input == "rad")
+  else if (!strcasecmp(Input.str(), "rad"))
     angle_type = RAD;
-  else if (Input == "grad")
+  else if (!strcasecmp(Input.str(), "grad"))
     angle_type = GRAD;
 #endif
 
 #ifdef CALC_HISTORY
   else if (Input == "allow ")
     {
-      extract(Input.str(), temp_char.str(), 6, -1, NUL, 25);
+      extract(Input.str(), temp_char.str(), 6, -1, '\0', 25);
       if (temp_char == "ALL")
 	record |= ALL_;
       else if (temp_char == "ALL VALID")
@@ -197,7 +192,7 @@ Boston, MA 02110-1301  USA\n");
     }
   else if (Input == "restrict ")
     {
-      extract(Input.str(), temp_char.str(), 9, -1, NUL, 30);
+      extract(Input.str(), temp_char.str(), 9, -1, '\0', 30);
       if (temp_char == "ALL")
 	record &= ~ALL_;
       else if (temp_char == "ALL VALID")
@@ -355,7 +350,7 @@ Boston, MA 02110-1301  USA\n");
 #ifdef PROMPT
   else if (Input == "prompt=")
     {
-      extract(Input.str(), temp_char.str(), 7, -1, NUL, 500);
+      extract(Input.str(), temp_char.str(), 7, -1, '\0', 500);
 #ifdef CALC_COLORS
       strcpy(prompt, prompt_font.str());
       strncat(prompt, temp_char.str(), 460);
