@@ -1,7 +1,6 @@
 #include <calc_features.hpp>
 
 #include <signal.h>
-
 #include <readline/readline.h>
 
 #ifdef SHELL_INPUT
@@ -11,11 +10,12 @@ using namespace std;
 
 #include <calc_colors.hpp>
 #include <calc_history.hpp>
+#include <input_bindings.hpp>
 #include <calc_cmd_action.hpp>
 #include <calc_screen_manip.hpp>
 #include <calc_shell_options.hpp>
 
-strings Error, Input;
+strings Error;
 
 #ifdef CALC_HISTORY
 short record = ALL_; /* Switch for (not )storing specific history types */
@@ -27,14 +27,7 @@ char precision[15] = "%.5Lg";/* String for storing precision */
 char e[3] = "Lg";            /* String for showing or not showing exponential */
 
 #ifdef DIRECT_INPUT
-#ifdef SHELL_INPUT
-bool direct_input = 1;
-#endif
 bool welcome_msg = true;
-#endif
-
-#ifdef PROMPT
-char prompt[500];       /* String for storing prompt */
 #endif
 
 int main(int argc, char *argv[])
@@ -56,6 +49,7 @@ int main(int argc, char *argv[])
 	  );
 #endif // PROMPT
 
+  init_readline();
 
 #ifdef SHELL_INPUT
 
@@ -99,10 +93,7 @@ int main(int argc, char *argv[])
 
       /* ************************************************************** */
       /*                           take input                           */
-      /* */            do { Input = readline(prompt); }              /* */
-      /*                     check length of Input                      */
-      /* */                  while (!Input.len());                   /* */
-      /*                     loop if Input is empty                     */
+      /* */                 Input = readline(prompt);                /* */
       /* ************************************************************** */
 
 #ifdef CALC_COLORS
