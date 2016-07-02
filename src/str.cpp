@@ -8,85 +8,6 @@
 #ifdef CONST_CMDS
 extern const_list cons;
 #endif
-/*
-unsigned int strlen(const char *s)
-{
-  register const char *c = s;
-  for (; *c; ++c);
-  return (c - s);
-}
-
-signed char strcmp(const char *s1, const char *s2)
-{
-  while ((*s1 || *s2) && *s1 == *s2)
-    *s1 ? ++s1 : 0, *s2 ? ++s2 : 0;
-  return (*s1 - *s2);
-}
-
-signed char strncmp(const char *s1, const char *s2, unsigned int l)
-{
-  for (register unsigned int i = 1;
-       i < l && (*s1 || *s2) && *s1 == *s2;
-       ++i, *s1 ? ++s1 : 0, s2 ? ++s2 : 0);
-  return (*s1 - *s2);
-}
-
-signed char strcasecmp(const char *s1, const char *s2)
-{
-  while ((*s1 || *s2) && tolower(*s1) == tolower(*s2))
-    *s1 ? s1++ : 0, *s2 ? s2++ : 0;
-  return (tolower(*s1) - tolower(*s2));
-}
-
-signed char strncasecmp(const char *s1, const char *s2, unsigned int l)
-{
-  register unsigned int i = 1;
-  for (; i < l && (*s1 || *s2) && tolower(*s1) == tolower(*s2);
-       ++i, *s1 ? ++s1 : 0, s2 ? ++s2 : 0);
-  return (tolower(*s1) - tolower(*s2));
-}
-
-void strcpy(char *s1, const char *s2)
-{
-  while (*s2)
-    *(s1++) = *(s2++);
-  *s1 = 0;
-}
-
-void strncpy(char *s1, const char *s2, unsigned int l)
-{
-  register unsigned int i = 0;
-  for (; i < l && *s2; ++i, *(s1++) = *(s2++));
-  if (i < l)
-    *s1 = 0;
-}
-
-void strcat(char *s1, const char *s2)
-{
-  register char *s = strlen(s1) + s1;
-  while (*s2)
-    *(s++) = *(s2++);
-  *s = 0;
-}
-
-void strcat(char *s1, const char c)
-{
-  if (c)
-    {
-      char *s = strlen(s1) + s1;
-      *s++ = c, *s = 0;
-    }
-}
-
-void strncat(char *s1, const char *s2, unsigned int l)
-{
-  register unsigned int i = strlen(s1);
-  while (*s2 && i < l)
-    s1[i++] = *(s2++);
-  if (i < l)
-    s1[i] = 0;
-    }*/
-
 bool ismathchar(const char ch)
 {
   if (isalpha(ch) || ch == '/' || ch == '*' || ch == '-' || ch == '+' || ch == '^' || ch == '%'
@@ -121,7 +42,7 @@ bool isbinary(const char *s)
 	{
 	  if ((*s == '>' && (*(s + 1) == '=' || *(s + 1) == '>')) ||
 	      (*s == '<' && (*(s + 1) == '=' || *(s + 1) == '<')) ||
-	      (*s == '=' && *(s + 1) == '=') ||
+	      ((*s == '=' || *s == '!') && *(s + 1) == '=') ||
 	      (*s == '|' && *(s + 1) == '|') ||
 	      (*s == '&' && *(s + 1) == '&'))
 	    return SUCCESS;
@@ -199,7 +120,7 @@ signed char atof(const char *a, unsigned long &i, long double &x, data_type d)
 	return ERROR;
       register signed long j = 0;
       while (*(++c) > 47 && *c < 58) // isdigit
-	x = x + pow(10, --j) * (*c - 48);
+	x = x + powl(10, --j) * (*c - 48);
     }
   if (s == 1)
     x = -x;
@@ -273,6 +194,7 @@ unsigned char extract_math(const char *a, unsigned long &i, long double &x, char
 	      || (*b == '&' && a[i] == '&')
 	      || (*b == '|' && a[i] == '|')
 	      || (*b == 'c' && a[i] == 'o')
+	      || (*b == '!' && a[i] == '=')
 	      || (!strcmp(b, "cos") && (a[i] == 'e' || a[i] == 'h'))
 	      || (!strcmp(b, "sin") && a[i] == 'h')
 	      || (!strcmp(b, "tan") && a[i] == 'h')
@@ -296,7 +218,7 @@ int priority_group(const char *s)
   /*
       const char operators[][5][4] = {
       { "&&", "||" },
-      { ">", "<", ">=", "<=", "==" },
+      { ">", "<", ">=", "<=", "==", "!=" },
       { "+", "-" },
       { "*", "/", "%", "^" },
       { "P", "C", "log" },
@@ -311,6 +233,7 @@ int priority_group(const char *s)
       case '|': return 1;
       case '>':
       case '<': return 7;
+      case '=': return 2;
       default : return 0;
       }
   else if (*(s + 1) == '=')
@@ -318,7 +241,7 @@ int priority_group(const char *s)
       {
       case '>':
       case '<':
-      case '=': return 2;
+      case '!': return 2;
       default : return 0;
       }
   else

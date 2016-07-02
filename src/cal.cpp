@@ -6,6 +6,7 @@
 #include <cal.hpp>
 #include <calc_history.hpp>
 #include <calc_strings.hpp>
+#include <input_bindings.hpp>
 #include <calc_cmd_action.hpp>
 
 #include <calc_stacks/ans_stack.hpp>
@@ -15,15 +16,9 @@
 
 unsigned char angle_type = DEG;
 
-#ifdef CONST_CMDS
-extern const_list cons;
-#endif
-
-extern strings Input;
-
 #ifdef STEPS_CMD
 bool steps = false;             /* Whether or not to show steps */
-#endif // STEPS_CMD
+#endif
 
 static long double factorial(long double x)
 {
@@ -186,13 +181,14 @@ static signed char calculateit(const char *a,
     ans = (unsigned long)x << (unsigned long)y;
 
   /* Relational operators */
-  else if (*a == '>')  ans = x >  y;
-  else if (*a == '<')  ans = x <  y;
+  else if (*a == '>')  ans = x > y;
+  else if (*a == '<')  ans = x < y;
   else if (*(a + 1) == '=')
     switch (*a)
       {
       case '>': ans = x >= y; break; // >=
       case '<': ans = x <= y; break; // <=
+      case '!': ans = x != y; break; // !=
       case '=': ans = x == y; break; // ==
       default : goto Operator_Invalid;
       }
@@ -498,7 +494,11 @@ signed char calculate(const char *a,
       /* **************************Factorial************************ */
       /* It is a special kind of unary operator which                */
       /* stands after the number whose factorial is to be calculated */
-      if (i && a[i] == '!' && isalnum(a[i - 1]))
+
+      if (i // factorial cannot be at the beginning of input
+	  && a[i] == '!' // symbol for factorial notation
+	  && a[i + 1] != '=' // operator may be '!='
+	  && isalnum(a[i - 1]))
         {
 	  if (num.get(x) == ERROR)
 	    return Error = "Number scarcity", ERROR;
