@@ -97,6 +97,8 @@ int main(int argc, char *argv[])
       /* */                 Input = readline(prompt);                /* */
       /* ************************************************************** */
 
+      if (Input == "#")
+	continue;
       add_history(Input.str());
 #ifdef CALC_COLORS
       output_font.print();

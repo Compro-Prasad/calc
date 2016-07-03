@@ -81,6 +81,8 @@ void parse_options(int argc, char *argv[])
 	    ++max_ret_value;
 	  i += max_ret_value - 1;
 	}
+      else if (*c == '#')
+	continue;
       else
 	{
 	  Input = c;
@@ -289,10 +291,9 @@ signed char option_action(const char *action, char **action_args)
 	    {
 	      while (!f.eof())
 		{
-		  f.getline(Input.str(), 4000, '\n');
-#ifdef CALC_COLORS
-		  input_font.print();
-#endif
+		  f.getline(Input.str(), strMAX, '\n');
+		  if (Input == "#")
+		    continue;
 		  fprintf(PRINTFAST, "\n%s%s", prompt, Input.str());
 #ifdef CALC_COLORS
 		  output_font.print();
