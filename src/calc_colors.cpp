@@ -1,5 +1,4 @@
-#include <string.h>
-
+#include <str.hpp>
 #include <calc_colors.hpp>
 #include <calc_term_csi.hpp>
 

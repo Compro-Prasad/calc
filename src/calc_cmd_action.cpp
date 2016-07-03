@@ -1,7 +1,6 @@
-#include <signal.h>
-#include <string.h>
 #include <readline/history.h>
 
+#include <str.hpp>
 #include <cal.hpp>
 #include <calc_help.hpp>
 #include <calc_colors.hpp>

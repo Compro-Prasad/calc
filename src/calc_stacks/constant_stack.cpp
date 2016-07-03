@@ -1,7 +1,6 @@
 #include <calc_stacks/constant_stack.hpp>
 #ifdef CONSTANT_STACK_H
 
-#include <string.h>
 #include <ctype.h>
 
 #include <calc_strings.hpp>
