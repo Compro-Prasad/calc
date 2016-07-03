@@ -2,7 +2,7 @@
 
 #ifdef ANS_CMD
 
-#include <string.h>
+#include <str.hpp>
 
 bool store = true;              /* Whether or not to store answers */
 link_ans l;                     /* Object for storing answers in stack */
@@ -56,16 +56,19 @@ void link_ans::add_ans(const double a)
 
 long double link_ans::get_ans_x(unsigned long pos)
 {
-  if (!pos && end)
+  if (!top)
+    Error = Empty;
+  else  if (!pos && end)
     return end->num;
-  if (pos <= n)
+  else if (pos <= n)
     {
       ans * t = top;
       for (; t && --pos; t = t->next);
       if (t)
 	return t->num;
     }
-  Error = "!!Unable to predict a future answer!!";
+  else
+    Error = "!!Unable to predict a future answer!!";
   return 0;
 }
 
