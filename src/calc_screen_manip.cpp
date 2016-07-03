@@ -26,6 +26,7 @@ void get_screen_size()
 
 void clrscr()
 {
+  get_screen_size();
   fprintf(PRINTFAST, "\n\r");
   for (unsigned short i = 1; i < max_lines; i++)
     fprintf(PRINTFAST, "\n");
