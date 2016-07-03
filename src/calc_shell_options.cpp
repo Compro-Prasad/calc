@@ -93,18 +93,18 @@ void parse_options(int argc, char *argv[])
 #endif
 	  cmd_action();
 	  if (Error != "")
-#ifdef CALC_COLORS
 	    {
+#ifdef CALC_COLORS
 	      error_font.print(PRINTFAST);
 #endif
 	      fprintf(PRINTFAST, "%s", Error.str());
 #ifdef CALC_COLORS
 	      output_font.print();
-	    }
 #endif
+	      Error = "";
+	    }
 	  fprintf(PRINTFAST, "\n");
 	}
-      Error = "";
     }
 #ifdef CALC_PROCESS_TIME
   if (calc_time == true)
@@ -299,16 +299,16 @@ signed char option_action(const char *action, char **action_args)
 #endif
 		  cmd_action();
 		  if (Error != "")
-#ifdef CALC_COLORS
 		    {
+#ifdef CALC_COLORS
 		      error_font.print(PRINTFAST);
 #endif
-		      fprintf(PRINTFAST, "\n%s", Error.str());
+		      fprintf(PRINTFAST, "%s", Error.str());
 #ifdef CALC_COLORS
 		      output_font.print();
-		    }
 #endif
-		  fprintf(PRINTFAST, "\n");
+		      Error = "";
+		    }
 		}
 	    }
 	  else

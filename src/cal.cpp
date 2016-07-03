@@ -39,24 +39,9 @@ void factorize(unsigned long &i)
 	if (!fmodl(x, g))
 	  fprintf(PRINTFAST, "%.0Lf, ", g);
       fprintf(PRINTFAST, "%.0Lf", x);
-#ifdef CALC_HISTORY
-      if (record & VALID_EXPRESSIONS)
-	add_history(Input.str());
-#endif
     }
-  else
-#ifdef CALC_HISTORY
-    {
-#endif
-      if (Error != "")
-	Error += " Error!!";
-      else
-	sprintf(Error.str(), "\nUndefined symbols in '%s'", Input.str());
-#ifdef CALC_HISTORY
-      if (record & INVALID_EXPRESSIONS)
-	add_history(Input.str());
-    }
-#endif
+  else if (Error == "")
+    sprintf(Error.str(), "\nUndefined symbols in '%s'", Input.str());
 }
 
 void sum(long double lower_limit,
@@ -88,14 +73,9 @@ void sum(long double lower_limit,
 	{
 	  f = 0;
 	  if (Error != "")
-	    Error += " Error!! in expression";
+	    Error += " in expression";
 	  else
-	    sprintf(Error.str(), "Failure to recognise expression in \"%s\"",
-		    Input.str());
-#ifdef CALC_HISTORY
-	  if (record & INVALID_EXPRESSIONS)
-	    add_history(Input.str());
-#endif
+	    sprintf(Error.str(), "Failure to recognise expression in '%s'", Input.str());
 	  break;
 	}
     }
@@ -246,7 +226,7 @@ static signed char calculateit(const char *a,
 	ans = tanl(z);
       else
         {
-	  Error = "!!tan Undefined";
+	  Error = "!!tan undefined";
 	  return ERROR;
         }
     }
@@ -377,7 +357,7 @@ static signed char insert(const char *s /* operator to be pushed in operator sta
                 {
 		  /* pop out two numbers from number stack */
 		  if (num.get(y) != SUCCESS || num.get(x) != SUCCESS)
-		    return (Error = Number, ERROR);
+		    return (Error = "!!Number scarcity", ERROR);
 
 		  /* calculate out the result */
 		  if (calculateit(top_optr, z, x, y) != SUCCESS)
@@ -394,7 +374,7 @@ static signed char insert(const char *s /* operator to be pushed in operator sta
                 {
 		  /* pop out a single number */
 		  if (num.get(x) != SUCCESS)
-		    return (Error = Number, ERROR);
+		    return (Error = "!!Number scarcity", ERROR);
 
 		  /* calculate out the result */
 		  if (calculateit(top_optr, z, x) != SUCCESS)
@@ -477,7 +457,7 @@ signed char calculate(const char *a,
 	    if (a[i++] == '-')
 	      t = t * (-1);
 	  if (insert(t < 0 ? "-" : "+", optr, num) == ERROR)
-	    return ERROR;
+	    goto ERROR_LABEL;
 	  flag ? SKIP_SPACE(a, i) : 0;
 	  continue;
         }
@@ -501,11 +481,17 @@ signed char calculate(const char *a,
 	  && isalnum(a[i - 1]))
         {
 	  if (num.get(x) == ERROR)
-	    return Error = "Number scarcity", ERROR;
+	    {
+	      Error = "Number scarcity";
+	      goto ERROR_LABEL;
+	    }
 	  if (x >= 0 && !(x - floorl(x)))
 	    num.push(factorial(x));
 	  else
-	    return Error = "!!Factorial", ERROR;
+	    {
+	      Error = "!!Factorial";
+	      goto ERROR_LABEL;
+	    }
 	  ++i;
 	  flag ? SKIP_SPACE(a, i) : 0;
 	  continue;
@@ -556,7 +542,7 @@ signed char calculate(const char *a,
 	      /* We just have to insert the '*' operator when the above
 		 condition is satisfied*/
 	      if (insert("*", optr, num) == ERROR)
-		return ERROR;
+		goto ERROR_LABEL;
 	    }
 	  /* *************************************************************** */
         }
@@ -567,7 +553,7 @@ signed char calculate(const char *a,
 	  if (separate_ans(a, i, ans_no) == ERROR)
             {
 	      Error = "!!Answer";
-	      return ERROR;
+	      goto ERROR_LABEL;
             }
 	  // extracting from answer list
 	  x = l.get_ans_x(ans_no);
@@ -577,17 +563,17 @@ signed char calculate(const char *a,
 	      if (num.push(x) == ERROR)
 		{
 		  Error = "!!Number linker";
-		  return ERROR;
+		  goto ERROR_LABEL;
 		}
 	    }
 	  else
-	    return ERROR;
+	    goto ERROR_LABEL;
         }
 #endif
       else if (check_extract == GOT_MATH_FUNC)
         {
 	  if (insert(c, optr, num) == ERROR)
-	    return ERROR;
+	    goto ERROR_LABEL;
 	  else
             {
 	      flag ? SKIP_SPACE(a, i) : 0;
@@ -612,10 +598,10 @@ signed char calculate(const char *a,
 	      if (!optr.check_brac())
                 {
 		  Error = "!!Bracket";
-		  return ERROR;
+		  goto ERROR_LABEL;
                 }
 	      if (insert(c, optr, num) == ERROR)
-		return ERROR;
+		goto ERROR_LABEL;
 	      flag ? SKIP_SPACE(a, i) : 0;
 #ifdef CONST_CMDS
 	      unsigned long j = i;
@@ -629,24 +615,33 @@ signed char calculate(const char *a,
 			&& a[i] != 'C'))) || a[i] == '('
 		  || isdigit(a[i]))
 		if (insert("*", optr, num) == ERROR)
-		  return ERROR;
+		  goto ERROR_LABEL;
             }
         }
-    }							// loop ends
+    }
   while (optr.get())
     if (insert(")", optr, num) == ERROR)
-      return ERROR;
+      goto ERROR_LABEL;
   if (num.get(n) != SUCCESS)
     return FAILURE;
   if (num.get(y) == SUCCESS)
     {
-      Error = Operator;
-      return ERROR;
+      Error = "!!Operator scarcity";
+      goto ERROR_LABEL;
     }
   if (optr.get())
     {
-      Error = Number;
-      return ERROR;
+      Error = "!!Number scarcity";
+      goto ERROR_LABEL;
     }
+
   return SUCCESS;
+
+ ERROR_LABEL:
+  Error += " Error!!";
+#ifdef CALC_HISTORY
+  if (!(record & INVALID_EXPRESSIONS))
+    remove_history(history_get_history_state()->length - 1);
+#endif
+  return ERROR;
 }

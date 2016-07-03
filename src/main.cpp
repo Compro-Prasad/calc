@@ -2,6 +2,7 @@
 
 #include <signal.h>
 #include <readline/readline.h>
+#include <readline/history.h>
 
 #ifdef SHELL_INPUT
 #include <fstream>
@@ -96,6 +97,7 @@ int main(int argc, char *argv[])
       /* */                 Input = readline(prompt);                /* */
       /* ************************************************************** */
 
+      add_history(Input.str());
 #ifdef CALC_COLORS
       output_font.print();
 #endif

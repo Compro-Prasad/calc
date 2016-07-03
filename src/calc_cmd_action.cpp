@@ -43,27 +43,14 @@ void cmd_action()
       long double x = 0;
       unsigned long i = 13;
       if (calculate(Input.str(), x, i) == SUCCESS && x > 24)
-        {
-	  strMAX = x + 2;
-#ifdef CALC_HISTORY
-	  if (record & VALID_COMMANDS)
-	    add_history(Input.str());
-#endif
-	}
+	strMAX = x + 2;
+      else if (Error != "");
+      else if (x < 25)
+	Error = "!!Minimum length is 25!!";
       else
-        {
-	  if (Error != "")
-	    Error += " Error!!";
-	  else if (x < 25)
-	    Error = "!!Minimum length is 25!!";
-	  else
-	    Error = "!!Invalid Expression!!";
-#ifdef CALC_HISTORY
-	  if (record & INVALID_EXPRESSIONS)
-	    add_history(Input.str());
-#endif
-	}
+	Error = "!!Invalid Expression!!";
     }
+
   /* commands for dealing with exponentials */
   else if (!strcasecmp(Input.str(), "show e"))
     {
@@ -76,6 +63,7 @@ void cmd_action()
       strcpy(e, "Lf");
     }
   /******************************************/
+
   else if (Input == "warranty")
     {
       fprintf(PRINTFAST, "\n\n\t\
@@ -235,26 +223,9 @@ Boston, MA 02110-1301  USA\n");
 	  unsigned long i = 0;
 	  while (Input[i] && Input[i++] != '=');
 	  if (calculate(Input.str(), con.value, i) == SUCCESS)
-#ifdef CALC_HISTORY
-	    {
-#endif
-	      cons.insert_const(con);
-#ifdef CALC_HISTORY
-	      if (record & VALID_COMMANDS)
-		add_history(Input.str());
-	    }
-#endif
-	  else
-	    {
-	      if (Error != "")
-		Error += " Error!!";
-	      else
-		Error = "!!Invalid Expression!!";
-#ifdef CALC_HISTORY
-	      if (record & INVALID_EXPRESSIONS)
-		add_history(Input.str());
-#endif
-	    }
+	    cons.insert_const(con);
+	  else if (Error == "")
+	    Error = "!!Invalid Expression!!";
         }
       else
 	sprintf(Error.str(), "!!%s already defined as a mathematical function!!", con.name);
@@ -370,22 +341,9 @@ Boston, MA 02110-1301  USA\n");
 	  unsigned short n = x;
 	  n %= 1000;
 	  sprintf(precision, "%%.%d%s", n, e);
-#ifdef CALC_HISTORY
-	  if (record & VALID_COMMANDS)
-	    add_history(Input.str());
-#endif
         }
-      else
-        {
-	  if (Error != "")
-	    Error += " Error!!";
-	  else
-	    Error = "!!Invalid Expression!!";
-#ifdef CALC_HISTORY
-	  if (record & INVALID_EXPRESSIONS)
-	    add_history(Input.str());
-#endif
-	}
+      else if (Error == "")
+	Error = "!!Invalid Expression!!";
     }
 #endif // CHANGE_PRECISION
 
@@ -466,8 +424,20 @@ Boston, MA 02110-1301  USA\n");
 	}
       else
 	Error = "Invalid font attribute";
-    }
+#ifdef PROMPT
+      sprintf(prompt,
+	      "%s"
+#ifdef CALC_COLORS
+	      "%s%s", prompt_font.str()
 #endif
+	      , ">> "
+#ifdef CALC_COLORS
+	      , input_font.str()
+#endif
+	      );
+#endif // PROMPT
+    }
+#endif // CALC_COLORS
 
 
 #ifdef FACTORIZE
@@ -511,6 +481,10 @@ Boston, MA 02110-1301  USA\n");
 		  num_detail = NO;
 #endif
 		  sum(lower_limit, upper_limit, rate, i);
+#ifdef CALC_HISTORY
+		  if (!(record & VALID_EXPRESSIONS) && Error == "")
+		    remove_history(history_get_history_state()->length - 1);
+#endif
 #ifdef OPTR_DETAILS
 		  operator_detail = temp_operator_detail;
 #endif
@@ -523,17 +497,9 @@ Boston, MA 02110-1301  USA\n");
 		}
 	    }
 	}
-      if (check != SUCCESS)
-	{
-	  if (Error != "")
-	    Error += " Error!!";
-	  else
-	    sprintf(Error.str(), "\nUndefined symbols in \'%s\'", Input.str());
-#ifdef CALC_HISTORY
-	  if (record & INVALID_EXPRESSIONS)
-	    add_history(Input.str());
-#endif
-	}
+      if (check != SUCCESS && Error == "")
+	sprintf(Error.str(), "\nUndefined symbols in \'%s\'", Input.str());
+      return;
     }
 #endif // SUM
 
@@ -541,8 +507,7 @@ Boston, MA 02110-1301  USA\n");
     {
       long double x = 0.0;
       unsigned long i = 0;
-      signed char check_calculate = calculate(Input.str(), x, i);
-      if (check_calculate == SUCCESS)
+      if (calculate(Input.str(), x, i) == SUCCESS)
         {
 	  fprintf(PRINTFAST, " = ");
 	  fprintf(PRINTFAST, precision, x);
@@ -551,35 +516,26 @@ Boston, MA 02110-1301  USA\n");
 	    l.add_ans(x);
 #endif
 #ifdef CALC_HISTORY
-	  if (record & VALID_EXPRESSIONS)
-	    add_history(Input.str());
+	  if (!(record & VALID_EXPRESSIONS))
+	    remove_history(history_get_history_state()->length - 1);
 #endif
         }
-      else if (check_calculate == ERROR)
-        {
-	  Error += " Error!!";
-#ifdef CALC_HISTORY
-	  if (record & INVALID_EXPRESSIONS)
-	    add_history(Input.str());
-#endif
-	}
-      else if (check_calculate == FAILURE)
-#ifdef CALC_HISTORY
-        {
-#endif
+      else if (Error == "")
+	{
 	  sprintf(Error.str(), "\nUndefined command \"%s\"", Input.str());
 #ifdef CALC_HISTORY
-	  if (record & INVALID_COMMANDS)
-	    add_history(Input.str());
-        }
+	  if (!(record & INVALID_COMMANDS))
+	    remove_history(history_get_history_state()->length - 1);
 #endif
+	}
+      return;
     }
 
   if (Error == "")
     {
 #ifdef CALC_HISTORY
-      if (record & VALID_COMMANDS)
-	add_history(Input.str());
+      if (!(record & VALID_COMMANDS))
+	remove_history(history_get_history_state()->length - 1);
 #endif
 #ifdef CALC_PROCESS_TIME
       calc_process_time(TIMER_STOP);
