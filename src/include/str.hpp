@@ -25,6 +25,18 @@ enum data_type
 
 extern unsigned long strMAX;
 
+
+extern size_t strlen(const char *s);
+extern int strcmp(const char *s1, const char *s2);
+extern int strncmp(const char *s1, const char *s2, unsigned int l);
+extern int strcasecmp(const char *s1, const char *s2);
+extern int strncasecmp(const char *s1, const char *s2, unsigned int l);
+extern char* strcpy(char *s1, const char *s2);
+extern char* strncpy(char *s1, const char *s2, unsigned int l);
+extern char* strcat(char *s1, const char *s2);
+extern char* strncat(char *s1, const char *s2, unsigned int l);
+
+
 extern bool ismathchar(const char ch);
 extern bool isbinary(const char *s);
 extern bool isunary(const char *s);

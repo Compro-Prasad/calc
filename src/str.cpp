@@ -1,13 +1,84 @@
 #include <math.h>
-#include <string.h>
 #include <ctype.h>
 
 #include <str.hpp>
 #include <calc_stacks/constant_stack.hpp>
 
-#ifdef CONST_CMDS
-extern const_list cons;
-#endif
+size_t strlen(const char *s)
+{
+  register int l = 0;
+  for (; s[l]; l++);
+  return l;
+}
+
+int strcmp(const char *s1, const char *s2)
+{
+  while ((*s1 || *s2) && *s1 == *s2)
+    *s1 ? s1++ : 0, *s2 ? s2++ : 0;
+  return (*s1 - *s2);
+}
+
+int strncmp(const char *s1, const char *s2, unsigned int l)
+{
+  for (register unsigned int i = 1;
+       i < l && (*s1 || *s2) && *s1 == *s2;
+       i++, *s1 ? s1++ : 0, s2 ? s2++ : 0);
+  return (*s1 - *s2);
+}
+
+int strcasecmp(const char *s1, const char *s2)
+{
+  while ((*s1 || *s2) && tolower(*s1) == tolower(*s2))
+    *s1 ? s1++ : 0, *s2 ? s2++ : 0;
+  return (tolower(*s1) - tolower(*s2));
+}
+
+int strncasecmp(const char *s1, const char *s2, unsigned int l)
+{
+  register unsigned int i = 1;
+  for (; i < l && (*s1 || *s2) && tolower(*s1) == tolower(*s2);
+       i++, *s1 ? s1++ : 0, s2 ? s2++ : 0);
+  return (tolower(*s1) - tolower(*s2));
+}
+
+char* strcpy(char *s1, const char *s2)
+{
+  char *ret_val = s1;
+  while (*s2)
+    *(s1++) = *(s2++);
+  *s1 = 0;
+  return ret_val;
+}
+
+char* strncpy(char *s1, const char *s2, unsigned int l)
+{
+  char *ret_val = s1;
+  register unsigned int i = 1;
+  for (; i < l && *s2; i++, *(s1++) = *(s2++));
+  if (i < l)
+    *s1 = 0;
+  return ret_val;
+}
+
+char* strcat(char *s1, const char *s2)
+{
+  register char *s = strlen(s1) + s1;
+  while (*s2)
+    *(s++) = *(s2++);
+  *s = 0;
+  return s1;
+}
+
+char* strncat(char *s1, const char *s2, unsigned int l)
+{
+  register unsigned int i = strlen(s1);
+  while (*s2 && i < l)
+    s1[i++] = *(s2++);
+  if (i < l)
+    s1[i] = 0;
+  return s1;
+}
+
 bool ismathchar(const char ch)
 {
   if (isalpha(ch) || ch == '/' || ch == '*' || ch == '-' || ch == '+' || ch == '^' || ch == '%'
