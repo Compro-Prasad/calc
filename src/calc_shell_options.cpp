@@ -6,7 +6,6 @@
 using namespace std;
 
 #include <math.h>
-#include <string.h>
 #include <signal.h>
 
 #include <cal.hpp>
@@ -25,7 +24,7 @@ using namespace std;
 #define CHECK_OPTION_AMONG(short, long)					\
   ((!ret_value && *action == short) || (ret_value && !strcmp(action, long)))
 
-bool direct_input;
+bool direct_input = true;
 
 #ifdef DIRECT_INPUT
 extern bool welcome_msg;
