@@ -3,8 +3,6 @@
 #ifndef CALC_CAL_H
 #define CALC_CAL_H
 
-#define Operator "!!Operator scarcity"
-#define Number "!!Number scarcity"
 #define PI 3.14159265358979323846264338327950288419716939937510
 
 /* type of angles */
