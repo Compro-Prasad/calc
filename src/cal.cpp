@@ -1,5 +1,4 @@
 #include <math.h>
-#include <string.h>
 #include <ctype.h>
 #include <readline/history.h>
 
@@ -68,10 +67,11 @@ void sum(long double lower_limit,
   bool flag = 0, f = 1;
   unsigned long m = i;
   long double sum = 0, x = 0;
+  fprintf(PRINTFAST, "\nSuming expression \"");
+  Input.print(m);
   fprintf(PRINTFAST,
-	  "\nSuming expression \"%s\""
-	  " from i = %Lg to i = %Lg at the rate of %Lg per sum",
-	  Input.str(), lower_limit, upper_limit, rate);
+	  "\" from i = %Lg to i = %Lg at the rate of %Lg per sum",
+	  lower_limit, upper_limit, rate);
   if (lower_limit > upper_limit && rate < 0.0)
     {
       swap(lower_limit, upper_limit, long double);
@@ -571,7 +571,7 @@ signed char calculate(const char *a,
             }
 	  // extracting from answer list
 	  x = l.get_ans_x(ans_no);
-	  if (x != 0.0|| Error == "")
+	  if (x != 0.0 || Error == "")
 	    {
 	      // pushing answer to stack
 	      if (num.push(x) == ERROR)

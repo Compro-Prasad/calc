@@ -1,5 +1,4 @@
 #include <assert.h>
-#include <string.h>
 #include <malloc.h>
 
 #include <calc_strings.hpp>
@@ -209,5 +208,5 @@ void strings::print(unsigned long &start, unsigned long end)
   end == strMAX ? end = length : 0;
   for (register char *ch = c + start;
 	 *ch && start < end; ++ch, ++start)
-    fprintf(PRINTFAST, "%s", c);
+    fprintf(PRINTFAST, "%c", *ch);
 }
