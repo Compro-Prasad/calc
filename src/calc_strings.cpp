@@ -203,7 +203,7 @@ char * strings::str()
   return c;
 }
 
-void strings::print(unsigned long &start, unsigned long end)
+void strings::print(unsigned long start, unsigned long end)
 {
   end == strMAX ? end = length : 0;
   for (register char *ch = c + start;
