@@ -125,7 +125,7 @@ static signed char calculateit(const char *a,
     ans = powl(x, y);
 
   /* Factorials */
-  else if (*a == 'C')
+  else if (*a == 'P')
     {
       if (x >= 0 && y >= 0 && x >= y && !(x - floorl(x)) && !(y - floorl(y)))
 	ans = factorial(x) / factorial(x - y);
