@@ -56,9 +56,7 @@ void link_ans::add_ans(const double a)
 
 long double link_ans::get_ans_x(unsigned long pos)
 {
-  if (!top)
-    Error = Empty;
-  else  if (!pos && end)
+  if (!pos && end)
     return end->num;
   else if (pos <= n)
     {
@@ -68,7 +66,7 @@ long double link_ans::get_ans_x(unsigned long pos)
 	return t->num;
     }
   else
-    Error = "!!Unable to predict a future answer!!";
+    Error = "!!Future answer used in past";
   return 0;
 }
 
