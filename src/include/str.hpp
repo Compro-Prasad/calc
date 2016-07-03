@@ -28,13 +28,13 @@ extern unsigned long strMAX;
 
 extern size_t strlen(const char *s);
 extern int strcmp(const char *s1, const char *s2);
-extern int strncmp(const char *s1, const char *s2, unsigned int l);
+extern int strncmp(const char *s1, const char *s2, size_t l);
 extern int strcasecmp(const char *s1, const char *s2);
-extern int strncasecmp(const char *s1, const char *s2, unsigned int l);
+extern int strncasecmp(const char *s1, const char *s2, size_t l);
 extern char* strcpy(char *s1, const char *s2);
-extern char* strncpy(char *s1, const char *s2, unsigned int l);
+extern char* strncpy(char *s1, const char *s2, size_t l);
 extern char* strcat(char *s1, const char *s2);
-extern char* strncat(char *s1, const char *s2, unsigned int l);
+extern char* strncat(char *s1, const char *s2, size_t l);
 
 
 extern bool ismathchar(const char ch);

@@ -18,7 +18,7 @@ int strcmp(const char *s1, const char *s2)
   return (*s1 - *s2);
 }
 
-int strncmp(const char *s1, const char *s2, unsigned int l)
+int strncmp(const char *s1, const char *s2, size_t l)
 {
   for (register unsigned int i = 1;
        i < l && (*s1 || *s2) && *s1 == *s2;
@@ -33,7 +33,7 @@ int strcasecmp(const char *s1, const char *s2)
   return (tolower(*s1) - tolower(*s2));
 }
 
-int strncasecmp(const char *s1, const char *s2, unsigned int l)
+int strncasecmp(const char *s1, const char *s2, size_t l)
 {
   register unsigned int i = 1;
   for (; i < l && (*s1 || *s2) && tolower(*s1) == tolower(*s2);
@@ -50,7 +50,7 @@ char* strcpy(char *s1, const char *s2)
   return ret_val;
 }
 
-char* strncpy(char *s1, const char *s2, unsigned int l)
+char* strncpy(char *s1, const char *s2, size_t l)
 {
   char *ret_val = s1;
   register unsigned int i = 1;
@@ -69,7 +69,7 @@ char* strcat(char *s1, const char *s2)
   return s1;
 }
 
-char* strncat(char *s1, const char *s2, unsigned int l)
+char* strncat(char *s1, const char *s2, size_t l)
 {
   register unsigned int i = strlen(s1);
   while (*s2 && i < l)
