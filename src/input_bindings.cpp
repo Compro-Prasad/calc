@@ -13,7 +13,7 @@ char prompt[500];
 
 static int return_pressed(int x, int input_char)
 {
-  if (input_char == RETURN && rl_end)
+  if ((input_char == RETURN || input_char == NEWLINE) && rl_end)
     {
       if (rl_line_buffer[rl_end - 1] == SPACE
 	  && strncasecmp(rl_line_buffer, "prompt=", 7))
@@ -42,4 +42,5 @@ void init_readline()
   rl_bind_key(SPACE, space_pressed);
   rl_bind_key(TAB, do_nothing);
   rl_bind_key(RETURN, return_pressed);
+  rl_bind_key(NEWLINE, return_pressed);
 }

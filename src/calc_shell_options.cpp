@@ -86,9 +86,6 @@ void parse_options(int argc, char *argv[])
       else
 	{
 	  Input = c;
-#ifdef CALC_COLORS
-	  input_font.print();
-#endif
 	  fprintf(PRINTFAST, "\n%s%s", prompt, Input.str());
 #ifdef CALC_COLORS
 	  output_font.print();

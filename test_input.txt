@@ -1,5 +1,5 @@
 input length 10+10
-asdf sdfg dfgh fghj ghjk hjkl jkl; kl;'
+asdf    sdfg    dfgh    fghj    ghjk    hjkl jkl; kl;'
 input length 50+50
 hide e
 show e

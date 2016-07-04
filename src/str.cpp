@@ -81,9 +81,21 @@ char* strncat(char *s1, const char *s2, size_t l)
 
 bool ismathchar(const char ch)
 {
-  if (isalpha(ch) || ch == '/' || ch == '*' || ch == '-' || ch == '+' || ch == '^' || ch == '%'
-      || ch == '_' || ch == '!' || ch == '&' || ch == '|' || ch == '<' || ch == '>' || ch == '~'
-      || ch == '=')
+  if (isalpha(ch) ||
+      ch == '/' ||
+      ch == '*' ||
+      ch == '-' ||
+      ch == '+' ||
+      ch == '^' ||
+      ch == '%' ||
+      ch == '_' ||
+      ch == '!' ||
+      ch == '&' ||
+      ch == '|' ||
+      ch == '<' ||
+      ch == '>' ||
+      ch == '~' ||
+      ch == '=')
     return SUCCESS;
   return FAILURE;
 }

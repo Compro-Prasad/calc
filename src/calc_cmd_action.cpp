@@ -351,7 +351,7 @@ Boston, MA 02110-1301  USA\n");
   else if (!strcasecmp(Input.str(), "settings"))
     {
 #ifdef PROMPT
-      fprintf(PRINTFAST, "\nPrompt             =  \"%s\"", prompt);
+      fprintf(PRINTFAST, "\nPrompt             =  \"%s%s\"", prompt, output_font.str());
 #endif // PROMPT
 #ifdef ANS_CMD
       fprintf(PRINTFAST, "\nStoring Answers    =  %s", store == YES ? "YES" : "NO");

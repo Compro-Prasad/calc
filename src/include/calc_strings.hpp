@@ -62,6 +62,6 @@ public:
 
 };
 
-extern strings Error;                  /* String for storing errors generated after each command */
+extern strings Error; /* String for storing errors generated after each command */
 
 #endif // strings_H

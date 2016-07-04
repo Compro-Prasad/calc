@@ -38,22 +38,15 @@ int main(int argc, char *argv[])
 #endif
 
 #ifdef PROMPT
-  sprintf(prompt,
-	  "%s"
 #ifdef CALC_COLORS
-	  "%s%s", prompt_font.str()
-#endif
-	  , ">> "
-#ifdef CALC_COLORS
-	  , input_font.str()
-#endif
-	  );
+  sprintf(prompt, "%s>> %s", prompt_font.str(), input_font.str());
+#else
+  sprintf(prompt, ">> ");
+#endif // CALC_COLORS
 #endif // PROMPT
 
-  init_readline();
 
 #ifdef SHELL_INPUT
-
 
   /* ****************************************************************** */
   /*                     checking out shell arguments                   */
@@ -61,19 +54,17 @@ int main(int argc, char *argv[])
   /*                           parsing complete                         */
   /* ****************************************************************** */
 
-  if (argc != 1
+  if (argc != 1)
 #ifdef DIRECT_INPUT
-      && !direct_input
+    if (!direct_input)
 #endif
-      )
-    PACKUP_AND_LEAVE("");
+      PACKUP_AND_LEAVE("");
 
 #endif // SHELL_INPUT
 
 
 
 #ifdef DIRECT_INPUT
-
 
   /* ******************************************************************* */
   /*                             Welcome message                         */
@@ -84,6 +75,7 @@ int main(int argc, char *argv[])
 	    "Type help and press return to know more.");
   /* ******************************************************************* */
 
+  init_readline();
 
   while (Input != "exit")
     {
@@ -99,7 +91,11 @@ int main(int argc, char *argv[])
 
       if (Input == "#")
 	continue;
+
+#ifdef CALC_HISTORY
       add_history(Input.str());
+#endif
+
 #ifdef CALC_COLORS
       output_font.print();
 #endif

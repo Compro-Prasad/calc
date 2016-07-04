@@ -63,21 +63,19 @@ void help(strings c)
 	else
 #endif
 	  if (c == "command history")
-	    {
-	      fprintf(PRINTFAST, "\n\
--> allow/restrict <history_type> - Allow/Restrict recording of history types\n\
-   <history_type>:\n\
-\t   Valid Commands\n\
-\t   Valid Expressions\n\
-\t   Invalid Commands\n\
-\t   Invalid Expressions\n\
-\t   All Valid\n\
-\t   All Invalid\n\
-\t   All Commands\n\
-\t   All Expressions\n\n\
--> <up arrow key>                          - previous command\n\
--> <down arrow key>                        - next command");
-	    }
+	    fprintf(PRINTFAST,
+		    "\n-> allow/restrict <history_type> - Allow/Restrict recording of history types"
+		    "\n   <history_type>:"
+		    "\n\t   Valid Commands"
+		    "\n\t   Valid Expressions"
+		    "\n\t   Invalid Commands"
+		    "\n\t   Invalid Expressions"
+		    "\n\t   All Valid"
+		    "\n\t   All Invalid"
+		    "\n\t   All Commands"
+		    "\n\t   All Expressions\n"
+		    "\n-> <up arrow key>                - previous command"
+		    "\n-> <down arrow key>              - next command");
 #endif
 	  else if (c == "miscellaneous")
 	    fprintf(PRINTFAST,
@@ -126,7 +124,7 @@ void help(strings c)
 		    "\nhelp constants       - Help on constant manipulating commands"
 #endif
 #ifdef ANS_CMD
-		      "\nhelp answers         - Help on answer manipulating commands"
+		    "\nhelp answers         - Help on answer manipulating commands"
 #endif
 #ifdef CALC_COLORS
 		    "\nhelp font            - Help on font manipulating commands"

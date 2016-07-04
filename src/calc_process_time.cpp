@@ -1,6 +1,4 @@
-#include <signal.h>
 #include <time.h>
-#include <unistd.h>
 
 #include <calc_process_time.hpp>
 

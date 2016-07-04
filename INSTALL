@@ -2,4 +2,4 @@ Type in 'make' to start compiling using the Makefile.
 Wait untill the compilation ends.
 For installation, run 'make install' to successfully install it into
 '/usr/local/bin'. You can change the install location by changing the
-value of INSTALL_DIR in the Makefile present at line 7.
+value of INSTALL_DIR.

@@ -30,11 +30,6 @@
 #define scroll_up   fprintf(PRINTFAST, CSISU)
 #define scroll_down fprintf(PRINTFAST, CSISD)
 
-#define DEC_CUR_POS (!(cur_col >> 1) && cur_line > 1 ? --cur_line : 0,	\
-		     cur_col = cur_col >> 1 ? cur_col - 1 : max_cols)
-#define INC_CUR_POS (cur_col = cur_col == max_cols ? 1 : cur_col + 1,	\
-		     !(cur_col >> 1) && cur_line < max_lines ? ++cur_line : 0)
-
 extern void clrscr();
 
 #endif
