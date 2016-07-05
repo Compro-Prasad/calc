@@ -22,7 +22,7 @@ static int return_pressed(int x, int input_char)
       rl_redisplay();
       rl_done = true;
     }
-  return 0;
+  return x;
 }
 
 static int space_pressed(int x, int input_char)
@@ -32,10 +32,10 @@ static int space_pressed(int x, int input_char)
        (rl_point && rl_line_buffer[rl_point - 1] != SPACE &&
 	(rl_point == rl_end || rl_line_buffer[rl_point] != SPACE))))
     rl_insert(x, input_char);
-  return 0;
+  return x;
 }
 
-static int do_nothing(int x, int input_char) { return 0; }
+static int do_nothing(int x, int input_char) { return x + input_char; }
 
 void init_readline()
 {
