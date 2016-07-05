@@ -33,7 +33,7 @@ void calc_font::update()
   this->format[BACK_COLOR_INDEX] = bagnd + '0';
 }
 
-const char *const calc_font::str()
+const char *calc_font::str()
 {
   return this->format;
 }

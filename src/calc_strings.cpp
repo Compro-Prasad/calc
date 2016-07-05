@@ -188,7 +188,7 @@ void strings::del(unsigned long i)
   length = strlen(c);
 }
 
-const unsigned long strings::len()
+unsigned long strings::len()
 {
   return length;
 }

@@ -1,7 +1,7 @@
 CC = g++
 CXX = $(CC)
 
-CFLAGS = -O3 -Ofast -Wall
+CFLAGS = -O3 -Ofast -Wall -W
 #-ansi -pedantic
 
 CXXFLAGS = $(CFLAGS)

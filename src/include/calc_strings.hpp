@@ -52,7 +52,7 @@ public:
 
   void del(unsigned long i);
 
-  const unsigned long len();
+  unsigned long len();
 
   void update_len();
 
