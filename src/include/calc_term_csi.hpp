@@ -1,7 +1,9 @@
 #ifndef CALC_TERM_CSI_H
 #define CALC_TERM_CSI_H
 
-#define CSI "\033["
+#ifndef CSI         /* if CSI is already defined during compilation */
+# define CSI "\033["/* do not define it again */
+#endif
 
 #define /* Cursor Up */               CSICUU CSI"A"
 #define /* Cursor Down */             CSICUD CSI"B"
