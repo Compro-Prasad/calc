@@ -37,14 +37,6 @@ int main(int argc, char *argv[])
   output_font.print();
 #endif
 
-#ifdef PROMPT
-#ifdef CALC_COLORS
-  sprintf(prompt, "%s>> %s", prompt_font.str(), input_font.str());
-#else
-  sprintf(prompt, ">> ");
-#endif // CALC_COLORS
-#endif // PROMPT
-
 
 #ifdef SHELL_INPUT
 
@@ -81,6 +73,15 @@ int main(int argc, char *argv[])
     {
 
       fprintf(PRINTFAST, "\n");
+#ifdef PROMPT
+#ifdef CALC_COLORS
+      prompt_font.print();
+#endif
+      fprintf(PRINTFAST, "%s", prompt);
+#endif
+#ifdef CALC_COLORS
+      input_font.print();
+#endif
 
       Error = "";
 

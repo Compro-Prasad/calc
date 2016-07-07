@@ -321,13 +321,7 @@ Boston, MA 02110-1301  USA\n");
   else if (Input == "prompt=")
     {
       extract(Input.str(), temp_char.str(), 7, -1, '\0', 500);
-#ifdef CALC_COLORS
-      strcpy(prompt, prompt_font.str());
-      strncat(prompt, temp_char.str(), 460);
-      strcat(prompt, input_font.str());
-#else
       strncpy(prompt, temp_char.str(), 500);
-#endif
     }
 #endif // PROMPT
 
@@ -351,13 +345,13 @@ Boston, MA 02110-1301  USA\n");
   else if (!strcasecmp(Input.str(), "settings"))
     {
 #ifdef PROMPT
-      fprintf(PRINTFAST, "\nPrompt             =  \"%s%s\"", prompt, output_font.str());
+      fprintf(PRINTFAST, "\nPrompt             =  '%s'", prompt);
 #endif // PROMPT
 #ifdef ANS_CMD
       fprintf(PRINTFAST, "\nStoring Answers    =  %s", store == YES ? "YES" : "NO");
 #endif // ANS_CMD
 #ifdef CHANGE_PRECISION
-      fprintf(PRINTFAST, "\nPrecision          =  \"%s\"", precision);
+      fprintf(PRINTFAST, "\nPrecision          =  '%s'", precision);
 #endif // CHANGE_PRECISION
       fprintf(PRINTFAST, "\nShow Exponential   =  %s", strcasecmp(e, "Lf") ? "NO" : "YES");
       fprintf(PRINTFAST, "\nAngle Mode         =  %s", angle_type == DEG ? "DEGREE" : angle_type == GRAD ? "GRAD" : "RADIAN");
@@ -424,18 +418,6 @@ Boston, MA 02110-1301  USA\n");
 	}
       else
 	Error = "Invalid font attribute";
-#ifdef PROMPT
-      sprintf(prompt,
-	      "%s"
-#ifdef CALC_COLORS
-	      "%s%s", prompt_font.str()
-#endif
-	      , ">> "
-#ifdef CALC_COLORS
-	      , input_font.str()
-#endif
-	      );
-#endif // PROMPT
     }
 #endif // CALC_COLORS
 
