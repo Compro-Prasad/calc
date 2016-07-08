@@ -16,44 +16,43 @@ using namespace std;
 #include <calc_screen_manip.hpp>
 #include <calc_shell_options.hpp>
 
+char precision[15] = "%.5Lg";/* String for storing precision */
+char e[3]          = "Lg";   /* String for showing or not showing exponential */
 strings Error;
+unsigned long strMAX = 1000;
 
 #ifdef CALC_HISTORY
 short record = ALL_; /* Switch for (not )storing specific history types */
 #endif
-
-unsigned long strMAX = 1000;
-
-char precision[15] = "%.5Lg";/* String for storing precision */
-char e[3] = "Lg";            /* String for showing or not showing exponential */
-
 #ifdef DIRECT_INPUT
 bool welcome_msg = true;
+#endif
+#ifdef SHELL_INPUT
+const char *prog_name = NULL;
 #endif
 
 int main(int argc, char *argv[])
 {
+
+  prog_name = *argv;
+
 #ifdef CALC_COLORS
   output_font.print();
 #endif
 
 
 #ifdef SHELL_INPUT
-
   /* ****************************************************************** */
   /*                     checking out shell arguments                   */
   /*                   */ parse_options(argc, argv); /*                 */
   /*                           parsing complete                         */
   /* ****************************************************************** */
-
   if (argc != 1)
 #ifdef DIRECT_INPUT
     if (!direct_input)
 #endif
       PACKUP_AND_LEAVE("");
-
 #endif // SHELL_INPUT
-
 
 
 #ifdef DIRECT_INPUT
@@ -75,11 +74,14 @@ int main(int argc, char *argv[])
       fprintf(PRINTFAST, "\n");
 #ifdef PROMPT
 #ifdef CALC_COLORS
+      /* Setting prompt font settings */
       prompt_font.print();
 #endif
+      /* Displaying prompt */
       fprintf(PRINTFAST, "%s", prompt);
-#endif
+#endif // PROMPT
 #ifdef CALC_COLORS
+      /* Setting input font settings */
       input_font.print();
 #endif
 
@@ -90,14 +92,15 @@ int main(int argc, char *argv[])
       /* */                 Input = readline(prompt);                /* */
       /* ************************************************************** */
 
-      if (Input == "#")
-	continue;
+      if (Input == "#") /* A comment  */
+	continue;       /* Do nothing */
 
 #ifdef CALC_HISTORY
       add_history(Input.str());
 #endif
 
 #ifdef CALC_COLORS
+      /* Setting output font settings */
       output_font.print();
 #endif
 

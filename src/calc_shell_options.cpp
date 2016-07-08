@@ -26,6 +26,8 @@ using namespace std;
 
 bool direct_input = true;
 
+extern const char *prog_name;
+
 #ifdef DIRECT_INPUT
 extern bool welcome_msg;
 #endif
@@ -223,40 +225,43 @@ signed char option_action(const char *action, char **action_args)
 	{
 	  fprintf(PRINTFAST,
 		  "USAGE:\n\t"
-		  "calc [-short_options] [--long_option] [<expression>]\n\t"
+		  "%s [-short_options] [--long_option] [<expression>]\n\t"
 #ifdef DIRECT_INPUT
-		  "calc [-q]           Quits after reading all shell arguments\n\t"
-		  "calc [-[N]w]        Show welcome message\n\t"
+		  "%s [-q]           Quits after reading all shell arguments\n\t"
+		  "%s [-[N]w]        Show welcome message\n\t"
 #endif
-		  "calc [-f FILE]      Loads calculator's script from FILE\n\t"
+		  "%s [-f FILE]      Loads calculator's script from FILE\n\t"
 #ifdef NUM_DETAILS
-		  "calc [-[N]n]        Show number details\n\t"
+		  "%s [-[N]n]        Show number details\n\t"
 #endif
 #ifdef OPTR_DETAILS
-		  "calc [-[N]q]        Show operator details\n\t"
+		  "%s [-[N]q]        Show operator details\n\t"
 #endif
 #ifdef CALC_PROCESS_TIME
-		  "calc [-[N]t]        Show processing time\n\t"
+		  "%s [-[N]t]        Show processing time\n\t"
 #endif
 #ifdef ANS_CMD
-		  "calc [-[N]a]        Store answers\n\t"
+		  "%s [-[N]a]        Store answers\n\t"
 #endif
-		  "calc [-[N]e]        Show exponential part if necessary\n\t"
+		  "%s [-[N]e]        Show exponential part if necessary\n\t"
 #ifdef PROMPT
-		  "calc [-p PROMPT]    Show PROMPT after each input\n\t"
+		  "%s [-p PROMPT]    Show PROMPT after each input\n\t"
 #endif
 #ifdef CHANGE_PRECISION
-		  "calc [-P PRECISION] Show upto PRECISION decimal places\n\t"
+		  "%s [-P PRECISION] Show upto PRECISION decimal places\n\t"
 #endif
-		  "calc [-A TYPE]      TYPE should be angle of type deg/rad/grad\n\t"
+		  "%s [-A TYPE]      TYPE should be angle of type deg/rad/grad\n\t"
 #ifdef FACTORIZE
-		  "calc [-F NUM]       Find all factors of NUM\n\t"
+		  "%s [-F NUM]       Find all factors of NUM\n\t"
 #endif
 #ifdef SUM
-		  "calc [-S <low_lt> <up_lt> <rate> <expr>]\n"
+		  "%s [-S <low_lt> <up_lt> <rate> <expr>]\n"
 #endif
-		  "[-N] represents negation of the specific action\n"
-		  "Other options and long options can be consulted from manpage\n");
+		  "[N] represents negation of the specific action\n"
+		  "Other options and long options can be consulted from manpage\n"
+		  , prog_name, prog_name, prog_name, prog_name, prog_name, prog_name
+		  , prog_name, prog_name, prog_name, prog_name, prog_name, prog_name
+		  , prog_name, prog_name);
 	}
 
 #ifdef DIRECT_INPUT
