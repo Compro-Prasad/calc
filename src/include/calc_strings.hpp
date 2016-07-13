@@ -58,7 +58,7 @@ public:
 
   char * str();
 
-  void print(unsigned long start, unsigned long end = strMAX);
+  void print(unsigned long start = 0, unsigned long end = strMAX);
 
 };
 
