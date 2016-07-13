@@ -36,31 +36,55 @@ void parse_options(int argc, char *argv[])
 {
   char *c;
   signed char ret_value, max_ret_value;
+
+  /* Go through the list of shell arguments */
   for (int i = 1; i < argc; i++)
     {
       c = argv[i];
-      if (*c == '-')
+
+      /* if it starts with '#' ignore it because it is a comment */
+      if (*c == '#')
+	continue;
+
+      /* if argument begins with '-' it should be a predefined action */
+      else if (*c == '-')
 	{
-	  ret_value = 1;
-	  max_ret_value = -1;
+	  ret_value = max_ret_value = -1;
+
+	  /* assume it to be a short option and go through every character */
 	  while (*(++c))
 	    {
 #ifdef CALC_PROCESS_TIME
 	      calc_process_time(TIMER_START);
 #endif
+	      /* take action on(from) the specific character */
+	      /* Note: we have left out the first character that is '-' */
 	      if ((ret_value = option_action(c, argv + i + 1)) < 0)
-		break;
+		{
+		  /* if the return value is less than zero then */
+		  /* stop reading this argument */
+		  break;
+		}
 #ifdef CALC_PROCESS_TIME
 	      calc_process_time(TIMER_STOP);
 #endif
 
+	      /* ret_value is the number of more arguments read by this */
+	      /* argument. So a 'max_ret_value' is required to skip     */
+	      /* 'max_ret_value' number of arguments after reading this */
+	      /* argument                                               */
 	      max_ret_value < ret_value ? max_ret_value = ret_value : 0;
 
+	      /* a long argument is an argument in itself, so we don't  */
+	      /* require to read every character when we find a 2nd '-' */
 	      if (*c == '-' || !*c)
 		break;
+	      /* if the option is 'N'(negation) that means it actually  */
+	      /* requires a following character                         */
 	      else if (*c == 'N')
 		++c;
 	    }
+
 	  if (ret_value == -1)
 	    {
 	      if (Error == "")
@@ -70,10 +94,10 @@ void parse_options(int argc, char *argv[])
 	      Error += argv[i];
 #ifdef CALC_COLORS
 	      error_font.print(PRINTFAST);
-#endif
-	      fprintf(PRINTFAST, "%s", Error.str());
-#ifdef CALC_COLORS
+	      Error.print();
 	      output_font.print();
+#else
+	      Error.print();
 #endif
 	      fprintf(PRINTFAST, "\n");
 	      Error = "";
@@ -81,26 +105,37 @@ void parse_options(int argc, char *argv[])
 	    }
 	  else if (!*c)
 	    ++max_ret_value;
-	  i += max_ret_value - 1;
+
+	  i += max_ret_value - 1; /* go to next argument(if required) */
 	}
-      else if (*c == '#')
-	continue;
+
+      /* else it may be a direct input command */
       else
 	{
 	  Input = c;
-	  fprintf(PRINTFAST, "\n%s%s", prompt, Input.str());
 #ifdef CALC_COLORS
+# ifdef PROMPT
+	  prompt_font.print();
+	  fprintf(PRINTFAST, "%s", prompt);
+# endif
+	  input_font.print();
+	  Input.print();
 	  output_font.print();
+#else
+# ifdef PROMPT
+	  fprintf(PRINTFAST, "%s", prompt);
+# endif
+	  Input.print();
 #endif
 	  cmd_action();
 	  if (Error != "")
 	    {
 #ifdef CALC_COLORS
 	      error_font.print(PRINTFAST);
-#endif
-	      fprintf(PRINTFAST, "%s", Error.str());
-#ifdef CALC_COLORS
+	      Error.print();
 	      output_font.print();
+#else
+	      Error.print();
 #endif
 	      Error = "";
 	    }
@@ -125,10 +160,14 @@ signed char option_action(const char *action, char **action_args)
       ++action;
     }
 
+  /* if it is a negation */
   if (*action == 'N')
     negate = YES, ++action;
-  else if (!*action)
+
+  /* if it has reached NULL return Error */
+  if (!*action)
     return -1;
+
 
   if (CHECK_OPTION_AMONG('e', "show-exp"))
     {
@@ -296,9 +335,19 @@ signed char option_action(const char *action, char **action_args)
 		  f.getline(Input.str(), strMAX, '\n');
 		  if (Input == "#")
 		    continue;
-		  fprintf(PRINTFAST, "\n%s%s", prompt, Input.str());
 #ifdef CALC_COLORS
+# ifdef PROMPT
+		  prompt_font.print();
+		  fprintf(PRINTFAST, "%s", prompt);
+# endif
+		  input_font.print();
+		  Input.print();
 		  output_font.print();
+#else
+# ifdef PROMPT
+		  fprintf(PRINTFAST, "%s", prompt);
+# endif
+		  Input.print();
 #endif
 		  cmd_action();
 		  if (Error != "")
