@@ -307,12 +307,14 @@ Boston, MA 02110-1301  USA\n");
   else if (Input == "shell ")
     {
       extract(Input.str(), temp_char.str(), 6);
-      fprintf(PRINTFAST, "\nConnecting to shell...\n");
+      fprintf(PRINTFAST, "\nConnecting to shell...%s\n", CSI"00;37;40m");
+      output_font.print();
       fprintf(PRINTFAST, "Return value %d", system(temp_char.str()));
     }
   else if (!strcasecmp(Input.str(), "shell"))
     {
-      fprintf(PRINTFAST, "\nConnecting to shell...\n");
+      fprintf(PRINTFAST, "\nConnecting to shell...%s\n", CSI"00;37;40m");
+      output_font.print();
       fprintf(PRINTFAST, "Return value %d", system(Shell));
     }
 #endif // SHELL_CMD

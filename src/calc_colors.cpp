@@ -8,7 +8,7 @@
 #define TEXT_COLOR_INDEX  9
 #define BACK_COLOR_INDEX 12
 
-calc_font input_font  = calc_font( CYAN  , DEFAULT, REGULAR );
+calc_font input_font  = calc_font( WHITE , DEFAULT, REGULAR );
 calc_font error_font  = calc_font( RED   , DEFAULT, BOLD    );
 calc_font output_font = calc_font( GREEN , DEFAULT, REGULAR );
 calc_font prompt_font = calc_font( YELLOW, DEFAULT, REGULAR );
