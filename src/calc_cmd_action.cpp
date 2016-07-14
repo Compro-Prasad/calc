@@ -268,7 +268,7 @@ Boston, MA 02110-1301  USA\n");
     {
       long double x = 0.0;
       unsigned long y, i = 23;
-      if (atof(Input.str(), i, x, UNSIGNED_INT) == SUCCESS)
+      if (atof(Input.str(), i, x, data_type::UNSIGNED_INT) == SUCCESS)
 	if (y = x, !l.has_ans())
 	  Error = "!!Answers list empty!!";
 	else
@@ -281,7 +281,7 @@ Boston, MA 02110-1301  USA\n");
     {
       long double x = 0.0;
       unsigned long y, i = 21;
-      if (atof(Input.str(), i, x, UNSIGNED_INT) == SUCCESS)
+      if (atof(Input.str(), i, x, data_type::UNSIGNED_INT) == SUCCESS)
 	if (y = x, !l.has_ans())
 	  Error = "!!Answers list empty!!";
 	else
