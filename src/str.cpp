@@ -197,7 +197,7 @@ signed char atof(const char *a, unsigned long &i, long double &x, data_type d)
     }
   while (isdigit(*c))
     x = x * 10 + *(c++) - 48;
-  if (*c == '.')
+  if (*c == '.' && isdigit(c[1]))
     {
       if (d != REAL && d != UNSIGNED_REAL)
 	return ERROR;
@@ -205,9 +205,13 @@ signed char atof(const char *a, unsigned long &i, long double &x, data_type d)
       while (*(++c) > 47 && *c < 58) // isdigit
 	x = x + powl(10, --j) * (*c - 48);
     }
+  if (*c == '.' && !isdigit(c[1]))
+	return ERROR;
+  if (a + i == c)
+	return ERROR;
+  i = c - a;
   if (s == 1)
     x = -x;
-  i = c - a;
   return SUCCESS;
 }
 
@@ -254,10 +258,7 @@ unsigned char extract_math(const char *a, unsigned long &i, long double &x, char
   unsigned long k = 0;
   b[0] = 0;
   if (a[i] == '.' || isdigit(a[i]))
-    {
-      atof(a, i, x = 0, UNSIGNED_REAL);
-      return GOT_NUMBER;
-    }
+	return atof(a, i, x = 0, UNSIGNED_REAL) == SUCCESS ? GOT_NUMBER : FAILURE;
 #ifdef ANS_CMD
   else if (tolower(a[i + 0]) == 'a' && isdigit(a[i + 1]))
     return GOT_ANSWER;
