@@ -15,6 +15,8 @@
 
 #define SKIP_SPACE(s, i) s[i] == ' ' ? ++i : i
 
+typedef unsigned long long str_hash;
+
 enum data_type
   {
     REAL,
@@ -36,7 +38,8 @@ extern char* strncpy(char *s1, const char *s2, size_t l);
 extern char* strcat(char *s1, const char *s2);
 extern char* strncat(char *s1, const char *s2, size_t l);
 
-extern unsigned long long generate_hash_key(const char *s, unsigned long start = 0, unsigned long end = 0);
+extern str_hash generate_hash_key(const char *s, unsigned long start = 0, unsigned long end = 0);
+extern void make_operator_hashes();
 
 extern bool ismathchar(const char ch);
 extern bool isbinary(const char *s);

@@ -4,6 +4,21 @@
 #include <str.hpp>
 #include <calc_stacks/constant_stack.hpp>
 
+static const char bin_ops[17][4] =
+  {
+    "+", "-", "*", "/", "^", "|", "&", "P", "C",
+    "<", ">", ">=", "<=", "==", "!=", "%", "log"
+  };
+
+static const char un_ops[17][7] =
+  {
+    "!", "ln", "abs", "cos", "sin", "tan", "acos", "asin", "atan",
+    "sec", "cosec", "cot", "asec", "acosec", "acot", "logten", "floor"
+  };
+
+static str_hash bin_ops_hash[17] = { 0 };
+static str_hash un_ops_hash[17] = { 0 };
+
 size_t strlen(const char *s)
 {
   register int l = 0;
@@ -79,12 +94,12 @@ char* strncat(char *s1, const char *s2, size_t l)
   return s1;
 }
 
-unsigned long long generate_hash_key(const char *s,
-				     unsigned long start,
-				     unsigned long end)
+str_hash generate_hash_key(const char *s,
+			   unsigned long start,
+			   unsigned long end)
 {
   const char *x = s + start;
-  unsigned long long hash = *x % 7;
+  str_hash hash = *x % 7;
   if (start == end)
     while (*x)
       hash = 2 * hash + *(x++);
@@ -94,6 +109,16 @@ unsigned long long generate_hash_key(const char *s,
   else
     return 0;
   return hash;
+}
+
+void make_operator_hashes()
+{
+  int i = 0;
+  for (; i < 17; ++i)
+    {
+      bin_ops_hash[i] = generate_hash_key(bin_ops[i]);
+      un_ops_hash[i] = generate_hash_key(un_ops[i]);
+    }
 }
 
 bool ismathchar(const char ch)
