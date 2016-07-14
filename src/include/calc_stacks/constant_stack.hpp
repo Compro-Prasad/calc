@@ -6,12 +6,6 @@
 
 #include <calc_colors.hpp>
 
-/*
-  structure made for storing real constants This is made so that the contents
-  are stored in a file for storing many constants This would reduce the
-  program and memory size to make the program run faster
-*/
-
 struct constant
 {
   char name[21];
