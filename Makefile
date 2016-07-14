@@ -5,8 +5,8 @@ CFLAGS = -O3 -Ofast -Wall -W
 #-ansi -pedantic
 
 CXXFLAGS = $(CFLAGS)
-ALL_CFLAGS = $(CFLAGS) -c -o
-ALL_CXXFLAGS = $(CXXFLAGS) -c -o
+ALL_CFLAGS = $(CFLAGS) -std=gnu++11 -c -o
+ALL_CXXFLAGS = $(CXXFLAGS) -std=gnu++11 -c -o
 
 TARGET = calc
 
