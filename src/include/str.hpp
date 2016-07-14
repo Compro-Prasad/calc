@@ -17,7 +17,7 @@
 
 typedef unsigned long long str_hash;
 
-enum data_type
+enum class data_type
   {
     REAL,
     INT,
@@ -38,6 +38,7 @@ extern char* strncpy(char *s1, const char *s2, size_t l);
 extern char* strcat(char *s1, const char *s2);
 extern char* strncat(char *s1, const char *s2, size_t l);
 
+extern unsigned long generate_hash_keys(const char *s, unsigned long start, unsigned long end, str_hash *keys);
 extern str_hash generate_hash_key(const char *s, unsigned long start = 0, unsigned long end = 0);
 extern void make_operator_hashes();
 
@@ -47,7 +48,7 @@ extern bool isunary(const char *s);
 extern bool ismath(const char *s);
 extern bool isidentifier(const char *s);
 
-extern signed char atof(const char *a, unsigned long &i, long double &x, data_type d = REAL);
+extern signed char atof(const char *a, unsigned long &i, long double &x, data_type d = data_type::REAL);
 
 #ifdef ANS_CMD
 extern signed char separate_ans(const char *a, unsigned long &i, unsigned long &x);

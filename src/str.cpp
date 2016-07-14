@@ -94,12 +94,32 @@ char* strncat(char *s1, const char *s2, size_t l)
   return s1;
 }
 
+unsigned long generate_hash_keys(const char *s,
+				 unsigned long start,
+				 unsigned long end,
+				 str_hash *keys)
+{
+  if (start < end)
+    {
+      s += start;
+      register const char *x = s;
+      register str_hash hash = *x % 7;
+      while (*x && start < end)
+	{
+	  hash = 2 * hash + *(x++);
+	  keys[end - start++] = hash;
+	}
+      return x - s;
+    }
+  return 0;
+}
+
 str_hash generate_hash_key(const char *s,
 			   unsigned long start,
 			   unsigned long end)
 {
-  const char *x = s + start;
-  str_hash hash = *x % 7;
+  register const char *x = s + start;
+  register str_hash hash = *x % 7;
   if (start == end)
     while (*x)
       hash = 2 * hash + *(x++);
@@ -231,7 +251,7 @@ signed char atof(const char *a, unsigned long &i, long double &x, data_type d)
   register const char *c = a + i;
   if (*c == '-')
     {
-      if (d == REAL || d == INT)
+      if (d == data_type::REAL || d == data_type::INT)
 	s = 1;
       else
 	return ERROR;
@@ -241,7 +261,7 @@ signed char atof(const char *a, unsigned long &i, long double &x, data_type d)
     x = x * 10 + *(c++) - 48;
   if (*c == '.' && isdigit(c[1]))
     {
-      if (d != REAL && d != UNSIGNED_REAL)
+      if (d != data_type::REAL && d != data_type::UNSIGNED_REAL)
 	return ERROR;
       register signed long j = 0;
       while (*(++c) > 47 && *c < 58) // isdigit
@@ -264,7 +284,7 @@ signed char separate_ans(const char *a, unsigned long &i, unsigned long &ans_no)
     return ERROR;
   i++;
   long double p = 0.0;
-  if (atof(a, i, p, UNSIGNED_INT) != SUCCESS)
+  if (atof(a, i, p, data_type::UNSIGNED_INT) != SUCCESS)
     return ERROR;
   ans_no = p;
   return SUCCESS;
@@ -300,7 +320,7 @@ unsigned char extract_math(const char *a, unsigned long &i, long double &x, char
   unsigned long k = 0;
   b[0] = 0;
   if (a[i] == '.' || isdigit(a[i]))
-    return atof(a, i, x = 0, UNSIGNED_REAL) == SUCCESS ? GOT_NUMBER : FAILURE;
+    return atof(a, i, x = 0, data_type::UNSIGNED_REAL) == SUCCESS ? GOT_NUMBER : FAILURE;
 #ifdef ANS_CMD
   else if (tolower(a[i + 0]) == 'a' && isdigit(a[i + 1]))
     return GOT_ANSWER;
