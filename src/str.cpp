@@ -79,6 +79,14 @@ char* strncat(char *s1, const char *s2, size_t l)
   return s1;
 }
 
+unsigned long long generate_hash_key(const char *s)
+{
+  unsigned long long hash = *s % 7;
+  while (*s)
+	hash = 2 * hash + *(s++);
+  return hash;
+}
+
 bool ismathchar(const char ch)
 {
   if (isalpha(ch) ||
