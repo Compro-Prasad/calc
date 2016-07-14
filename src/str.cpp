@@ -79,11 +79,20 @@ char* strncat(char *s1, const char *s2, size_t l)
   return s1;
 }
 
-unsigned long long generate_hash_key(const char *s)
+unsigned long long generate_hash_key(const char *s,
+				     unsigned long start,
+				     unsigned long end)
 {
-  unsigned long long hash = *s % 7;
-  while (*s)
-	hash = 2 * hash + *(s++);
+  const char *x = s + start;
+  unsigned long long hash = *x % 7;
+  if (start == end)
+    while (*x)
+      hash = 2 * hash + *(x++);
+  else if (start < end)
+    while (start < end)
+      hash = 2 * hash + *(x++), ++start;
+  else
+    return 0;
   return hash;
 }
 
@@ -266,7 +275,7 @@ unsigned char extract_math(const char *a, unsigned long &i, long double &x, char
   unsigned long k = 0;
   b[0] = 0;
   if (a[i] == '.' || isdigit(a[i]))
-	return atof(a, i, x = 0, UNSIGNED_REAL) == SUCCESS ? GOT_NUMBER : FAILURE;
+    return atof(a, i, x = 0, UNSIGNED_REAL) == SUCCESS ? GOT_NUMBER : FAILURE;
 #ifdef ANS_CMD
   else if (tolower(a[i + 0]) == 'a' && isdigit(a[i + 1]))
     return GOT_ANSWER;

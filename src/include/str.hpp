@@ -36,7 +36,7 @@ extern char* strncpy(char *s1, const char *s2, size_t l);
 extern char* strcat(char *s1, const char *s2);
 extern char* strncat(char *s1, const char *s2, size_t l);
 
-extern unsigned long long generate_hash_key(const char *s);
+extern unsigned long long generate_hash_key(const char *s, unsigned long start = 0, unsigned long end = 0);
 
 extern bool ismathchar(const char ch);
 extern bool isbinary(const char *s);
