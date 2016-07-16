@@ -38,13 +38,8 @@ extern char* strncpy(char *s1, const char *s2, size_t l);
 extern char* strcat(char *s1, const char *s2);
 extern char* strncat(char *s1, const char *s2, size_t l);
 
-extern unsigned long generate_hash_keys(const char *s, unsigned long start, unsigned long end, str_hash *keys);
 extern str_hash generate_hash_key(const char *s, unsigned long start = 0, unsigned long end = 0);
-extern void make_operator_hashes();
 
-extern bool ismathchar(const char ch);
-extern bool isbinary(const char *s);
-extern bool isunary(const char *s);
 extern bool ismath(const char *s);
 extern bool isidentifier(const char *s);
 
@@ -66,22 +61,5 @@ extern void extract(const char *a,              /* Source string */
 						 * numerical position */
 		    char ch = '\0',             /* Stopping character of extraction */
 		    unsigned long len = strMAX);/* Length of the source string */
-
-/* Extract a number/answer/operator/constant from
- * a given string and return a specific integer
- * to inform about the type of thing extracted
- */
-extern unsigned char extract_math(const char *a,   /* The source string */
-			   unsigned long &i,/* Starting point of extraction */
-			   long double &x,  /* Number stored here if got */
-			   char *b);        /* Things other than numbers are
-					     * stored in this string */
-
-/* Check priority of two operators contained in string s1 and s2
- * The function returns HIGH for higher priority of s1 than s2
- * and LOW for s1's priority is less than s2. Full documentation
- * is given inthe function's defination in str.cpp
- */
-extern long check_priority(const char *s1, const char *s2);
 
 #endif // CALC_STR_H
