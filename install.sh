@@ -53,7 +53,7 @@ function replace_
     fi
 }
 
-echo -n 'Do you want a custom install[recommended](y/n)? '
+echo -n 'Do you want a custom install[not recommended](y/n)? '
 read input
 if [ "$input" = "y" -o -z "$input" ]; then
     echo "Input method:"
