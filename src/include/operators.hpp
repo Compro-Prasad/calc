@@ -29,45 +29,50 @@
 #define H_cos             1610983
 #define H_tan             1883393
 #define H_sec             1867761
-#define H_cosec           25983557733
+#define H_cosec           983557758//25983557733
 #define H_cot             1610984
 #define H_asin            200561431
 #define H_acos            200304134
 #define H_atan            200576544
 #define H_asec            200560912
-#define H_acosec          3230705390212
+#define H_acosec          705393442//3230705390212
 #define H_acot            200304135
 #define H_sinh            237271664
 #define H_cosh            204594945
 #define H_tanh            239191015
 #define H_log             1756132
 #define H_ln              13826
-#define H_logten          3597232818457
+#define H_logten          232822054//3597232818457
+#define H_abs             1577074
+#define H_floor           757783302
+#define H_ceil            204432389
 
 #include <str.hpp>
 
-extern unsigned long generate_hash_keys(const char *s, unsigned long start, unsigned long end, str_hash *keys);
+extern unsigned long generate_hash_keys(const char *s, unsigned long start, unsigned long end, optr_hash *keys);
 extern void make_operator_hashes();
 
 extern bool ismathchar(const char ch);
-extern bool isbinary(const char *s);
-extern bool isunary(const char *s);
+extern bool isbinary(const optr_hash s);
+extern bool isunary(const optr_hash s);
 
 /* Extract a number/answer/operator/constant from
  * a given string and return a specific integer
  * to inform about the type of thing extracted
  */
 extern unsigned char extract_math(const char *a,   /* The source string */
-			   unsigned long &i,/* Starting point of extraction */
-			   long double &x,  /* Number stored here if got */
-			   char *b);        /* Things other than numbers are
-					     * stored in this string */
+				  unsigned long &i,/* Starting point of extraction */
+				  long double &x,  /* Number stored here if got */
+				  optr_hash &b);   /* Things other than numbers are
+						    * stored in this string */
 
 /* Check priority of two operators contained in string s1 and s2
  * The function returns HIGH for higher priority of s1 than s2
  * and LOW for s1's priority is less than s2. Full documentation
  * is given inthe function's defination in str.cpp
  */
-extern long check_priority(const char *s1, const char *s2);
+extern long check_priority(const optr_hash s1, const optr_hash s2);
+
+const char *optr_from_hash(const optr_hash h);
 
 #endif

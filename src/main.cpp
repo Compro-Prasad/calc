@@ -9,6 +9,7 @@
 using namespace std;
 #endif
 
+#include <operators.hpp>
 #include <calc_colors.hpp>
 #include <calc_history.hpp>
 #include <input_bindings.hpp>
@@ -33,6 +34,8 @@ const char *prog_name = NULL;
 
 int main(int argc, char *argv[])
 {
+
+  make_operator_hashes();
 
   prog_name = *argv;
 

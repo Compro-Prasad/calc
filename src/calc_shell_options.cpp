@@ -71,8 +71,8 @@ void parse_options(int argc, char *argv[])
 
 	      /* ret_value is the number of more arguments read by this */
 	      /* argument. So a 'max_ret_value' is required to skip     */
-	      /* 'max_ret_value' number of arguments after reading this */
-	      /* argument                                               */
+	      /* 'max_ret_value' number of arguments after reading the  */
+	      /* current argument                                       */
 	      max_ret_value < ret_value ? max_ret_value = ret_value : 0;
 
 	      /* a long argument is an argument in itself, so we don't  */
@@ -392,7 +392,7 @@ signed char option_action(const char *action, char **action_args)
       else if (*action_args && CHECK_OPTION_AMONG('c', "constant"))
 	{
 	  constant con;
-	  if (isidentifier(*action_args) && ismath(con.name) != SUCCESS)
+	  if (isidentifier(*action_args) && ismath(generate_hash_key(con.name)) != SUCCESS)
 	    {
 	      strncpy(con.name, *(action_args++), 21);
 	      con.name[20] = 0;

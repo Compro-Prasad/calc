@@ -3,6 +3,7 @@
 #include <readline/history.h>
 
 #include <cal.hpp>
+#include <operators.hpp>
 #include <calc_history.hpp>
 #include <calc_strings.hpp>
 #include <input_bindings.hpp>
@@ -97,21 +98,21 @@ void sum(long double lower_limit,
 }
 
 
-static signed char calculateit(const char *a,
-			long double &ans,
-			const long double &x,
-			const long double y = 0)
+static signed char calculateit(const optr_hash a,
+			       long double &ans,
+			       const long double &x,
+			       const long double y = 0)
 {
   long double z = angle_type == DEG ? (x * PI / 180) : (angle_type == RAD ? x : (x * PI / 200));
 
   /* Basic arithmatic operators */
-  if (*a == '+')
+  if (a == H_plus)
     ans = x + y;
-  else if (*a == '-')
+  else if (a == H_minus)
     ans = x - y;
-  else if (*a == '*')
+  else if (a == H_multiply)
     ans = x * y;
-  else if (*a == '/')
+  else if (a == H_divide)
     {
       if (y)
 	ans = x / y;
@@ -121,11 +122,11 @@ static signed char calculateit(const char *a,
 	  return ERROR;
         }
     }
-  else if (*a == '^')
+  else if (a == H_pow)
     ans = powl(x, y);
 
   /* Factorials */
-  else if (*a == 'P')
+  else if (a == H_P)
     {
       if (x >= 0 && y >= 0 && x >= y && !(x - floorl(x)) && !(y - floorl(y)))
 	ans = factorial(x) / factorial(x - y);
@@ -135,7 +136,7 @@ static signed char calculateit(const char *a,
 	  return ERROR;
         }
     }
-  else if (*a == 'C')
+  else if (a == H_C)
     {
       if (x >= 0 && y >= 0 && x >= y && !(x - floorl(x)) && !(y - floorl(y)))
 	ans = factorial(x) / (factorial(y) * factorial(x - y));
@@ -146,35 +147,30 @@ static signed char calculateit(const char *a,
         }
     }
 
-  /* Computer related operations */
-  else if (*a == '~')
+  /* Computer related basic operators */
+  else if (a == H_bit_not)
     ans = ~(unsigned long)x;
-  else if (*a == '|' && !*a)
+  else if (a == H_bit_or)
     ans = (unsigned long)x | (unsigned long)y;
-  else if (*a == '&' && !*a)
+  else if (a == H_bit_and)
     ans = (unsigned long)x & (unsigned long)y;
-  else if (*a == '%')
+  else if (a == H_mod)
     ans = fmodl(x, y);
-  else if (*(a + 1) == *a && *a == '>')
+  else if (a == H_bit_shift_right)
     ans = (unsigned long)x >> (unsigned long)y;
-  else if (*(a + 1) == *a && *a == '<')
+  else if (a == H_bit_shift_left)
     ans = (unsigned long)x << (unsigned long)y;
 
   /* Relational operators */
-  else if (*a == '>')  ans = x > y;
-  else if (*a == '<')  ans = x < y;
-  else if (*(a + 1) == '=')
-    switch (*a)
-      {
-      case '>': ans = x >= y; break; // >=
-      case '<': ans = x <= y; break; // <=
-      case '!': ans = x != y; break; // !=
-      case '=': ans = x == y; break; // ==
-      default : goto Operator_Invalid;
-      }
+  else if (a == H_great)  ans = x > y;
+  else if (a == H_less)  ans = x < y;
+  else if (a == H_great_equal) ans = x >= y;
+  else if (a == H_less_equal)  ans = x <= y;
+  else if (a == H_not_equal)   ans = x != y;
+  else if (a == H_equal)       ans = x == y;
 
   /* Other mathematical functions */
-  else if (!strcmp(a, "log"))
+  else if (a == H_log)
     {
       if (y > 0 && x >= 0)
 	ans = logl(y) / logl(x);
@@ -184,13 +180,13 @@ static signed char calculateit(const char *a,
 	  return ERROR;
         }
     }
-  else if (!strcmp(a, "abs"))
+  else if (a == H_abs)
     ans = fabsl(x);
-  else if (!strcmp(a, "ceil"))
+  else if (a == H_ceil)
     ans = ceill(x);
-  else if (!strcmp(a, "floor"))
+  else if (a == H_floor)
     ans = floorl(x);
-  else if (!strcmp(a, "ln"))
+  else if (a == H_ln)
     {
       if (x > 0)
 	ans = logl(x);
@@ -200,7 +196,7 @@ static signed char calculateit(const char *a,
 	  return ERROR;
         }
     }
-  else if (!strcmp(a, "logten"))
+  else if (a == H_logten)
     {
       if (x > 0)
 	ans = log10l(x);
@@ -210,17 +206,17 @@ static signed char calculateit(const char *a,
 	  return ERROR;
         }
     }
-  else if (!strcmp(a, "sinh"))
+  else if (a == H_sinh)
     ans = sinhl(z);
-  else if (!strcmp(a, "cosh"))
+  else if (a == H_cosh)
     ans = coshl(z);
-  else if (!strcmp(a, "tanh"))
+  else if (a == H_tanh)
     ans = tanhl(z);
-  else if (!strcmp(a, "sin"))
+  else if (a == H_sin)
     ans = sinl(z);
-  else if (!strcmp(a, "cos"))
+  else if (a == H_cos)
     ans = cosl(z);
-  else if (!strcmp(a, "tan"))
+  else if (a == H_tan)
     {
       if (cosl(z))
 	ans = tanl(z);
@@ -230,7 +226,7 @@ static signed char calculateit(const char *a,
 	  return ERROR;
         }
     }
-  else if (!strcmp(a, "cosec"))
+  else if (a == H_cosec)
     {
       if (sinl(z))
 	ans = 1 / sinl(z);
@@ -240,7 +236,7 @@ static signed char calculateit(const char *a,
 	  return ERROR;
         }
     }
-  else if (!strcmp(a, "sec"))
+  else if (a == H_sec)
     {
       if (cosl(z))
 	ans = 1 / cosl(z);
@@ -250,7 +246,7 @@ static signed char calculateit(const char *a,
 	  return ERROR;
         }
     }
-  else if (!strcmp(a, "cot"))
+  else if (a == H_cot)
     {
       if (sinl(z))
 	ans = 1 / tanl(z);
@@ -260,7 +256,7 @@ static signed char calculateit(const char *a,
 	  return ERROR;
         }
     }
-  else if (!strcmp(a, "asin"))
+  else if (a == H_asin)
     {
       if (x <= 1 && x >= -1)
 	ans = angle_type == DEG ? (asinl(x) * 180 / PI) :
@@ -271,9 +267,9 @@ static signed char calculateit(const char *a,
 	  return ERROR;
         }
     }
-  else if (!strcmp(a, "acos"))
+  else if (a == H_acos)
     {
-      if (x <= 1 && x >= -1)
+      if (x <= 1.0 && x >= -1.0)
 	ans = angle_type == DEG ? (acosl(x) * 180 / PI) :
 	  angle_type == GRAD ? (acosl(x) * 200 / PI) : (acosl(x));
       else
@@ -282,12 +278,12 @@ static signed char calculateit(const char *a,
 	  return ERROR;
         }
     }
-  else if (!strcmp(a, "atan"))
+  else if (a == H_atan)
     ans = angle_type == DEG ? (atanl(x) * 180 / PI) :
       angle_type == GRAD ? (atanl(x) * 200 / PI) : (atanl(x));
-  else if (!strcmp(a, "acosec"))
+  else if (a == H_acosec)
     {
-      if (x <= -1 && x >= 1)
+      if (x <= -1.0 || x >= 1.0)
 	ans = angle_type == DEG ? (asinl(1 / x) * 180 / PI) :
 	  angle_type == GRAD ? (asinl(1 / x) * 200 / PI) : (asinl(1 / x));
       else
@@ -296,9 +292,9 @@ static signed char calculateit(const char *a,
 	  return ERROR;
         }
     }
-  else if (!strcmp(a, "asec"))
+  else if (a == H_asec)
     {
-      if (x <= -1 && x >= 1)
+      if (x <= -1 || x >= 1)
 	ans = angle_type == DEG ? (acosl(1 / x) * 180 / PI) :
 	  angle_type == GRAD ? (acosl(1 / x) * 200 / PI) : (acosl(1 / x));
       else
@@ -307,21 +303,17 @@ static signed char calculateit(const char *a,
 	  return ERROR;
         }
     }
-  else if (!strcmp(a, "acot"))
+  else if (a == H_acot)
     ans = angle_type == DEG ? (atanl(1 / x) * 180 / PI) :
       angle_type == GRAD ? (atanl(1 / x) * 200 / PI) : (atanl(1 / x));
 
   /* Logical operators */
   else if ((x == 1 || !x) && (y == 1 || !y))
     {
-      if (*a == '!')        ans = !x;
-      if (*a == *(a + 1))
-	switch (*a)
-	  {
-	  case '|': ans = x || y; break; // ||
-	  case '&': ans = x && y; break; // &&
-	  default : goto Operator_Invalid;
-	  }
+      if (a == H_not)       ans = !x;
+      else if (a == H_or)   ans = x || y;
+      else if (a == H_and)  ans = x && y;
+      else                  goto Operator_Invalid;
     }
 
   else
@@ -332,25 +324,25 @@ static signed char calculateit(const char *a,
   return SUCCESS;
 }
 
-static signed char insert(const char *s /* operator to be pushed in operator stack */,
-		   operators_stack &optr,
-		   numbers_stack &num)
+static signed char insert(const optr_hash s /* operator to be pushed in operator stack */,
+			  operators_stack &optr,
+			  numbers_stack &num)
 {
   if (s)
     {
       long double x, y, z;
-      char *top_optr = optr.get();
+      optr_hash top_optr = optr.get();
 
       if (check_priority(top_optr, s) == HIGH)
         {
 #ifdef OPTR_DETAILS
 	  if (operator_detail == YES)
-	    fprintf(PRINTFAST, "\nPriority of %6s\tis higher than\t%6s", top_optr, s);
+	    fprintf(PRINTFAST, "\nPriority of %6s\tis higher than\t%6s", optr_from_hash(top_optr), optr_from_hash(s));
 #endif
 	  /* Pop out other operators untill the priority returns low or if the
 	     operator to be pushed is a ')' and also top_optr is '(' */
 	  while (check_priority(top_optr, s) == HIGH
-		 && (*s != ')' || *top_optr != '('))
+		 && (s != H_close_bracket || top_optr != H_open_bracket))
             {
 	      /* if the top_optr is binary */
 	      if (isbinary(top_optr))
@@ -365,7 +357,7 @@ static signed char insert(const char *s /* operator to be pushed in operator sta
 #ifdef STEPS_CMD
 		  else if (steps == YES)
 		    fprintf(PRINTFAST, "\n-> %.3LG %s %.3LG = %.3LG",
-			    x, top_optr, y, z);
+			    x, optr_from_hash(top_optr), y, z);
 #endif
                 }
 
@@ -381,7 +373,7 @@ static signed char insert(const char *s /* operator to be pushed in operator sta
 		    return ERROR;
 #ifdef STEPS_CMD
 		  else if (steps == YES)
-		    fprintf(PRINTFAST, "\n-> %s(%.3LG) = %.3LG", top_optr, x, z);
+		    fprintf(PRINTFAST, "\n-> %s(%.3LG) = %.3LG", optr_from_hash(top_optr), x, z);
 #endif
                 }
 
@@ -398,7 +390,7 @@ static signed char insert(const char *s /* operator to be pushed in operator sta
             }
 
 	  /* if the operator was a ')' then pop out a single operator */
-	  if (*s == ')')
+	  if (s == H_close_bracket)
 	    optr.pop();
 
 	  /* else push the operator in the operator stack */
@@ -411,7 +403,7 @@ static signed char insert(const char *s /* operator to be pushed in operator sta
         {
 #ifdef OPTR_DETAILS
 	  if (operator_detail == YES)
-	    fprintf(PRINTFAST, "\nPriority of %6s\tis lower than\t%6s", top_optr, s);
+	    fprintf(PRINTFAST, "\nPriority of %6s\tis lower than\t%6s", optr_from_hash(top_optr), optr_from_hash(s));
 #endif
 	  if (optr.push(s) == ERROR)
 	    return 5;
@@ -440,7 +432,7 @@ signed char calculate(const char *a,
   operators_stack optr;
   numbers_stack num;
   long double x, y;
-  char c[10];
+  optr_hash c;
   unsigned long first = i;
   bool flag = ch != ' ';
   for (; a[i] != ch;)
@@ -456,7 +448,7 @@ signed char calculate(const char *a,
 	  while (a[i] == '+' || a[i] == '-')
 	    if (a[i++] == '-')
 	      t = t * (-1);
-	  if (insert(t < 0 ? "-" : "+", optr, num) == ERROR)
+	  if (insert(t < 0 ? H_minus : H_plus, optr, num) == ERROR)
 	    goto ERROR_LABEL;
 	  flag ? SKIP_SPACE(a, i) : 0;
 	  continue;
@@ -541,7 +533,7 @@ signed char calculate(const char *a,
 	    {
 	      /* We just have to insert the '*' operator when the above
 		 condition is satisfied*/
-	      if (insert("*", optr, num) == ERROR)
+	      if (insert(H_multiply, optr, num) == ERROR)
 		goto ERROR_LABEL;
 	    }
 	  /* *************************************************************** */
@@ -586,7 +578,7 @@ signed char calculate(const char *a,
         }
       else if (check_extract == GOT_BRACKET)
         {
-	  if (!strcmp(c, "("))
+	  if (c == H_open_bracket)
             {
 	      if (optr.push(c) == ERROR)
 		return 5;
@@ -614,13 +606,13 @@ signed char calculate(const char *a,
 		       (a[i] != 'P' && tolower(a[i]) != 'l'
 			&& a[i] != 'C'))) || a[i] == '('
 		  || isdigit(a[i]))
-		if (insert("*", optr, num) == ERROR)
+		if (insert(H_multiply, optr, num) == ERROR)
 		  goto ERROR_LABEL;
             }
         }
     }
   while (optr.get())
-    if (insert(")", optr, num) == ERROR)
+    if (insert(H_close_bracket, optr, num) == ERROR)
       goto ERROR_LABEL;
   if (num.get(n) != SUCCESS)
     return FAILURE;

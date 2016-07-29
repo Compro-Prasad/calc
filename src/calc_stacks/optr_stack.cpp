@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include <str.hpp>
+#include <operators.hpp>
 #include <calc_stacks/optr_stack.hpp>
 
 #ifdef OPTR_DETAILS
@@ -15,7 +15,7 @@ operators_stack::operators_stack()
 #elif defined(ACCELERATE_UP)
   accelerate = 1;
 #endif
-  start = new char[size][7];
+  start = new optr_hash[size];
   current = 0;
 }
 
@@ -27,27 +27,27 @@ operators_stack::operators_stack(const operators_stack &t)
 #elif defined(ACCELERATE_UP)
   this->accelerate = t.accelerate;
 #endif
-  this->start = new char[this->size][7];
+  this->start = new optr_hash[this->size];
   this->current = t.current ? this->start + (t.current - t.start) : 0;
-  for (char (*temp1)[7] = this->start, (*temp2)[7] = t.start;
-       temp2 < t.current; ++temp1, ++temp2)
-    strcpy(*temp1, *temp2);
+  for (optr_hash *temp1 = this->start, *temp2 = t.start;
+       temp2 < t.current;
+       *(temp1++) = *(temp2++));
 }
 
 void operators_stack::operator=(const operators_stack &t)
 {
   if (this->start)
     delete [] this->start;
-  this->start = new char[this->size = t.size][7];
+  this->start = new optr_hash[this->size = t.size];
 #if defined(SPEED_UP)
   this->rate = t.rate;
 #elif defined(ACCELERATE_UP)
   this->accelerate = t.accelerate;
 #endif
   this->current = t.current ? this->start + (t.current - t.start) : 0;
-  for (char (*temp1)[7] = this->start, (*temp2)[7] = t.start;
-       temp2 < t.current; ++temp1, ++temp2)
-    strcpy(*temp1, *temp2);
+  for (optr_hash *temp1 = this->start, *temp2 = t.start;
+       temp2 < t.current;
+       *(temp1++) = *(temp2++));
 }
 
 operators_stack::~operators_stack()
@@ -56,26 +56,26 @@ operators_stack::~operators_stack()
   delete [] this->start;
 }
 
-char* operators_stack::get()
+optr_hash operators_stack::get()
 {
   if (current)
     return *(current - 1);
   return 0;
 }
 
-signed char operators_stack::push(const char *x)
+signed char operators_stack::push(const optr_hash x)
 {
   if (current)
     {
       if ((long unsigned)(current - start) == size && this->increase_size() == ERROR)
 	return ERROR;
-      strcpy(*(current++), x);
+      *(current++) = x;
     }
   else
-    strcpy(*((current = start + 1) - 1), x);
+    *((current = start + 1) - 1) = x;
 #ifdef OPTR_DETAILS
   if (operator_detail)
-    fprintf(PRINTFAST, "\nPushing     %6s\tto   location\t%lx", x, (unsigned long)(current - 1));
+    fprintf(PRINTFAST, "\nPushing     %6s\tto   location\t%lx", optr_from_hash(x), (unsigned long)(current - 1));
 #endif
   return SUCCESS;
 }
@@ -87,7 +87,7 @@ signed char operators_stack::pop()
       --current;
 #ifdef OPTR_DETAILS
       if (operator_detail)
-	fprintf(PRINTFAST, "\nPoping      %6s\tfrom location\t%lx", *current, (unsigned long)current);
+	fprintf(PRINTFAST, "\nPoping      %6s\tfrom location\t%lx", optr_from_hash(*current), (unsigned long)current);
 #endif
       if (start == current)
 	current = 0;
@@ -103,8 +103,8 @@ void operators_stack::reset()
 
 bool operators_stack::check_brac()
 {
-  for (char (*t)[7] = start; current - t; ++t)
-    if (**t == '(')
+  for (optr_hash *t = start; current - t; ++t)
+    if (*t == H_open_bracket)
       return 1;
   return 0;
 }
@@ -119,9 +119,9 @@ signed char operators_stack::decrease_size()
       return FAILURE;
 
 #if defined(SPEED_UP)
-  char (*temp)[7] = new char[size - rate][7];
+  optr_hash *temp = new optr_hash[size - rate];
 #elif defined(ACCELERATE_UP)
-  char (*temp)[7] = new char[size / accelerate][7];
+  optr_hash *temp = new optr_hash[size / accelerate];
 #endif
   if (temp)
     {
@@ -132,9 +132,9 @@ signed char operators_stack::decrease_size()
 #endif
       if (current)
 	{
-	  char (*x)[7] = start, (*y)[7] = temp;
+	  optr_hash *x = start, *y = temp;
 	  while ((unsigned long)(y - temp) < size)
-	    strcpy(*(y++), *(x++));
+	    *(y++) = *(x++);
 	  current = y - 1;
 	}
       delete [] this->start;
@@ -147,9 +147,9 @@ signed char operators_stack::decrease_size()
 signed char operators_stack::increase_size()
 {
 #if defined(SPEED_UP)
-  char (*temp)[7] = new char[rate + size][7];
+  optr_hash *temp = new optr_hash[rate + size];
 #elif defined(ACCELERATE_UP)
-  char (*temp)[7] = new char[(accelerate + 1) * size][7];
+  optr_hash *temp = new optr_hash[(accelerate + 1) * size];
 #endif
   if (temp)
     {
@@ -160,9 +160,9 @@ signed char operators_stack::increase_size()
 #endif
       if (current)
 	{
-	  char (*x)[7] = start, (*y)[7] = temp;
+	  optr_hash *x = start, *y = temp;
 	  while (current - x)
-	    strcpy(*(y++), *(x++));
+	    *(y++) = *(x++);
 	  current = y - 1;
 	}
       delete [] this->start;

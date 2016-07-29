@@ -1,7 +1,7 @@
 #include <math.h>
 #include <ctype.h>
 
-#include <str.hpp>
+#include <operators.hpp>
 #include <calc_stacks/constant_stack.hpp>
 
 size_t strlen(const char *s)
@@ -96,15 +96,11 @@ str_hash generate_hash_key(const char *s,
   return hash;
 }
 
-bool ismath(const char *s)
+bool ismath(const optr_hash s)
 {
-  if (s)
-    {
-      if (isbinary(s) || isunary(s))
-	return SUCCESS;
-      return FAILURE;
-    }
-  return ERROR;
+  if (s && (isbinary(s) || isunary(s)))
+    return SUCCESS;
+  return FAILURE;
 }
 
 bool isidentifier(const char *s)

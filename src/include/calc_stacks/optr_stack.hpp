@@ -3,10 +3,12 @@
 #ifndef CALC_OPTR_STACK_H
 #define CALC_OPTR_STACK_H
 
+#include <str.hpp>
+
 class operators_stack
 {
-  char (*start)[7];
-  char (*current)[7];
+  optr_hash *start;
+  optr_hash *current;
   long unsigned size;
 #if defined(SPEED_UP)
   long unsigned rate;
@@ -18,8 +20,8 @@ public:
   operators_stack(const operators_stack &);
   ~operators_stack();
   void operator=(const operators_stack &);
-  char *get();
-  signed char push(const char *x);
+  optr_hash get();
+  signed char push(const optr_hash x);
   signed char pop();
   signed char decrease_size();
   signed char increase_size();

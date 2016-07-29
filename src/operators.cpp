@@ -1,30 +1,39 @@
 #include <operators.hpp>
-static const char bin_ops[17][4] =
+#include <ctype.h>
+#include <calc_stacks/constant_stack.hpp>
+
+static const char bin_ops[22][4] =
   {
-    "+", "-", "*", "/", "^", "|", "&", "P", "C",
-    "<", ">", ">=", "<=", "==", "!=", "%", "log"
+    "+", "-", "*", "/", "^", "|", "&", "P", "C", ">>", "<<",
+    "<", ">", ">=", "<=", "==", "!=", "%", "log", "&&", "||", ""
   };
 
-static const char un_ops[17][7] =
+static const char un_ops[22][7] =
   {
-    "!", "ln", "abs", "cos", "sin", "tan", "acos", "asin", "atan",
-    "sec", "cosec", "cot", "asec", "acosec", "acot", "logten", "floor"
+    "~", "!", "ln", "abs", "cos", "sin", "tan", "acos", "asin", "atan",
+    "sec", "cosec", "cot", "asec", "acosec", "acot", "logten", "floor",
+    "sinh", "cosh", "tanh", "ceil"
   };
 
-static str_hash bin_ops_hash[17] = { 0 };
-static str_hash un_ops_hash[17] = { 0 };
+static optr_hash bin_ops_hash[22] = { 0 };
+static optr_hash un_ops_hash[22] = { 0 };
+
+static const unsigned long unify = 999999999;
 
 unsigned long generate_hash_keys(const char *s,
 				 unsigned long start,
 				 unsigned long end,
-				 str_hash *keys)
+				 optr_hash *keys)
 {
   if (start < end)
     {
       register const char *x = s = s + start;
-      register str_hash hash = 0;
+      register optr_hash hash = 0;
       while (ismathchar(*x) && start < end)
-	keys[x - s] = hash = 127 * hash + *(x++), ++start;
+	{
+	  hash = 127 * hash + *x, ++start;
+	  keys[x++ - s] = hash % unify;
+	}
       return x - s;
     }
   return 0;
@@ -33,10 +42,10 @@ unsigned long generate_hash_keys(const char *s,
 void make_operator_hashes()
 {
   int i = 0;
-  for (; i < 17; ++i)
+  for (; i < 22; ++i)
     {
-      bin_ops_hash[i] = generate_hash_key(bin_ops[i]);
-      un_ops_hash[i] = generate_hash_key(un_ops[i]);
+      bin_ops_hash[i] = generate_hash_key(bin_ops[i]) % unify;
+      un_ops_hash[i] = generate_hash_key(un_ops[i]) % unify;
     }
 }
 
@@ -61,73 +70,25 @@ bool ismathchar(const char ch)
   return FAILURE;
 }
 
-bool isbinary(const char *s)
+bool isbinary(const optr_hash s)
 {
   if (s)
-    {
-      if (!*(s + 1))
-	switch (*s)
-	  {
-	  case '>':
-	  case '<':
-	  case '/':
-	  case '*':
-	  case '-':
-	  case '+':
-	  case '^':
-	  case 'C':
-	  case 'P':
-	  case '%':
-	  case '|':
-	  case '&':
-	    return SUCCESS;
-	  }
-      else if (!*(s + 2))
-	{
-	  if ((*s == '>' && (*(s + 1) == '=' || *(s + 1) == '>')) ||
-	      (*s == '<' && (*(s + 1) == '=' || *(s + 1) == '<')) ||
-	      ((*s == '=' || *s == '!') && *(s + 1) == '=') ||
-	      (*s == '|' && *(s + 1) == '|') ||
-	      (*s == '&' && *(s + 1) == '&'))
-	    return SUCCESS;
-	}
-      else if (!strcmp(s, "log"))
+    for (register unsigned char i = 0; i < 21; ++i)
+      if (s == bin_ops_hash[i])
 	return SUCCESS;
-    }
   return FAILURE;
 }
 
-bool isunary(const char *s)
+bool isunary(const optr_hash s)
 {
   if (s)
-    {
-      if (*s == '~' || *s == '!' ||
-	  !strcmp(s, "ln") ||
-	  !strcmp(s, "abs") ||
-	  !strcmp(s, "ceil") ||
-	  !strcmp(s, "floor") ||
-	  !strcmp(s, "sin") ||
-	  !strcmp(s, "cos") ||
-	  !strcmp(s, "tan") ||
-	  !strcmp(s, "cot") ||
-	  !strcmp(s, "cosec") ||
-	  !strcmp(s, "sec") ||
-	  !strcmp(s, "asin") ||
-	  !strcmp(s, "acos") ||
-	  !strcmp(s, "atan") ||
-	  !strcmp(s, "acot") ||
-	  !strcmp(s, "asec") ||
-	  !strcmp(s, "acosec") ||
-	  !strcmp(s, "sinh") ||
-	  !strcmp(s, "cosh") ||
-	  !strcmp(s, "tanh") ||
-	  !strcmp(s, "logten"))
+    for (register unsigned char i = 0; i < 22; ++i)
+      if (s == un_ops_hash[i])
 	return SUCCESS;
-    }
   return FAILURE;
 }
 
-unsigned char extract_math(const char *a, unsigned long &i, long double &x, char *b)
+unsigned char extract_math(const char *a, unsigned long &i, long double &x, optr_hash &b)
 {
   /*
     This function is mainly called by calculate() in cal.cpp for extracting
@@ -143,8 +104,6 @@ unsigned char extract_math(const char *a, unsigned long &i, long double &x, char
     is found then return is 4, if mathematical function strings is found then
     3, if brackets are encountered then 2.
   */
-  unsigned long k = 0;
-  b[0] = 0;
   if (a[i] == '.' || isdigit(a[i]))
     return atof(a, i, x = 0, data_type::UNSIGNED_REAL) == SUCCESS ? GOT_NUMBER : FAILURE;
 #ifdef ANS_CMD
@@ -153,39 +112,26 @@ unsigned char extract_math(const char *a, unsigned long &i, long double &x, char
 #endif
   else if (a[i] == '(' || a[i] == ')')
     {
-      b[k++] = a[i++], b[k] = 0;
+      b = a[i++] == '(' ? H_open_bracket : H_close_bracket;
       return GOT_BRACKET;
     }
   else if (ismathchar(a[i]))
     {
-#ifdef CONST_CMDS
-      long unsigned j = i;
-#endif
-      while (k < 8 && ismathchar(a[i]) &&
-	     (!ismath(b)
-	      || (*b == '&' && a[i] == '&')
-	      || (*b == '|' && a[i] == '|')
-	      || (*b == 'c' && a[i] == 'o')
-	      || (*b == '!' && a[i] == '=')
-	      || (!strcmp(b, "cos") && (a[i] == 'e' || a[i] == 'h'))
-	      || (!strcmp(b, "sin") && a[i] == 'h')
-	      || (!strcmp(b, "tan") && a[i] == 'h')
-	      || (!strcmp(b, "log") && a[i] == 't')))
-	b[k++] = a[i++], b[k] = 0;
-      if (ismath(b))
-	return GOT_MATH_FUNC;
-#ifdef CONST_CMDS
-      else
-        {
-	  i = j;
-	  return cons.get_const(a, i, x);
-        }
-#endif
+      optr_hash h[7] = { 0 };
+      unsigned long chars_read = generate_hash_keys(a, i, i + 6, h + 1);
+      while (chars_read)
+	if (ismath(h[chars_read--]))
+	  {
+	    i += chars_read + 1;
+	    b = h[chars_read + 1];
+	    return GOT_MATH_FUNC;
+	  }
+      return cons.get_const(a, i, x);
     }
   return FAILURE;
 }
 
-const char *optr_from_hash(const str_hash h)
+const char *optr_from_hash(const optr_hash h)
 {
   switch (h)
     {
@@ -229,13 +175,17 @@ const char *optr_from_hash(const str_hash h)
     case H_log:               return "log";
     case H_ln:                return "ln";
     case H_logten:            return "logten";
+    case H_abs:               return "abs";
+    case H_floor:             return "floor";
+    case H_ceil:              return "ceil";
     default:                  return "";
     }
 }
 
-int priority_group(const str_hash s)//char *s)
+int priority_group(const optr_hash s)//char *s)
 {
   /*
+    priority list:  
       const char operators[][5][4] = {
       { "&&", "||" },
       { ">", "<", ">=", "<=", "==", "!=" },
@@ -288,45 +238,10 @@ int priority_group(const str_hash s)//char *s)
 
     default:
       return 0;
-    }/*
-  if (*s == *(s + 1))
-    switch (*s)
-      {
-      case '&':
-      case '|': return 1;
-      case '>':
-      case '<': return 8;
-      case '=': return 2;
-      default : return 0;
-      }
-  else if (*(s + 1) == '=')
-    switch (*s)
-      {
-      case '>':
-      case '<':
-      case '!': return 2;
-      default : return 0;
-      }
-  else
-    switch (*s)
-      {
-      case '>':
-      case '<': return 2;
-      case '+':
-      case '-': return 3;
-      case '*':
-      case '/': return 4;
-      case '%':
-      case '^': return 5;
-      case 'P':
-      case 'C': return 6;
-      case '&':
-      case '|': return 7;
-      default : return strcmp(s, "log") ? 0 : 6;
-      }*/
+    }
 }
 
-long check_priority(const char *s1, const char *s2)
+long check_priority(const optr_hash s1, const optr_hash s2)
 {
   /*
     This is the main function of the calculator. But is placed here because of
@@ -378,15 +293,15 @@ long check_priority(const char *s1, const char *s2)
   */
   if (s1 && s2)
     {
-      if (*s2 == ')')	// highest priority
+      if (s2 == H_close_bracket)        // highest priority
 	return HIGH;
-      if (*s1 == '(')	// lowest priority
+      if (s1 == H_open_bracket)         // lowest priority
 	return LOW;
-      if (isbinary(s1) && isunary(s2))	// 2+sin3; where s1=+ && s2=sin
-	return LOW;			// s1 < s2
+      if (isbinary(s1) && isunary(s2))  // 2+sin3; where s1=+ && s2=sin
+	return LOW;                     // s1 < s2
       if (isunary(s1) && isbinary(s2))	// sin2+3; where s1=sin && s2=+
-	return HIGH;		// s1 > s2
-      if (ismath(s1) && ismath(s2) && !strcasecmp(s1, s2))	// 2+3+2
+	return HIGH;		        // s1 > s2
+      if (ismath(s1) && ismath(s2) && s1 == s2) // 2+3+2
         {
 	  if (isunary(s1))
 	    return LOW;

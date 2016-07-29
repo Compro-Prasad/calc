@@ -16,6 +16,7 @@
 #define SKIP_SPACE(s, i) s[i] == ' ' ? ++i : i
 
 typedef unsigned long long str_hash;
+typedef unsigned int optr_hash;
 
 enum class data_type
   {
@@ -40,7 +41,7 @@ extern char* strncat(char *s1, const char *s2, size_t l);
 
 extern str_hash generate_hash_key(const char *s, unsigned long start = 0, unsigned long end = 0);
 
-extern bool ismath(const char *s);
+extern bool ismath(const optr_hash s);
 extern bool isidentifier(const char *s);
 
 extern signed char atof(const char *a, unsigned long &i, long double &x, data_type d = data_type::REAL);
