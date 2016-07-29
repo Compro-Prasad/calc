@@ -218,7 +218,7 @@ Boston, MA 02110-1301  USA\n");
     {
       constant con;
       extract(Input.str(), con.name, 9, -1, '=');
-      if (isidentifier(con.name) && ismath(con.name) != SUCCESS)
+      if (isidentifier(con.name) && ismath(generate_hash_key(con.name)) != SUCCESS)
         {
 	  unsigned long i = 0;
 	  while (Input[i] && Input[i++] != '=');
@@ -429,6 +429,9 @@ Boston, MA 02110-1301  USA\n");
     {
       unsigned long i = 10;
       factorize(i);
+#ifdef CALC_PROCESS_TIME
+      calc_process_time(TIMER_STOP);
+#endif
     }
 #endif
 
@@ -478,6 +481,9 @@ Boston, MA 02110-1301  USA\n");
 #ifdef NUM_DETAILS
 		  num_detail = temp_num_detail;
 #endif
+#ifdef CALC_PROCESS_TIME
+		  calc_process_time(TIMER_STOP);
+#endif
 		}
 	    }
 	}
@@ -503,6 +509,9 @@ Boston, MA 02110-1301  USA\n");
 	  if (!(record & VALID_EXPRESSIONS))
 	    remove_history(history_get_history_state()->length - 1);
 #endif
+#ifdef CALC_PROCESS_TIME
+	  calc_process_time(TIMER_STOP);
+#endif
         }
       else if (Error == "")
 	{
@@ -520,9 +529,6 @@ Boston, MA 02110-1301  USA\n");
 #ifdef CALC_HISTORY
       if (!(record & VALID_COMMANDS))
 	remove_history(history_get_history_state()->length - 1);
-#endif
-#ifdef CALC_PROCESS_TIME
-      calc_process_time(TIMER_STOP);
 #endif
     }
 }
