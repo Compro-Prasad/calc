@@ -2,8 +2,8 @@
 A beautiful and robust calculator for the command line
 
 ## Dependencies
-This calculator depends upon GNU readline which is installed by default in most
-*nix systems because bash also uses it.
+This calculator depends upon GNU readline library which is installed by default in
+most *nix systems because bash also uses it.
 
 ## How to install?
 Installation can be done easily by executing `./install.sh`.
