@@ -43,7 +43,16 @@ void cmd_action()
       long double x = 0;
       unsigned long i = 13;
       if (calculate(Input.str(), x, i) == SUCCESS && x > 24)
-	strMAX = x + 2;
+	{
+	  strMAX = x + 2;
+	  if (!Input.newsize(strMAX))
+	    {
+	      strMAX -= 2;
+	      fprintf(stderr, "\nPlease Wait\nResizing input length to fit in memory");
+	    }
+	  while (!Input.newsize(strMAX))
+	    strMAX -= 2;
+	}
       else if (Error != "");
       else if (x < 25)
 	Error = "!!Minimum length is 25!!";
@@ -346,6 +355,7 @@ Boston, MA 02110-1301  USA\n");
 
   else if (!strcasecmp(Input.str(), "settings"))
     {
+      fprintf(PRINTFAST, "\nInput length       =  %lu", strMAX);
 #ifdef PROMPT
       fprintf(PRINTFAST, "\nPrompt             =  '%s'", prompt);
 #endif // PROMPT

@@ -6,6 +6,11 @@
 strings::strings()
 {
   c = 0;
+  if (!this->newsize(strMAX))
+    {
+      strMAX -= 2;
+      fprintf(stderr, "\nPlease Wait\nResizing input length to fit in memory");
+    }
   while (!this->newsize(strMAX))
     --strMAX;
   assert(strMAX);
@@ -15,6 +20,11 @@ strings::strings()
 strings::strings(const char *x)
 {
   c = 0;
+  if (!this->newsize(strMAX))
+    {
+      strMAX -= 2;
+      fprintf(stderr, "\nPlease Wait\nResizing input length to fit in memory");
+    }
   while (!this->newsize(strMAX))
     --strMAX;
   assert(strMAX - 1);
