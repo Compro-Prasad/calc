@@ -41,12 +41,33 @@ unsigned long generate_hash_keys(const char *s,
 
 void make_operator_hashes()
 {
-  int i = 0;
+  int i = 0, j;
+  optr_hash t;
+
+  /* Generating */
   for (; i < 22; ++i)
     {
       bin_ops_hash[i] = generate_hash_key(bin_ops[i]) % unify;
       un_ops_hash[i] = generate_hash_key(un_ops[i]) % unify;
     }
+
+  /* Sorting */
+  for (i = 0; i < 22; ++i)
+    for (j = 0; j < 22 - i - 1; ++j)
+      if (un_ops_hash[j] > un_ops_hash[j + 1])
+	{
+	  t = un_ops_hash[j];
+	  un_ops_hash[j] = un_ops_hash[j + 1];
+	  un_ops_hash[j + 1] = t;
+	}
+  for (i = 0; i < 21; ++i)
+    for (j = 0; j < 21 - i - 1; ++j)
+      if (bin_ops_hash[j] > bin_ops_hash[j + 1])
+	{
+	  t = bin_ops_hash[j];
+	  bin_ops_hash[j] = bin_ops_hash[j + 1];
+	  bin_ops_hash[j + 1] = t;
+	}
 }
 
 bool ismathchar(const char ch)
@@ -73,18 +94,42 @@ bool ismathchar(const char ch)
 bool isbinary(const optr_hash s)
 {
   if (s)
-    for (register unsigned char i = 0; i < 21; ++i)
-      if (s == bin_ops_hash[i])
-	return SUCCESS;
+    {
+      register unsigned char beg = 0, end = 20, mid;
+      while (beg <= end)
+	{
+	  mid = (beg + end) / 2;
+	  if (s == bin_ops_hash[mid] ||
+	      s == bin_ops_hash[beg] ||
+	      s == bin_ops_hash[end])
+	    return SUCCESS;
+	  else if (s < bin_ops_hash[mid])
+	    end = mid - 1, ++beg;
+	  else
+	    beg = mid + 1, --end;
+	}
+    }
   return FAILURE;
 }
 
 bool isunary(const optr_hash s)
 {
   if (s)
-    for (register unsigned char i = 0; i < 22; ++i)
-      if (s == un_ops_hash[i])
-	return SUCCESS;
+    {
+      register unsigned char beg = 0, end = 21, mid;
+      while (beg <= end)
+	{
+	  mid = (beg + end) / 2;
+	  if (s == un_ops_hash[mid] ||
+	      s == un_ops_hash[beg] ||
+	      s == un_ops_hash[end])
+	    return SUCCESS;
+	  else if (s < un_ops_hash[mid])
+	    end = mid - 1, ++beg;
+	  else
+	    beg = mid + 1, --end;
+	}
+    }
   return FAILURE;
 }
 
