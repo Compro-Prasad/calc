@@ -66,15 +66,13 @@ int main(int argc, char *argv[])
     fprintf(PRINTFAST,
 	    "This is free software with ABSOLUTELY NO WARRANTY.\n"
 	    "For details type `warranty'.\n"
-	    "Type help and press return to know more.");
+	    "Type help and press return to know more.\n");
   /* ******************************************************************* */
 
   init_readline();
 
   while (Input != "exit")
     {
-
-      fprintf(PRINTFAST, "\n");
 #ifdef PROMPT
 #ifdef CALC_COLORS
       /* Setting prompt font settings */
@@ -122,6 +120,8 @@ int main(int argc, char *argv[])
 	  output_font.print();
 	}
 #endif
+      if (Input != "clear")
+	fprintf(PRINTFAST, "\n");
     }
 #endif // DIRECT_INPUT
 
