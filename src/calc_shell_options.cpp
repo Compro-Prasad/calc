@@ -333,6 +333,7 @@ signed char option_action(const char *action, char **action_args)
 	      while (!f.eof())
 		{
 		  f.getline(Input.str(), strMAX, '\n');
+		  Input.update_len();
 		  if (Input == "#")
 		    continue;
 #ifdef CALC_COLORS
@@ -361,6 +362,8 @@ signed char option_action(const char *action, char **action_args)
 #endif
 		      Error = "";
 		    }
+		  if (Input != "clear")
+		    fprintf(PRINTFAST, "\n");
 		}
 	    }
 	  else
