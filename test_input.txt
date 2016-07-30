@@ -21,10 +21,10 @@ sintancos3
 grad
 sintancos3
 deg
-stop storing answers
+dont store answers
 2+2
 sin90
-start storing answers
+store answers
 sum 0 100 1 i
 show a0
 exit
