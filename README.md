@@ -42,3 +42,17 @@ Similarly, output color can be changed using:
 `change output color yellow`
 
 For more information use `calc "help font" -q`.
+
+## Your own configuration[init/rc file]
+If you have finished fixing your colors then add the command(s) to a file lets say,
+`/home/user/.calc.conf`. In turn make the calculator process the same file whenever
+you open it using `calc -f /home/user/.calc.conf`. If that seems long to you then
+add an alias to `.bashrc` lets say `calc_init` using
+`alias calc_init='calc -f /home/user/.calc.conf'` command. After that just run
+`calc_init` instead of `calc` to get your colors working without the need to change
+colors every time you open the calculator.
+
+Now that doesn't mean that it works only for colors. You can put in any direct
+input command in `/home/user/.calc.conf` to (de)activate features of the calculator.
+An example file is provided in the root of the repository named `.calc.config`. You
+can modify it to suit your needs.
