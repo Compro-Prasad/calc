@@ -14,17 +14,17 @@ Or can also be installed by the traditional `make` and `sudo make install` comma
 use `make PREFIX=<dir> install`*
 
 ## Using man pages[if not installed]
-Viewing in terminal:
+- Viewing in terminal:
 
-`groff -man -Tascii doc/man/man1/calc.1 | less`
+        groff -man -Tascii doc/man/man1/calc.1 | less
 
-Exporting as pdf:
+- Exporting as pdf:
 
-`groff -man doc/man/man1/calc.1 | ps2pdf - > man_calc.pdf`
+        groff -man doc/man/man1/calc.1 | ps2pdf - > man_calc.pdf
 
-Exporting as html:
+- Exporting as html:
 
-`groff -man -Thtml doc/man/man1/calc.1 > man_calc.html`
+        groff -man -Thtml doc/man/man1/calc.1 > man_calc.html
 
 *Note: The man page is generally updated after a long time. So, be careful with it.*
 
