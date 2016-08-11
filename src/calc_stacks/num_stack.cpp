@@ -1,5 +1,6 @@
 #include <stdio.h>
 
+#include <calc_strings.hpp>
 #include <calc_stacks/num_stack.hpp>
 
 #ifdef NUM_DETAILS
@@ -125,6 +126,7 @@ signed char numbers_stack::decrease_size()
       start = temp;
       return SUCCESS;
     }
+  Error = "!!Memory cannot be allocated";
   return ERROR;
 }
 
@@ -153,5 +155,6 @@ signed char numbers_stack::increase_size()
       start = temp;
       return SUCCESS;
     }
+  Error = "!!Memory cannot be allocated";
   return ERROR;
 }

@@ -328,94 +328,89 @@ static signed char insert(const optr_hash s /* operator to be pushed in operator
 			  operators_stack &optr,
 			  numbers_stack &num)
 {
-  if (s)
+  long double x, y, z;
+  optr_hash top_optr = optr.get();
+
+  if (check_priority(top_optr, s) == HIGH)
     {
-      long double x, y, z;
-      optr_hash top_optr = optr.get();
-
-      if (check_priority(top_optr, s) == HIGH)
-        {
 #ifdef OPTR_DETAILS
-	  if (operator_detail == YES)
-	    fprintf(PRINTFAST, "\nPriority of %6s\tis higher than\t%6s", optr_from_hash(top_optr), optr_from_hash(s));
+      if (operator_detail == YES)
+	fprintf(PRINTFAST, "\nPriority of %6s\tis higher than\t%6s", optr_from_hash(top_optr), optr_from_hash(s));
 #endif
-	  /* Pop out other operators untill the priority returns low or if the
-	     operator to be pushed is a ')' and also top_optr is '(' */
-	  while (check_priority(top_optr, s) == HIGH
-		 && (s != H_close_bracket || top_optr != H_open_bracket))
-            {
-	      /* if the top_optr is binary */
-	      if (isbinary(top_optr))
-                {
-		  /* pop out two numbers from number stack */
-		  if (num.get(y) != SUCCESS || num.get(x) != SUCCESS)
-		    return (Error = "!!Number scarcity", ERROR);
+      /* Pop out other operators untill the priority returns low or if the
+	 operator to be pushed is a ')' and also top_optr is '(' */
+      while (check_priority(top_optr, s) == HIGH
+	     && (s != H_close_bracket || top_optr != H_open_bracket))
+	{
+	  /* if the top_optr is binary */
+	  if (isbinary(top_optr))
+	    {
+	      /* pop out two numbers from number stack */
+	      if (num.get(y) != SUCCESS || num.get(x) != SUCCESS)
+		return (Error = "!!Number scarcity", ERROR);
 
-		  /* calculate out the result */
-		  if (calculateit(top_optr, z, x, y) != SUCCESS)
-		    return ERROR;
+	      /* calculate out the result */
+	      if (calculateit(top_optr, z, x, y) != SUCCESS)
+		return ERROR;
 #ifdef STEPS_CMD
-		  else if (steps == YES)
-		    fprintf(PRINTFAST, "\n-> %.3LG %s %.3LG = %.3LG",
-			    x, optr_from_hash(top_optr), y, z);
+	      else if (steps == YES)
+		fprintf(PRINTFAST, "\n-> %.3LG %s %.3LG = %.3LG",
+			x, optr_from_hash(top_optr), y, z);
 #endif
-                }
+	    }
 
-	      /* if the top_optr is unary */
-	      else if (isunary(top_optr))
-                {
-		  /* pop out a single number */
-		  if (num.get(x) != SUCCESS)
-		    return (Error = "!!Number scarcity", ERROR);
+	  /* if the top_optr is unary */
+	  else if (isunary(top_optr))
+	    {
+	      /* pop out a single number */
+	      if (num.get(x) != SUCCESS)
+		return (Error = "!!Number scarcity", ERROR);
 
-		  /* calculate out the result */
-		  if (calculateit(top_optr, z, x) != SUCCESS)
-		    return ERROR;
+	      /* calculate out the result */
+	      if (calculateit(top_optr, z, x) != SUCCESS)
+		return ERROR;
 #ifdef STEPS_CMD
-		  else if (steps == YES)
-		    fprintf(PRINTFAST, "\n-> %s(%.3LG) = %.3LG", optr_from_hash(top_optr), x, z);
+	      else if (steps == YES)
+		fprintf(PRINTFAST, "\n-> %s(%.3LG) = %.3LG", optr_from_hash(top_optr), x, z);
 #endif
-                }
+	    }
 
-	      /* popout the top operator from the operator stack */
-	      if (optr.pop() != SUCCESS)
-		return (Error = "!!Operator pop", ERROR);
+	  /* popout the top operator from the operator stack */
+	  optr.pop();
 
-	      /* push the newly generated result */
-	      if (num.push(z) != SUCCESS)
-		return (Error = "!!Number push", ERROR);
+	  /* push the newly generated result */
+	  if (num.push(z) == ERROR)
+	    return ERROR;
 
-	      /* Check out the next operator from the operator stack */
-	      top_optr = optr.get();
-            }
+	  /* Check out the next operator from the operator stack */
+	  top_optr = optr.get();
+	}
 
-	  /* if the operator was a ')' then pop out a single operator */
-	  if (s == H_close_bracket)
-	    optr.pop();
+      /* if the operator was a ')' then pop out a single operator */
+      if (s == H_close_bracket)
+	optr.pop();
 
-	  /* else push the operator in the operator stack */
-	  else if (optr.push(s) == ERROR)
-	    return 5;
-        }
-
-      /* if the priority is low then it will be pushed in the operator stack */
-      else if (check_priority(top_optr, s) == LOW)
-        {
-#ifdef OPTR_DETAILS
-	  if (operator_detail == YES)
-	    fprintf(PRINTFAST, "\nPriority of %6s\tis lower than\t%6s", optr_from_hash(top_optr), optr_from_hash(s));
-#endif
-	  if (optr.push(s) == ERROR)
-	    return 5;
-        }
-      else
-        {
-	  Error = "!!Priority";
-	  return ERROR;
-        }
-      return SUCCESS;
+      /* else push the operator in the operator stack */
+      else if (optr.push(s) == ERROR)
+	return ERROR;
     }
-  return ERROR;
+
+  /* if the priority is low then it will be pushed in the operator stack */
+  else if (check_priority(top_optr, s) == LOW)
+    {
+#ifdef OPTR_DETAILS
+      if (operator_detail == YES)
+	fprintf(PRINTFAST, "\nPriority of %6s\tis lower than\t%6s", optr_from_hash(top_optr), optr_from_hash(s));
+#endif
+      if (optr.push(s) == ERROR)
+	return ERROR;
+    }
+  else
+    {
+      Error = "!!Priority";
+      return ERROR;
+    }
+  return SUCCESS;
 }
 
 signed char calculate(const char *a,
@@ -581,9 +576,10 @@ signed char calculate(const char *a,
 	  if (c == H_open_bracket)
             {
 	      if (optr.push(c) == ERROR)
-		return 5;
+		return ERROR;
 	      if (a[i] == '-' || a[i] == '+')
-		num.push(0);
+		if (num.push(0) == ERROR)
+		  return ERROR;
             }
 	  else
             {

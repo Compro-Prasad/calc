@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include <operators.hpp>
+#include <calc_strings.hpp>
 #include <calc_stacks/optr_stack.hpp>
 
 #ifdef OPTR_DETAILS
@@ -141,6 +142,7 @@ signed char operators_stack::decrease_size()
       start = temp;
       return SUCCESS;
     }
+  Error = "!!Memory cannot be allocated";
   return ERROR;
 }
 
@@ -169,5 +171,6 @@ signed char operators_stack::increase_size()
       start = temp;
       return SUCCESS;
     }
+  Error = "!!Memory cannot be allocated";
   return ERROR;
 }
