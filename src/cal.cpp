@@ -331,7 +331,7 @@ static signed char insert(const optr_hash s /* operator to be pushed in operator
   long double x, y, z;
   optr_hash top_optr = optr.get();
 
-  if (check_priority(top_optr, s) == HIGH)
+  if (check_priority(top_optr, s) == LOW)
     {
 #ifdef OPTR_DETAILS
       if (operator_detail == YES)
@@ -339,7 +339,7 @@ static signed char insert(const optr_hash s /* operator to be pushed in operator
 #endif
       /* Pop out other operators untill the priority returns low or if the
 	 operator to be pushed is a ')' and also top_optr is '(' */
-      while (check_priority(top_optr, s) == HIGH
+      while (check_priority(top_optr, s) == LOW
 	     && (s != H_close_bracket || top_optr != H_open_bracket))
 	{
 	  /* if the top_optr is binary */
@@ -396,7 +396,7 @@ static signed char insert(const optr_hash s /* operator to be pushed in operator
     }
 
   /* if the priority is low then it will be pushed in the operator stack */
-  else if (check_priority(top_optr, s) == LOW)
+  else if (check_priority(top_optr, s) == HIGH)
     {
 #ifdef OPTR_DETAILS
       if (operator_detail == YES)

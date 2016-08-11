@@ -289,80 +289,42 @@ int priority_group(const optr_hash s)//char *s)
 long check_priority(const optr_hash s1, const optr_hash s2)
 {
   /*
-    This is the main function of the calculator. But is placed here because of
-    it deals only with strings and nothing else. Its for checking priority of
-    symbols/operators. Start seeing from ans.h for understanding this function.
-    Or start from cal.cpp
-
-    Here 2 operators are taken as argument. One of them is from the
-    link_oprators stack and the other operator is from broken strings of the
-    input.
-
-    It only checks the 2 operators provided by the insert() function in cal.cpp
-    and returns HIGH when the operator's priority is higher than that of the
-    latest inserted operator in the link_oprators stack. And returns LOW when
-    the operator's priority is lower than that of the latest inserted operator
-    in the link_oprators stack.
-
-    When both operators are same then there comes the decision of binary
-    operator and unary operator. When it is a binary operator then HIGH is
-    returned and when its unary operator LOW is returned.
-
-    Example(binary operator):-
-    2+2+5
-    Since + is a binary operator (2+2)+5 is same as 2+(2+5). In the latter case
-    there would be high chances of overflow of link_operators stack without any
-    need of storing both + operators in the stack. But in the 1st case the
-    first + can be removed from the stack before inserting the second +. So the
-    stack will have to take less pressure.
-
-    Example(unary operator):-
-    sinsin2
-    Since sin is a unary operator sin(sin(2)) is the only way we can write it.
-    So there is no way of removing the first sin and then adding up the new one
-    because it will create problems.
-
-    Note:
-    HIGH priority means that operator s2 has the capability to pop the
-    latest operator in link_oprators stack without getting any
-    calculation errors. For example, if the most recently added operator
-    in the link_oprators stack is '/' and now value of s2 is '+' then '+'
-    will pop out the '/' from the stack to calculate it at first which is
-    done by the insert function after HIGH is returned by this function.
-
-    On the other hand if '+' is the most recent operator in the
-    link_oprators stack and '/' is the value of s2 then it should not pop
-    out '+' at first because it will cause calculation mistakes. So,
-    instead it should itself be added on top of '+' which is done by the
-    insert function after it gets the value LOW from this function.
+     s1 and s2 are hashes of valid mathematical functions
+     This is already done by the extract_math function
+     Don't use it unless s1 and s2 are valid functions
   */
   if (s1 && s2)
     {
-      if (s2 == H_close_bracket)        // highest priority
+      bool s1_bin = isbinary(s1);
+      bool s2_bin = isbinary(s2);
+
+      if (s2 == H_close_bracket)
+	return LOW;
+
+      if (s1 == H_open_bracket)
 	return HIGH;
-      if (s1 == H_open_bracket)         // lowest priority
+
+      if (s1_bin && not s2_bin)
+	return HIGH;
+
+      if (not s1_bin && s2_bin)
 	return LOW;
-      if (isbinary(s1) && isunary(s2))  // 2+sin3; where s1=+ && s2=sin
-	return LOW;                     // s1 < s2
-      if (isunary(s1) && isbinary(s2))	// sin2+3; where s1=sin && s2=+
-	return HIGH;		        // s1 > s2
-      if (ismath(s1) && ismath(s2) && s1 == s2) // 2+3+2
+
+      if (not s1_bin && not s2_bin)
+	return HIGH;
+
+      if (s1 == s2)
         {
-	  if (isunary(s1))
+	  if (s1_bin)
 	    return LOW;
-	  else
-	    return HIGH;
+	  return HIGH;
         }
-      if (isunary(s1) && isunary(s2))
-	return LOW;
 
       unsigned char p1 = priority_group(s1), p2 = priority_group(s2);
       if (p1 && p2)
-	return p1 < p2 ? LOW : HIGH;
-      else
-	return ERROR;
+	return p1 < p2 ? HIGH : LOW;
     }
   else if (!s1 && s2)
-    return LOW;
+    return HIGH;
   return ERROR;
 }
