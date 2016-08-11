@@ -28,7 +28,7 @@ unsigned long generate_hash_keys(const char *s,
   if (start < end)
     {
       register const char *x = s = s + start;
-      register optr_hash hash = 0;
+      register str_hash hash = 0;
       while (ismathchar(*x) && start < end)
 	{
 	  hash = 127 * hash + *x, ++start;
@@ -223,6 +223,7 @@ const char *optr_from_hash(const optr_hash h)
     case H_abs:               return "abs";
     case H_floor:             return "floor";
     case H_ceil:              return "ceil";
+    case 0:                   return "(null)";
     default:                  return "";
     }
 }
