@@ -9,9 +9,11 @@ using namespace std;
 #include <signal.h>
 
 #include <cal.hpp>
+#include <calculate.hpp>
 #include <calc_history.hpp>
 #include <calc_strings.hpp>
 #include <input_bindings.hpp>
+#include <other_calc_func.hpp>
 #include <calc_cmd_action.hpp>
 #include <calc_process_time.hpp>
 #include <calc_screen_manip.hpp>

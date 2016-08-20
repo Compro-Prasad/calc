@@ -4,324 +4,169 @@
 
 #include <cal.hpp>
 #include <operators.hpp>
+#include <calculate.hpp>
 #include <calc_history.hpp>
-#include <calc_strings.hpp>
-#include <input_bindings.hpp>
-#include <calc_cmd_action.hpp>
+#include <other_calc_func.hpp>
 
 #include <calc_stacks/ans_stack.hpp>
 #include <calc_stacks/num_stack.hpp>
 #include <calc_stacks/optr_stack.hpp>
 #include <calc_stacks/constant_stack.hpp>
 
-unsigned char angle_type = DEG;
-
 #ifdef STEPS_CMD
 bool steps = false;             /* Whether or not to show steps */
 #endif
 
-static long double factorial(long double x)
+static int priority_group(const optr_hash s)//char *s)
 {
-  long double t = 1;
-  for (long double i = 1; i <= x; i++)
-    t *= i;
-  return t;
+  /*
+    priority list:  
+      const char operators[][5][4] = {
+      { "&&", "||" },
+      { ">", "<", ">=", "<=", "==", "!=" },
+      { "+", "-" },
+      { "*", "/" },
+      { "%", "^" },
+      { "P", "C", "log" },
+      { "&", "|" },
+      { ">>", "<<" }
+      };
+  */
+  switch (s)
+    {
+    case H_and:
+    case H_or:
+      return 1;
+
+    case H_great:
+    case H_less:
+    case H_equal:
+    case H_not_equal:
+    case H_great_equal:
+    case H_less_equal:
+      return 2;
+
+    case H_plus:
+    case H_minus:
+      return 3;
+
+    case H_multiply:
+    case H_divide:
+      return 4;
+
+    case H_mod:
+    case H_pow:
+      return 5;
+
+    case H_P:
+    case H_C:
+    case H_log:
+      return 6;
+
+    case H_bit_and:
+    case H_bit_or:
+      return 7;
+
+    case H_bit_shift_right:
+    case H_bit_shift_left:
+      return 8;
+
+    default:
+      return 0;
+    }
 }
 
-void factorize(unsigned long &i)
+static long check_priority(const optr_hash s1, const optr_hash s2)
 {
-  long double x = 0, y = 0;
-  if (parse_expr(Input.str(), y, i) == SUCCESS)
+  /*
+     s1 and s2 are hashes of valid mathematical functions
+     This is already done by the extract_math function
+     Don't use it unless s1 and s2 are valid functions
+  */
+  if (s1 && s2)
     {
-      y < 0 ? y = -y : 0;
-      modfl(y, &x);
-      fprintf(PRINTFAST, "\nFactors of %.0Lf: ", x);
-      for (long double g = 1; g <= x / 2; g++)
-	if (!fmodl(x, g))
-	  fprintf(PRINTFAST, "%.0Lf, ", g);
-      fprintf(PRINTFAST, "%.0Lf", x);
+      bool s1_bin = isbinary(s1);
+      bool s2_bin = isbinary(s2);
+      bool s1_open = s1 == H_open_bracket;
+      bool s2_close = s2 == H_close_bracket;
+
+      if (s1_open && s2_close)
+	return HIGH;
+      if (s2_close)
+	return LOW;
+      if (s1_open)
+	return HIGH;
+
+      if (s1_bin && not s2_bin)
+	return HIGH;
+
+      if (not s1_bin && s2_bin)
+	return LOW;
+
+      if (not s1_bin && not s2_bin)
+	return HIGH;
+
+      if (s1 == s2)
+        {
+	  if (s1_bin)
+	    return LOW;
+	  return HIGH;
+        }
+
+      unsigned char p1 = priority_group(s1), p2 = priority_group(s2);
+      if (p1 && p2)
+	return p1 < p2 ? HIGH : LOW;
     }
-  else if (Error == "")
-    sprintf(Error.str(), "\nUndefined symbols in '%s'", Input.str());
+  else if (!s1 && s2)
+    return HIGH;
+  return ERROR;
 }
 
-void sum(long double lower_limit,
-	 long double &upper_limit,
-	 long double &rate,
-	 const unsigned long &i)
+static unsigned char extract_math(const char *a, unsigned long &i,
+				  long double &x, optr_hash &b)
 {
-  bool flag = 0, f = 1;
-  unsigned long m = i;
-  long double sum = 0, x = 0;
-  fprintf(PRINTFAST, "\nSuming expression \"");
-  Input.print(m);
-  fprintf(PRINTFAST,
-	  "\" from i = %Lg to i = %Lg at the rate of %Lg per sum",
-	  lower_limit, upper_limit, rate);
-  if (lower_limit > upper_limit && rate < 0.0)
-    {
-      swap(lower_limit, upper_limit, long double);
-      rate = -rate;
-      flag = 1;
-    }
+  /*
+    This function is mainly called by parse_expr() in cal.cpp for extracting
+    each symbol or operator or identifier from strings a from position i and
+    placing it as required.
 
-  for (; lower_limit <= upper_limit; lower_limit += rate)
-    {
-      m = i;
-      if (parse_expr(Input.str(), x, m, '\0', lower_limit, true) == SUCCESS)
-	sum += x;
-      else
-	{
-	  f = 0;
-	  if (Error != "")
-	    Error += " in expression";
-	  else
-	    sprintf(Error.str(), "Failure to recognise expression in '%s'", Input.str());
-	  break;
-	}
-    }
+    For example, if its a number then it will be placed in x otherwise anything
+    other than number will be placed in strings *b.
 
-  /* For printing the sum and storing in answer list */
-  if (f)
-    {
-      fprintf(PRINTFAST, "\nSum = ");
-      if (flag)
-	sum = -sum;
-      extern char precision[15];
-      fprintf(PRINTFAST, precision, sum);
+    It also checks if the identifier or symbol is known to the calculator or
+    not. If its known then the function returns a specific value. For example,
+    if its a constant or number the return value is 1. Same way, if answer(a)
+    is found then return is 4, if mathematical function strings is found then
+    3, if brackets are encountered then 2.
+  */
+  if (a[i] == '.' || isdigit(a[i]))
+    if (atof(a, i, x = 0, data_type::UNSIGNED_REAL) == SUCCESS)
+      return GOT_NUMBER;
+    else
+      return FAILURE;
 #ifdef ANS_CMD
-      if (store == 1)
-	l.add_ans(sum);
+  else if (tolower(a[i + 0]) == 'a' && isdigit(a[i + 1]))
+    return GOT_ANSWER;
 #endif
-    }
-  /***************************************************/
-}
-
-
-static signed char calculate(const optr_hash a,
-			       long double &ans,
-			       const long double &x,
-			       const long double y = 0)
-{
-  long double z = angle_type == DEG ? (x * PI / 180) : (angle_type == RAD ? x : (x * PI / 200));
-
-  /* Basic arithmatic operators */
-  if (a == H_plus)
-    ans = x + y;
-  else if (a == H_minus)
-    ans = x - y;
-  else if (a == H_multiply)
-    ans = x * y;
-  else if (a == H_divide)
+  else if (a[i] == '(' || a[i] == ')')
     {
-      if (y)
-	ans = x / y;
-      else
-        {
-	  Error = "!!Divide";
-	  return ERROR;
-        }
+      b = a[i++] == '(' ? H_open_bracket : H_close_bracket;
+      return GOT_BRACKET;
     }
-  else if (a == H_pow)
-    ans = powl(x, y);
-
-  /* Factorials */
-  else if (a == H_P)
+  else if (ismathchar(a[i]))
     {
-      if (x >= 0 && y >= 0 && x >= y && !(x - floorl(x)) && !(y - floorl(y)))
-	ans = factorial(x) / factorial(x - y);
-      else
-        {
-	  Error = "!!Factorial";
-	  return ERROR;
-        }
+      optr_hash h[7] = { 0 };
+      unsigned long chars_read = generate_hash_keys(a, i, i + 6, h + 1);
+      while (chars_read)
+	if (ismath(h[chars_read--]))
+	  {
+	    i += chars_read + 1;
+	    b = h[chars_read + 1];
+	    return GOT_MATH_FUNC;
+	  }
+      return cons.get_const(a, i, x);
     }
-  else if (a == H_C)
-    {
-      if (x >= 0 && y >= 0 && x >= y && !(x - floorl(x)) && !(y - floorl(y)))
-	ans = factorial(x) / (factorial(y) * factorial(x - y));
-      else
-        {
-	  Error = "!!Factorial";
-	  return ERROR;
-        }
-    }
-
-  /* Computer related basic operators */
-  else if (a == H_bit_not)
-    ans = ~(unsigned long)x;
-  else if (a == H_bit_or)
-    ans = (unsigned long)x | (unsigned long)y;
-  else if (a == H_bit_and)
-    ans = (unsigned long)x & (unsigned long)y;
-  else if (a == H_mod)
-    ans = fmodl(x, y);
-  else if (a == H_bit_shift_right)
-    ans = (unsigned long)x >> (unsigned long)y;
-  else if (a == H_bit_shift_left)
-    ans = (unsigned long)x << (unsigned long)y;
-
-  /* Relational operators */
-  else if (a == H_great)  ans = x > y;
-  else if (a == H_less)  ans = x < y;
-  else if (a == H_great_equal) ans = x >= y;
-  else if (a == H_less_equal)  ans = x <= y;
-  else if (a == H_not_equal)   ans = x != y;
-  else if (a == H_equal)       ans = x == y;
-
-  /* Other mathematical functions */
-  else if (a == H_log)
-    {
-      if (y > 0 && x >= 0)
-	ans = logl(y) / logl(x);
-      else
-        {
-	  Error = "!!log";
-	  return ERROR;
-        }
-    }
-  else if (a == H_abs)
-    ans = fabsl(x);
-  else if (a == H_ceil)
-    ans = ceill(x);
-  else if (a == H_floor)
-    ans = floorl(x);
-  else if (a == H_ln)
-    {
-      if (x > 0)
-	ans = logl(x);
-      else
-        {
-	  Error = "!!log";
-	  return ERROR;
-        }
-    }
-  else if (a == H_logten)
-    {
-      if (x > 0)
-	ans = log10l(x);
-      else
-        {
-	  Error = "!!log";
-	  return ERROR;
-        }
-    }
-  else if (a == H_sinh)
-    ans = sinhl(z);
-  else if (a == H_cosh)
-    ans = coshl(z);
-  else if (a == H_tanh)
-    ans = tanhl(z);
-  else if (a == H_sin)
-    ans = sinl(z);
-  else if (a == H_cos)
-    ans = cosl(z);
-  else if (a == H_tan)
-    {
-      if (cosl(z))
-	ans = tanl(z);
-      else
-        {
-	  Error = "!!tan undefined";
-	  return ERROR;
-        }
-    }
-  else if (a == H_cosec)
-    {
-      if (sinl(z))
-	ans = 1 / sinl(z);
-      else
-        {
-	  Error = "!!cosec undefined";
-	  return ERROR;
-        }
-    }
-  else if (a == H_sec)
-    {
-      if (cosl(z))
-	ans = 1 / cosl(z);
-      else
-        {
-	  Error = "!!sec undefined";
-	  return ERROR;
-        }
-    }
-  else if (a == H_cot)
-    {
-      if (sinl(z))
-	ans = 1 / tanl(z);
-      else
-        {
-	  Error = "!!cot undefined";
-	  return ERROR;
-        }
-    }
-  else if (a == H_asin)
-    {
-      if (x <= 1 && x >= -1)
-	ans = angle_type == DEG ? (asinl(x) * 180 / PI) :
-	  angle_type == GRAD ? (asinl(x) * 200 / PI) : (asinl(x));
-      else
-        {
-	  Error = "!!asin(x) domain";
-	  return ERROR;
-        }
-    }
-  else if (a == H_acos)
-    {
-      if (x <= 1.0 && x >= -1.0)
-	ans = angle_type == DEG ? (acosl(x) * 180 / PI) :
-	  angle_type == GRAD ? (acosl(x) * 200 / PI) : (acosl(x));
-      else
-        {
-	  Error = "!!acos(x) domain";
-	  return ERROR;
-        }
-    }
-  else if (a == H_atan)
-    ans = angle_type == DEG ? (atanl(x) * 180 / PI) :
-      angle_type == GRAD ? (atanl(x) * 200 / PI) : (atanl(x));
-  else if (a == H_acosec)
-    {
-      if (x <= -1.0 || x >= 1.0)
-	ans = angle_type == DEG ? (asinl(1 / x) * 180 / PI) :
-	  angle_type == GRAD ? (asinl(1 / x) * 200 / PI) : (asinl(1 / x));
-      else
-        {
-	  Error = "!!acosec(x) domain";
-	  return ERROR;
-        }
-    }
-  else if (a == H_asec)
-    {
-      if (x <= -1 || x >= 1)
-	ans = angle_type == DEG ? (acosl(1 / x) * 180 / PI) :
-	  angle_type == GRAD ? (acosl(1 / x) * 200 / PI) : (acosl(1 / x));
-      else
-        {
-	  Error = "!!asec(x) domain";
-	  return ERROR;
-        }
-    }
-  else if (a == H_acot)
-    ans = angle_type == DEG ? (atanl(1 / x) * 180 / PI) :
-      angle_type == GRAD ? (atanl(1 / x) * 200 / PI) : (atanl(1 / x));
-
-  /* Logical operators */
-  else if ((x == 1 || !x) && (y == 1 || !y))
-    {
-      if (a == H_not)       ans = !x;
-      else if (a == H_or)   ans = x || y;
-      else if (a == H_and)  ans = x && y;
-      else                  goto Operator_Invalid;
-    }
-
-  else
-    {
-    Operator_Invalid:
-      return Error = "!!Invalid Operator", FAILURE;
-    }
-  return SUCCESS;
+  return FAILURE;
 }
 
 static signed char insert_into_stack
@@ -332,7 +177,7 @@ static signed char insert_into_stack
   long double x, y, z;
   optr_hash top_optr = optr.get();
 
-  if (check_priority(top_optr, s) == LOW)
+  if (check_priority(top_optr, s) == LOW || s == H_close_bracket)
     {
 #ifdef OPTR_DETAILS
       if (operator_detail == YES)

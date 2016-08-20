@@ -3,10 +3,12 @@
 #include <str.hpp>
 #include <cal.hpp>
 #include <calc_help.hpp>
+#include <calculate.hpp>
 #include <calc_colors.hpp>
 #include <calc_history.hpp>
 #include <calc_features.hpp>
 #include <input_bindings.hpp>
+#include <other_calc_func.hpp>
 #include <calc_cmd_action.hpp>
 #include <calc_process_time.hpp>
 #include <calc_screen_manip.hpp>
