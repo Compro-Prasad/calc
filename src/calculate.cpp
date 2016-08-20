@@ -1,16 +1,16 @@
 #include <math.h>
 
-#include <cal.hpp>
 #include <operators.hpp>
+#include <parse_expr.hpp>
 #include <calc_strings.hpp>
 #include <other_calc_func.hpp>
 
 unsigned char angle_type = DEG;
 
 signed char calculate(const optr_hash a,
-			       long double &ans,
-			       const long double &x,
-			       const long double y = 0)
+		      long double &ans,
+		      const long double &x,
+		      const long double y = 0)
 {
   long double z = angle_type == DEG ? (x * PI / 180) : (angle_type == RAD ? x : (x * PI / 200));
 

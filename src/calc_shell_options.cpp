@@ -8,8 +8,8 @@ using namespace std;
 #include <math.h>
 #include <signal.h>
 
-#include <cal.hpp>
 #include <calculate.hpp>
+#include <parse_expr.hpp>
 #include <calc_history.hpp>
 #include <calc_strings.hpp>
 #include <input_bindings.hpp>

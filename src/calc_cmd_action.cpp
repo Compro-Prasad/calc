@@ -1,9 +1,9 @@
 #include <readline/history.h>
 
 #include <str.hpp>
-#include <cal.hpp>
 #include <calc_help.hpp>
 #include <calculate.hpp>
+#include <parse_expr.hpp>
 #include <calc_colors.hpp>
 #include <calc_history.hpp>
 #include <calc_features.hpp>

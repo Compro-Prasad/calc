@@ -1,6 +1,8 @@
 #ifndef CALCULATE_H
 #define CALCULATE_H
 
+#include <str.hpp>
+
 extern unsigned char angle_type;
 
 extern signed char calculate(const optr_hash a,

@@ -2,9 +2,9 @@
 #include <ctype.h>
 #include <readline/history.h>
 
-#include <cal.hpp>
 #include <operators.hpp>
 #include <calculate.hpp>
+#include <parse_expr.hpp>
 #include <calc_history.hpp>
 #include <other_calc_func.hpp>
 
