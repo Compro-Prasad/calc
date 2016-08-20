@@ -6,6 +6,7 @@
 #include <calculate.hpp>
 #include <parse_expr.hpp>
 #include <calc_history.hpp>
+#include <calc_strings.hpp>
 #include <other_calc_func.hpp>
 
 #include <calc_stacks/ans_stack.hpp>
@@ -164,7 +165,9 @@ static unsigned char extract_math(const char *a, unsigned long &i,
 	    b = h[chars_read + 1];
 	    return GOT_MATH_FUNC;
 	  }
+#ifdef CONST_CMDS
       return cons.get_const(a, i, x);
+#endif
     }
   return FAILURE;
 }

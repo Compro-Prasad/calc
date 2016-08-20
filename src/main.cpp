@@ -30,14 +30,14 @@ bool welcome_msg = true;
 #endif
 #ifdef SHELL_INPUT
 const char *prog_name = NULL;
-#endif
 
 int main(int argc, char *argv[])
+#else
+int main()
+#endif
 {
 
   make_operator_hashes();
-
-  prog_name = *argv;
 
 #ifdef CALC_COLORS
   output_font.print();
@@ -45,6 +45,7 @@ int main(int argc, char *argv[])
 
 
 #ifdef SHELL_INPUT
+  prog_name = *argv;
   /* ****************************************************************** */
   /*                     checking out shell arguments                   */
   /*                   */ parse_options(argc, argv); /*                 */

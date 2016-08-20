@@ -34,7 +34,7 @@
 # define CALC_HISTORY
 #endif // CALC_STABLE
 
-# define ACCELERATE_UP
+# define SPEED_UP
 
 #ifdef CALC_UNSTABLE
 # ifdef DIRECT_INPUT
