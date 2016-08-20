@@ -324,9 +324,10 @@ static signed char calculateit(const optr_hash a,
   return SUCCESS;
 }
 
-static signed char insert(const optr_hash s /* operator to be pushed in operator stack */,
-			  operators_stack &optr,
-			  numbers_stack &num)
+static signed char insert_into_stack
+(const optr_hash s /* operator to be pushed in operator stack */,
+ operators_stack &optr,
+ numbers_stack &num)
 {
   long double x, y, z;
   optr_hash top_optr = optr.get();
@@ -339,8 +340,8 @@ static signed char insert(const optr_hash s /* operator to be pushed in operator
 #endif
       /* Pop out other operators untill the priority returns low or if the
 	 operator to be pushed is a ')' and also top_optr is '(' */
-      while (check_priority(top_optr, s) == LOW
-	     && (s != H_close_bracket || top_optr != H_open_bracket))
+      while (check_priority(top_optr, s) == LOW)
+	//&& (s != H_close_bracket || top_optr != H_open_bracket))
 	{
 	  /* if the top_optr is binary */
 	  if (isbinary(top_optr))
@@ -443,7 +444,7 @@ signed char calculate(const char *a,
 	  while (a[i] == '+' || a[i] == '-')
 	    if (a[i++] == '-')
 	      t = t * (-1);
-	  if (insert(t < 0 ? H_minus : H_plus, optr, num) == ERROR)
+	  if (insert_into_stack(t < 0 ? H_minus : H_plus, optr, num) == ERROR)
 	    goto ERROR_LABEL;
 	  flag ? SKIP_SPACE(a, i) : 0;
 	  continue;
@@ -528,7 +529,7 @@ signed char calculate(const char *a,
 	    {
 	      /* We just have to insert the '*' operator when the above
 		 condition is satisfied*/
-	      if (insert(H_multiply, optr, num) == ERROR)
+	      if (insert_into_stack(H_multiply, optr, num) == ERROR)
 		goto ERROR_LABEL;
 	    }
 	  /* *************************************************************** */
@@ -559,7 +560,7 @@ signed char calculate(const char *a,
 #endif
       else if (check_extract == GOT_MATH_FUNC)
         {
-	  if (insert(c, optr, num) == ERROR)
+	  if (insert_into_stack(c, optr, num) == ERROR)
 	    goto ERROR_LABEL;
 	  else
             {
@@ -588,7 +589,7 @@ signed char calculate(const char *a,
 		  Error = "!!Bracket";
 		  goto ERROR_LABEL;
                 }
-	      if (insert(c, optr, num) == ERROR)
+	      if (insert_into_stack(c, optr, num) == ERROR)
 		goto ERROR_LABEL;
 	      flag ? SKIP_SPACE(a, i) : 0;
 #ifdef CONST_CMDS
@@ -602,13 +603,13 @@ signed char calculate(const char *a,
 		       (a[i] != 'P' && tolower(a[i]) != 'l'
 			&& a[i] != 'C'))) || a[i] == '('
 		  || isdigit(a[i]))
-		if (insert(H_multiply, optr, num) == ERROR)
+		if (insert_into_stack(H_multiply, optr, num) == ERROR)
 		  goto ERROR_LABEL;
             }
         }
     }
   while (optr.get())
-    if (insert(H_close_bracket, optr, num) == ERROR)
+    if (insert_into_stack(H_close_bracket, optr, num) == ERROR)
       goto ERROR_LABEL;
   if (num.get(n) != SUCCESS)
     return FAILURE;

@@ -298,11 +298,14 @@ long check_priority(const optr_hash s1, const optr_hash s2)
     {
       bool s1_bin = isbinary(s1);
       bool s2_bin = isbinary(s2);
+      bool s1_open = s1 == H_open_bracket;
+      bool s2_close = s2 == H_close_bracket;
 
-      if (s2 == H_close_bracket)
+      if (s1_open && s2_close)
+	return HIGH;
+      if (s2_close)
 	return LOW;
-
-      if (s1 == H_open_bracket)
+      if (s1_open)
 	return HIGH;
 
       if (s1_bin && not s2_bin)

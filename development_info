@@ -91,8 +91,7 @@ ABOUT
 	for storing answers in the memory so they could be retrieved afterward
 	thus relieving stress off the user's head. But till then I had learned
 	about stacks, postfix and infix notations thus the user could also
-	enjoy writing larger expressions up to 5000 characters. Then the
-	operator support also widened to a great extent supporting bitwise
-	operations also.
-	Now it has abilities for normal file operations, color changing, and
+	enjoy writing larger expressions. Then the operator support also
+	widened to a great extent supporting bitwise operations also.
+	Now it has abilities for color changing, and
 	history support.

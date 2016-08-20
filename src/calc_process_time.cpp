@@ -24,7 +24,7 @@ void calc_process_time(char sig)
 	expressions++, total_time += time_taken;
 
       if (calc_time == true)
-	fprintf(PRINTFAST, "\nCommand Processing Time : %.6Lf seconds",
+	fprintf(PRINTFAST, "\nProcessing Time : %.6Lf seconds",
 		time_taken);
     }
   else if (sig == TIMER_RESET)

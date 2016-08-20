@@ -14,7 +14,7 @@ show number   details
 show steps
 3+2
 hide operator details
-deg
+hide number details
 sintancos3
 rad
 sintancos3
@@ -25,6 +25,12 @@ dont store answers
 2+2
 sin90
 store answers
+show processing time
 sum 0 100 1 i
+hide processing time
 show a0
+answers
+3+2(3+5)
+5/2+5*5-8^3
+8/(8+3*2-6/(5+3
 exit
