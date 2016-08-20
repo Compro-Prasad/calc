@@ -7,8 +7,6 @@ warranty
 clear
 show processing time
 hide processing time
-start recording
-stop recording
 show operator details
 show number   details
 show steps

@@ -308,7 +308,7 @@ signed char option_action(const char *action, char **action_args)
 	{
 	  unsigned long i = 0;
 	  long double x = 0;
-	  if (calculate(*action_args, x, i) == SUCCESS)
+	  if (parse_expr(*action_args, x, i) == SUCCESS)
 	    {
 	      if (x < 25)
 		{
@@ -407,7 +407,7 @@ signed char option_action(const char *action, char **action_args)
 	    {
 	      con.value = 0;
 	      unsigned long i = 0;
-	      if (calculate(*(action_args++), con.value, i) == SUCCESS)
+	      if (parse_expr(*(action_args++), con.value, i) == SUCCESS)
 		cons.insert_const(con);
 	      else
 		return -1;
@@ -458,15 +458,15 @@ signed char option_action(const char *action, char **action_args)
 	  num_detail = NO;
 #endif
 
-	  if (calculate(*(action_args++), lower_limit, i) == SUCCESS)
+	  if (parse_expr(*(action_args++), lower_limit, i) == SUCCESS)
 	    {
 	      long double upper_limit;
 	      i = 0, ++ret_value;
-	      if (calculate(*(action_args++), upper_limit, i) == SUCCESS)
+	      if (parse_expr(*(action_args++), upper_limit, i) == SUCCESS)
 		{
 		  long double rate;
 		  i = 0, ret_value += 2;
-		  if (calculate(*(action_args++), rate, i) == SUCCESS)
+		  if (parse_expr(*(action_args++), rate, i) == SUCCESS)
 		    {
 		      i = 0, ++ret_value;
 		      Input = *action_args;
@@ -500,7 +500,7 @@ signed char option_action(const char *action, char **action_args)
 	{
 	  long double x = 0;
 	  unsigned long i = 0;
-	  if (calculate(Input.str(), x, i) == SUCCESS)
+	  if (parse_expr(Input.str(), x, i) == SUCCESS)
 	    {
 	      unsigned short n = x;
 	      n %= 1000;

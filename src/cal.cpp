@@ -31,7 +31,7 @@ static long double factorial(long double x)
 void factorize(unsigned long &i)
 {
   long double x = 0, y = 0;
-  if (calculate(Input.str(), y, i) == SUCCESS)
+  if (parse_expr(Input.str(), y, i) == SUCCESS)
     {
       y < 0 ? y = -y : 0;
       modfl(y, &x);
@@ -68,7 +68,7 @@ void sum(long double lower_limit,
   for (; lower_limit <= upper_limit; lower_limit += rate)
     {
       m = i;
-      if (calculate(Input.str(), x, m, '\0', lower_limit, true) == SUCCESS)
+      if (parse_expr(Input.str(), x, m, '\0', lower_limit, true) == SUCCESS)
 	sum += x;
       else
 	{
@@ -98,7 +98,7 @@ void sum(long double lower_limit,
 }
 
 
-static signed char calculateit(const optr_hash a,
+static signed char calculate(const optr_hash a,
 			       long double &ans,
 			       const long double &x,
 			       const long double y = 0)
@@ -351,7 +351,7 @@ static signed char insert_into_stack
 		return (Error = "!!Number scarcity", ERROR);
 
 	      /* calculate out the result */
-	      if (calculateit(top_optr, z, x, y) != SUCCESS)
+	      if (calculate(top_optr, z, x, y) != SUCCESS)
 		return ERROR;
 #ifdef STEPS_CMD
 	      else if (steps == YES)
@@ -368,7 +368,7 @@ static signed char insert_into_stack
 		return (Error = "!!Number scarcity", ERROR);
 
 	      /* calculate out the result */
-	      if (calculateit(top_optr, z, x) != SUCCESS)
+	      if (calculate(top_optr, z, x) != SUCCESS)
 		return ERROR;
 #ifdef STEPS_CMD
 	      else if (steps == YES)
@@ -414,12 +414,9 @@ static signed char insert_into_stack
   return SUCCESS;
 }
 
-signed char calculate(const char *a,
-		      long double &n,
-		      unsigned long &i,
-		      const char ch,
-		      const long double var,
-		      const bool issum)
+signed char parse_expr(const char *a, long double &n,
+		       unsigned long &i, const char ch,
+		       const long double var, const bool issum)
 {
   unsigned char check_extract;
 #ifdef ANS_CMD

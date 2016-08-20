@@ -131,10 +131,8 @@ signed char atof(const char *a, unsigned long &i, long double &x, data_type d)
       while (*(++c) > 47 && *c < 58) // isdigit
 	x = x + powl(10, --j) * (*c - 48);
     }
-  if (*c == '.' && !isdigit(c[1]))
-	return ERROR;
-  if (a + i == c)
-	return ERROR;
+  if ((*c == '.' && !isdigit(c[1])) || a + i == c)
+    return ERROR;
   i = c - a;
   if (s == 1)
     x = -x;

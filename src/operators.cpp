@@ -133,10 +133,11 @@ bool isunary(const optr_hash s)
   return FAILURE;
 }
 
-unsigned char extract_math(const char *a, unsigned long &i, long double &x, optr_hash &b)
+unsigned char extract_math(const char *a, unsigned long &i,
+			   long double &x, optr_hash &b)
 {
   /*
-    This function is mainly called by calculate() in cal.cpp for extracting
+    This function is mainly called by parse_expr() in cal.cpp for extracting
     each symbol or operator or identifier from strings a from position i and
     placing it as required.
 
@@ -150,7 +151,10 @@ unsigned char extract_math(const char *a, unsigned long &i, long double &x, optr
     3, if brackets are encountered then 2.
   */
   if (a[i] == '.' || isdigit(a[i]))
-    return atof(a, i, x = 0, data_type::UNSIGNED_REAL) == SUCCESS ? GOT_NUMBER : FAILURE;
+    if (atof(a, i, x = 0, data_type::UNSIGNED_REAL) == SUCCESS)
+      return GOT_NUMBER;
+    else
+      return FAILURE;
 #ifdef ANS_CMD
   else if (tolower(a[i + 0]) == 'a' && isdigit(a[i + 1]))
     return GOT_ANSWER;

@@ -42,7 +42,7 @@ void cmd_action()
     {
       long double x = 0;
       unsigned long i = 13;
-      if (calculate(Input.str(), x, i) == SUCCESS && x > 24)
+      if (parse_expr(Input.str(), x, i) == SUCCESS && x > 24)
 	{
 	  strMAX = x + 2;
 	  if (!Input.newsize(strMAX))
@@ -231,7 +231,7 @@ Boston, MA 02110-1301  USA\n");
         {
 	  unsigned long i = 0;
 	  while (Input[i] && Input[i++] != '=');
-	  if (calculate(Input.str(), con.value, i) == SUCCESS)
+	  if (parse_expr(Input.str(), con.value, i) == SUCCESS)
 	    cons.insert_const(con);
 	  else if (Error == "")
 	    Error = "!!Invalid Expression!!";
@@ -341,7 +341,7 @@ Boston, MA 02110-1301  USA\n");
     {
       long double x = 0;
       unsigned long i = 10;
-      if (calculate(Input.str(), x, i) == SUCCESS)
+      if (parse_expr(Input.str(), x, i) == SUCCESS)
         {
 	  unsigned short n = x;
 	  n %= 1000;
@@ -453,15 +453,15 @@ Boston, MA 02110-1301  USA\n");
       long double x = 0.0;
       unsigned long i = 4;
       signed char check;
-      if ((check = calculate(Input.str(), x, i, ' ', 0, 1)) == SUCCESS)
+      if ((check = parse_expr(Input.str(), x, i, ' ', 0, 1)) == SUCCESS)
         {
 	  long double lower_limit = x;
 	  i++;
-	  if ((check = calculate(Input.str(), x, i, ' ', 0, 1)) == SUCCESS)
+	  if ((check = parse_expr(Input.str(), x, i, ' ', 0, 1)) == SUCCESS)
 	    {
 	      long double upper_limit = x;
 	      i++;
-	      if ((check = calculate(Input.str(), x, i, ' ', 0, 1)) == SUCCESS)
+	      if ((check = parse_expr(Input.str(), x, i, ' ', 0, 1)) == SUCCESS)
 		{
 		  i++;
 		  long double rate = x;
@@ -507,7 +507,7 @@ Boston, MA 02110-1301  USA\n");
     {
       long double x = 0.0;
       unsigned long i = 0;
-      if (calculate(Input.str(), x, i) == SUCCESS)
+      if (parse_expr(Input.str(), x, i) == SUCCESS)
         {
 	  fprintf(PRINTFAST, " = ");
 	  fprintf(PRINTFAST, precision, x);

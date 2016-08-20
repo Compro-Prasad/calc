@@ -26,12 +26,12 @@ extern bool steps;             /* Whether or not to show steps */
 
 extern unsigned char angle_type;
 
-extern signed char calculate(const char *a, // The input string to be worked on
-			     long double &n, // End Result
-			     unsigned long &i, // Position in string
-			     const char ch = '\0', // Stopping character
-			     const long double var = 0, // for variable in expr
-			     const bool issum = 0 /* for variable */);
+extern signed char parse_expr(const char *a, // The input string
+			      long double &n, // End Result
+			      unsigned long &i, // Position in string
+			      const char ch = '\0', // Stopping character
+			      const long double var = 0, // variable{i} in expr
+			      const bool issum = 0 /* for variable */);
 
 extern void factorize(unsigned long &i);
 
