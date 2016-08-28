@@ -13,7 +13,7 @@ Or can also be installed by the traditional `make` and `sudo make install` comma
 *Note: Default install location/prefix is `/usr/local/`. To change the location
 use `make PREFIX=<dir> install`*
 
-## Using man pages[if not installed]
+## Using man pages `if not installed`
 - Viewing in terminal:
 
         groff -man -Tascii doc/man/man1/calc.1 | less
