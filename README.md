@@ -3,7 +3,11 @@ A beautiful and robust calculator for the command line
 
 ## Dependencies
 This calculator depends upon GNU readline library which is installed by default in
-most *nix systems because bash also uses it.
+most \*nix systems because bash also uses it.
+
+If not available on your system search for a binary package named `libreadline-dev`.
+
+Or compile from source from http://ftp.gnu.org/gnu/readline/ of the form *regex(`readline-[0-9].[0-9].tar.gz`)*.
 
 ## How to install?
 Installation can be done easily by executing `./install.sh`.
