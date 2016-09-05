@@ -9,6 +9,9 @@ while [ -n "$1" ]; do
 	no-strip) Strip=no;;
 	auto-launch) AutoLaunch=yes;;
 	compile-only) CompileOnly=yes;;
+	*) echo "Invalid Option : $1"
+	   echo "Usage: $0 [no-strip] [auto-launch] [compile-only]"
+	   exit
     esac
     shift
 done
