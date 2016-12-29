@@ -1,0 +1,7 @@
+*.o
+/src/obj
+/GPATH
+/GRTAGS
+/GSYMS
+/GTAGS
+/calc
