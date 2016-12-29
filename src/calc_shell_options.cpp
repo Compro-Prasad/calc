@@ -443,8 +443,8 @@ signed char option_action(const char *action, char **action_args)
 #endif
 
 #ifdef SUM
-      else if (*action_args && *(action_args + 1) && *(action_args + 2) &&
-	       *(action_args + 3) && CHECK_OPTION_AMONG('S', "sum"))
+      else if (*action_args && action_args[1] && action_args[2] &&
+	       action_args[3] && CHECK_OPTION_AMONG('S', "sum"))
 	{
 	  long double lower_limit;
 	  unsigned long i = 0;
