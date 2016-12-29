@@ -433,6 +433,7 @@ signed char option_action(const char *action, char **action_args)
       else if (*action_args && CHECK_OPTION_AMONG('F', "factorize"))
 	{
 	  unsigned long i = 0;
+	  Input = *(action_args++);
 	  factorize(i);
 	  if (Error != "")
 	    return -1;
