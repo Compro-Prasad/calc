@@ -1,4 +1,6 @@
 *.o
+\#*
+*~
 /src/obj
 /GPATH
 /GRTAGS
