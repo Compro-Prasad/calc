@@ -1,5 +1,6 @@
 #include <math.h>
 #include <ctype.h>
+#include <stdio.h>
 #include <readline/history.h>
 
 #include <operators.hpp>
